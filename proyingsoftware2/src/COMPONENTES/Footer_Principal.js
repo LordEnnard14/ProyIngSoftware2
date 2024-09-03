@@ -9,7 +9,7 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 
 
 const Conteiner = styled(Box)(({ theme }) => ({
-  backgroundColor: '#C8D9E6', // Tono de amarillo más suave
+  backgroundColor: '#C8D9E6', 
   padding: theme.spacing(4),
   display: 'flex',
   justifyContent: 'space-between',

@@ -24,16 +24,16 @@ const BarradeBusqueda = () => {
             <IconButton
               onClick={handleSearch}
               sx={{ 
-                borderRadius: '50%', // Hacer el botón circular
-                backgroundColor: '#567C8D', // Fondo del botón
+                borderRadius: '50%',
+                backgroundColor: '#567C8D', 
                 '&:hover': {
-                  backgroundColor: '#4a6a7d', // Fondo del botón al pasar el mouse
+                  backgroundColor: '#4a6a7d', 
                 },
-                width: '40px', // Ancho del botón
-                height: '30px', // Alto del botón
-                padding: '0', // Eliminar padding
-                marginLeft: 1, // Espacio entre el campo de texto y el botón
-                border: 'none', // Eliminar el borde predeterminado           
+                width: '40px', 
+                height: '30px', 
+                padding: '0', 
+                marginLeft: 1, 
+                border: 'none',         
                 
               }}
             >
@@ -44,11 +44,11 @@ const BarradeBusqueda = () => {
         sx={{ 
             flexGrow: 1, 
             '& .MuiOutlinedInput-root': { 
-              borderRadius: '20px', // Redondear las esquinas del campo de texto
+              borderRadius: '20px', 
             },
             '& .MuiInputBase-input': {
-              height: '40px', // Ajustar la altura del campo de texto
-              padding: '0 14px', // Ajustar el padding para un mejor ajuste
+              height: '40px', 
+              padding: '0 14px', 
             },
           }}
         />
