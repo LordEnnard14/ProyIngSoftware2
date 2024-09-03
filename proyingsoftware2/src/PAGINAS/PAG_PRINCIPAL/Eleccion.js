@@ -3,9 +3,12 @@ import { Box, Grid, Button, Typography } from '@mui/material';
 import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
-
+import FooterPrincipal from '../../COMPONENTES/Footer_Principal';
+import HeaderPrincipal from '../../COMPONENTES/Header_Principal';
 const Eleccion = () => {
   return (
+    <>
+    <HeaderPrincipal/>
     <Box sx={{ 
       display: 'flex', 
       justifyContent: 'center', 
@@ -87,6 +90,8 @@ const Eleccion = () => {
         </Grid>
       </Box>
     </Box>
+    <FooterPrincipal/>
+    </>
   );
 };
 
