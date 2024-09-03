@@ -11,6 +11,10 @@ const Eleccion = () => {
       justifyContent: 'center', 
       alignItems: 'center', 
       height: '100vh', 
+      backgroundImage: 'url("https://static.vecteezy.com/system/resources/previews/006/712/964/non_2x/abstract-health-medical-science-healthcare-icon-digital-technology-doctor-concept-modern-innovation-treatment-medicine-on-hi-tech-future-blue-background-for-wallpaper-template-web-design-vector.jpg")', 
+      backgroundSize: 'cover', // Ajusta la imagen para cubrir el contenedor
+      backgroundRepeat: 'no-repeat', // Evita que la imagen se repita
+      backgroundPosition: 'center center', // Centra la imagen en el contenedor
       backgroundColor: '#F5EFEB', 
       color: '#00000', 
       textAlign: 'center' 
