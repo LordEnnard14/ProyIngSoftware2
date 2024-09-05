@@ -82,9 +82,9 @@ const Header1 = () => {
               <Button
                 variant="contained"
                 sx={{ marginLeft: 2, backgroundColor: '#567C8D', color: '#ffffff' }}
-                onClick={() => navigate('/iniciarsesion')}
+                onClick={() => navigate('/InicioSesion')}
               >
-                Mi Cuenta
+                Iniciar Sesión
               </Button>
             </Grow>
           </Toolbar>

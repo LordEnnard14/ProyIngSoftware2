@@ -5,7 +5,11 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import FooterPrincipal from '../../COMPONENTES/Footer_Principal';
 import HeaderPrincipal from '../../COMPONENTES/Header_Principal';
+import { useNavigate } from 'react-router-dom';
+
 const Eleccion = () => {
+  const navigate = useNavigate();
+
   return (
     <>
     <HeaderPrincipal/>
@@ -15,9 +19,9 @@ const Eleccion = () => {
       alignItems: 'center', 
       height: '100vh', 
       backgroundImage: 'url("https://static.vecteezy.com/system/resources/previews/006/712/964/non_2x/abstract-health-medical-science-healthcare-icon-digital-technology-doctor-concept-modern-innovation-treatment-medicine-on-hi-tech-future-blue-background-for-wallpaper-template-web-design-vector.jpg")', 
-      backgroundSize: 'cover', // Ajusta la imagen para cubrir el contenedor
-      backgroundRepeat: 'no-repeat', // Evita que la imagen se repita
-      backgroundPosition: 'center center', // Centra la imagen en el contenedor
+      backgroundSize: 'cover', 
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center center',
       backgroundColor: '#F5EFEB', 
       color: '#00000', 
       textAlign: 'center' 
@@ -38,6 +42,7 @@ const Eleccion = () => {
                   backgroundColor: '#486f99',
                 },
               }}
+              onClick={() => navigate('/BusquedaMedicina')} // Usa navigate para cambiar de página
             >
               <Box>
                 <LocalPharmacyIcon sx={{ fontSize: 50, color: '#ffffff' }} />
