@@ -42,7 +42,7 @@ const Eleccion = () => {
                   backgroundColor: '#486f99',
                 },
               }}
-              onClick={() => navigate('/BusquedaMedicina')} // Usa navigate para cambiar de página
+              onClick={() => navigate('/BusquedaMedicina')} 
             >
               <Box>
                 <LocalPharmacyIcon sx={{ fontSize: 50, color: '#ffffff' }} />
@@ -63,6 +63,7 @@ const Eleccion = () => {
                   backgroundColor: '#486f99',
                 },
               }}
+              onClick={() => navigate('/BoticasCercanas')}
             >
               <Box>
                 <StorefrontIcon sx={{ fontSize: 50, color: '#ffffff' }} />
