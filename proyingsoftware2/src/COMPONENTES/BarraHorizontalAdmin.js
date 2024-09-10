@@ -15,21 +15,26 @@ const BotonNavegacion = styled(Button)(({ theme }) => ({
 
 const BarraHorizontalAdmin = () => {
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#0057B7', borderRadius: '50px', mt: 2 }}>
-      <Toolbar sx={{ justifyContent: 'center' }}>
-        <Box>
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+      <AppBar position="static" sx={{ backgroundColor: '#4A90E2', borderRadius: '50px', maxWidth: '600px', width: '100%' }}>
+        <Toolbar sx={{ justifyContent: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
           <BotonNavegacion>
-            Usuarios registrados
-          </BotonNavegacion>
-          <BotonNavegacion>
-            Productos
-          </BotonNavegacion>
-          <BotonNavegacion>
-            Órdenes
-          </BotonNavegacion>
-        </Box>
-      </Toolbar>
-    </AppBar>
+              Dashboard
+            </BotonNavegacion>
+            <BotonNavegacion>
+              Usuarios registrados
+            </BotonNavegacion>
+            <BotonNavegacion>
+              Productos
+            </BotonNavegacion>
+            <BotonNavegacion>
+              Órdenes
+            </BotonNavegacion>
+          </Box>
+        </Toolbar>
+      </AppBar>
+    </Box>
   );
 };
 

@@ -13,16 +13,18 @@ const Dashboard = () => {
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#E0E0E0',
+            justifyContent: 'center', // Centra el texto horizontalmente
+            alignItems: 'center', // Centra el texto verticalmente
+            backgroundColor: '#D6E9FE', // Fondo color celeste
             padding: '10px 20px',
             borderRadius: '8px',
             mb: 4,
+            height: '50px' // Establece una altura fija si es necesario
           }}
         >
-          <Typography variant="h6">Dashboard</Typography>
-          <Typography variant="button">Cambiar Fecha o Periodo</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            Dashboard
+          </Typography>
         </Box>
 
         {/* Cuerpo del dashboard */}
@@ -37,7 +39,7 @@ const Dashboard = () => {
               }}
             >
               <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
-                68
+                69
               </Typography>
               <Typography variant="body1">Órdenes del día de hoy</Typography>
             </Paper>
@@ -53,7 +55,7 @@ const Dashboard = () => {
               }}
             >
               <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
-                12
+                69
               </Typography>
               <Typography variant="body1">Usuarios nuevos</Typography>
             </Paper>
@@ -69,7 +71,7 @@ const Dashboard = () => {
               }}
             >
               <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
-                S/ 13,500.00
+                69
               </Typography>
               <Typography variant="body1">Ingresos de hoy</Typography>
             </Paper>
