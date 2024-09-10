@@ -10,6 +10,7 @@ const Dashboard = () => {
       <BarraHorizontal />
 
       <Box sx={{ mt: 4, mx: 4 }}>
+        
         <Box
           sx={{
             display: 'flex',
@@ -77,6 +78,7 @@ const Dashboard = () => {
             </Paper>
           </Grid>
         </Grid>
+
       </Box>
     </div>
   );

@@ -11,6 +11,9 @@ import ResultadoBusqueda from './PAGINAS/BUSCAR_MEDICINAS/Resultado_Busqueda';
 //Vistas de administrador
 import Dashboard from './PAGINAS/ADMINISTRADOR/Dashboard';
 import Footer from './COMPONENTES/Footer_Principal'; 
+import OrdenesUsuario from './PAGINAS/ADMINISTRADOR/OrdenesUsuario'
+import AgregarProducto from './PAGINAS/ADMINISTRADOR/AgregarProductos'
+
 
 function App() {
   return (
@@ -32,7 +35,9 @@ function App() {
             <Route path="/detalles/:id" element={<DetallesProductos />} />
             <Route path="/ResultadoBusqueda" element={<ResultadoBusqueda />} />
             <Route path="/Dashboard" element={<Dashboard/>} />
-            
+            <Route path="/OrdenesUsuario" element={<OrdenesUsuario/>} />
+            <Route path="/AgregarProducto" element={<AgregarProducto/>} />
+
           </Routes>
         </Box>
         <Footer /> 
