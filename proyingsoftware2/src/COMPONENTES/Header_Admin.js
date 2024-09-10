@@ -36,7 +36,7 @@ const Header_Admin = () => {
         <AppBar position="static" sx={{ backgroundColor: '#FFFFFF' }} elevation={4}>
           <Toolbar sx={{ justifyContent: 'space-between' }}>
             <Box>
-              <Titulo_Boton>DosisXtra</Titulo_Boton>
+              <Titulo_Boton  onClick={() => navigate('/BusquedaMedicina')} >DosisXtra</Titulo_Boton>
             </Box>
 
             <Grow in={true} timeout={1000}>

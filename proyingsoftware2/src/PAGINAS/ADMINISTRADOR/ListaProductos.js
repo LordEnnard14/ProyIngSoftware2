@@ -2,8 +2,11 @@ import React from 'react';
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
 import HeaderAdmin from '../../COMPONENTES/Header_Admin';
 import BarraHorizontalAdmin from '../../COMPONENTES/BarraHorizontalAdmin';
+import { useNavigate } from 'react-router-dom';
 
 const ListaProductos = () => {
+  const navigate = useNavigate();
+
   // Datos simulados, puedes sustituirlos con datos de tu base de datos
   const productos = [
     { id: 1, nombre: 'Producto A', precio: 'S/ 50.00', fechaRegistro: '10/09/2023', stock: 100, estado: 'Disponible' },
@@ -13,6 +16,7 @@ const ListaProductos = () => {
   ];
 
   return (
+    
     <div>
       <HeaderAdmin />
       <BarraHorizontalAdmin />
@@ -31,6 +35,8 @@ const ListaProductos = () => {
           }}
         >
           <Typography variant="h6">Productos</Typography>
+          <Button onClick={() => navigate('/AgregarProducto')}  > Agregar Producto </Button>
+
         </Box>
 
         {/* Tabla de productos */}

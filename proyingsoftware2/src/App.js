@@ -13,6 +13,8 @@ import Dashboard from './PAGINAS/ADMINISTRADOR/Dashboard';
 import Footer from './COMPONENTES/Footer_Principal'; 
 import OrdenesUsuario from './PAGINAS/ADMINISTRADOR/OrdenesUsuario'
 import AgregarProducto from './PAGINAS/ADMINISTRADOR/AgregarProductos'
+import ListaUsuarios from './PAGINAS/ADMINISTRADOR/ListaUsuarios'
+import ListaProductos from './PAGINAS/ADMINISTRADOR/ListaProductos'
 
 
 function App() {
@@ -37,6 +39,8 @@ function App() {
             <Route path="/Dashboard" element={<Dashboard/>} />
             <Route path="/OrdenesUsuario" element={<OrdenesUsuario/>} />
             <Route path="/AgregarProducto" element={<AgregarProducto/>} />
+            <Route path="/ListaUsuarios" element={<ListaUsuarios/>} />
+            <Route path="/ListaProductos" element={<ListaProductos/>} />
 
           </Routes>
         </Box>

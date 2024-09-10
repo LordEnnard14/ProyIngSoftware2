@@ -1,100 +1,89 @@
 import HeaderAdmin from '../../COMPONENTES/Header_Admin'; 
-import BarraHorizontal from '../../COMPONENTES/BarraHorizontalAdmin'; 
-import React from 'react';
-import { Box, Typography, Grid, Paper, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Button } from '@mui/material';
+import BarraHorizontal from '../../COMPONENTES/BarraHorizontalAdmin';
+import React, { useState } from 'react';
+import { Box, Typography, Grid, Paper, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Button, Pagination } from '@mui/material';
 
-const OrdenesUsuario = () => {
-    return(
+const Ordenes = () => {
+    // Estado para controlar la búsqueda y las órdenes
+    const [busqueda, setBusqueda] = useState('');
+    const [ordenes, setOrdenes] = useState([
+        { id: 1, usuario: 'Juan Sanchez', fecha: '11/03/2023', total: 'S/125.00', correo: 'altavista@123.com', estado: 'Entregado' },
+        { id: 1, usuario: 'Juan Sanchez', fecha: '11/03/2023', total: 'S/125.00', correo: 'altavista@123.com', estado: 'Entregado' },
+        { id: 1, usuario: 'Juan Sanchez', fecha: '11/03/2023', total: 'S/125.00', correo: 'altavista@123.com', estado: 'Entregado' },
+        // Se pueden agregar más órdenes aquí...
+    ]);
+
+    const handleSearchChange = (e) => {
+        setBusqueda(e.target.value);
+    };
+
+    return (
         <div>
-            <HeaderAdmin/>
-            <BarraHorizontal/>
+            <HeaderAdmin />
+            <BarraHorizontal />
             <Box sx={{ mt: 4, mx: 4 }}>
 
-                {/* Sección de Detalle de Usuario Registrado */}
+                {/* Sección de Órdenes */}
                 <Box
                   sx={{
                     display: 'flex',
-                    justifyContent: 'center', // Centra el texto horizontalmente
-                    alignItems: 'center', // Centra el texto verticalmente
-                    backgroundColor: '#D6E9FE', // Fondo color celeste
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#D6E9FE',
                     padding: '10px 20px',
                     borderRadius: '8px',
                     mb: 4,
-                    height: '50px' // Establece una altura fija si es necesario
+                    height: '50px'
                   }}
                 >
                   <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                    Detalle de Usuario Registrado
+                    Órdenes
                   </Typography>
                 </Box>
 
-                {/* Información del usuario */}
-                <Paper
-                  elevation={4}
-                  sx={{
-                    padding: 2,
-                    mb: 4,
-                  }}
-                >
-                  <Typography variant="body1">
-                    <strong>ID:</strong> 12343
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Nombre:</strong> Juan Sánchez
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Correo:</strong> altavista@1234.com
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Fecha de Registro:</strong> 11/03/2021
-                  </Typography>
-                </Paper>
+                {/* Barra de búsqueda */}
+                <TextField
+                  fullWidth
+                  label="Buscar por nombre o apellido de usuario o nro de orden"
+                  variant="outlined"
+                  value={busqueda}
+                  onChange={handleSearchChange}
+                  sx={{ mb: 3 }}
+                />
 
-                {/* Tabla de Órdenes recientes */}
-                <Box sx={{ mb: 4 }}>
-                    <Typography variant="h6" sx={{ mb: 2 }}>
-                        Órdenes recientes (máximo 10)
-                    </Typography>
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell><strong>ID</strong></TableCell>
-                                    <TableCell><strong>Fecha de Orden</strong></TableCell>
-                                    <TableCell><strong>Total</strong></TableCell>
-                                    <TableCell><strong>Productos</strong></TableCell>
-                                    <TableCell><strong>Estado</strong></TableCell>
-                                    <TableCell><strong>Acciones</strong></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell>1</TableCell>
-                                    <TableCell>11/03/2023</TableCell>
-                                    <TableCell>S/125.00</TableCell>
-                                    <TableCell>13</TableCell>
-                                    <TableCell>Pendiente</TableCell>
+                {/* Tabla de Órdenes */}
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell><strong>ID</strong></TableCell>
+                                <TableCell><strong>Usuario</strong></TableCell>
+                                <TableCell><strong>Fecha de Orden</strong></TableCell>
+                                <TableCell><strong>Total</strong></TableCell>
+                                <TableCell><strong>Correo</strong></TableCell>
+                                <TableCell><strong>Estado</strong></TableCell>
+                                <TableCell><strong>Acciones</strong></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {ordenes.map((orden, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{orden.id}</TableCell>
+                                    <TableCell>{orden.usuario}</TableCell>
+                                    <TableCell>{orden.fecha}</TableCell>
+                                    <TableCell>{orden.total}</TableCell>
+                                    <TableCell>{orden.correo}</TableCell>
+                                    <TableCell>{orden.estado}</TableCell>
                                     <TableCell><Button variant="contained" color="primary">Ver</Button></TableCell>
                                 </TableRow>
-                                <TableRow>
-                                    <TableCell>1</TableCell>
-                                    <TableCell>11/03/2023</TableCell>
-                                    <TableCell>S/125.00</TableCell>
-                                    <TableCell>1</TableCell>
-                                    <TableCell>Por Enviar</TableCell>
-                                    <TableCell><Button variant="contained" color="primary">Ver</Button></TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell>1</TableCell>
-                                    <TableCell>11/03/2023</TableCell>
-                                    <TableCell>S/125.00</TableCell>
-                                    <TableCell>4</TableCell>
-                                    <TableCell>Entregado</TableCell>
-                                    <TableCell><Button variant="contained" color="primary">Ver</Button></TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                {/* Paginación */}
+                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+                    <Pagination count={11} page={2} color="primary" />
                 </Box>
 
             </Box>
@@ -102,4 +91,4 @@ const OrdenesUsuario = () => {
     );
 };
 
-export default OrdenesUsuario;
+export default Ordenes;
