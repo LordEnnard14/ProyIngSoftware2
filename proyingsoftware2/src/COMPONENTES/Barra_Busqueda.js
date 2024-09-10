@@ -8,7 +8,13 @@ const BarradeBusqueda = () => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    navigate(`/resultado`, { state: { query: searchTerm } });
+    navigate(`/ResultadoBusqueda`, { state: { query: searchTerm } });
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -19,6 +25,7 @@ const BarradeBusqueda = () => {
         fullWidth
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyDown={handleKeyDown}
         InputProps={{
           endAdornment: (
             <IconButton
@@ -34,7 +41,6 @@ const BarradeBusqueda = () => {
                 padding: '0', 
                 marginLeft: 1, 
                 border: 'none',         
-                
               }}
             >
               <SearchIcon sx={{ color: '#ffffff' }} />
