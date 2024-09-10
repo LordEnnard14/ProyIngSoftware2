@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Grid, Paper } from '@mui/material';
 import HeaderAdmin from '../../COMPONENTES/Header_Admin'; // Asegúrate de importar el Header correcto
 import BarraHorizontal from '../../COMPONENTES/BarraHorizontalAdmin'; // Barra de navegación creada previamente
-
+import ContenidoDashboard from '../ADMINISTRADOR/ContenidoDashboard';
 const Dashboard = () => {
   return (
     <div>
@@ -29,56 +29,7 @@ const Dashboard = () => {
         </Box>
 
         {/* Cuerpo del dashboard */}
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <Paper
-              elevation={4}
-              sx={{
-                backgroundColor: '#D6E9FE', // Color azul claro
-                padding: 4,
-                textAlign: 'center',
-              }}
-            >
-              <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
-                69
-              </Typography>
-              <Typography variant="body1">Órdenes del día de hoy</Typography>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Paper
-              elevation={4}
-              sx={{
-                backgroundColor: '#D6E9FE', // Color azul claro
-                padding: 4,
-                textAlign: 'center',
-              }}
-            >
-              <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
-                69
-              </Typography>
-              <Typography variant="body1">Usuarios nuevos</Typography>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Paper
-              elevation={4}
-              sx={{
-                backgroundColor: '#D6E9FE', // Color azul claro
-                padding: 4,
-                textAlign: 'center',
-              }}
-            >
-              <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
-                69
-              </Typography>
-              <Typography variant="body1">Ingresos de hoy</Typography>
-            </Paper>
-          </Grid>
-        </Grid>
-
+        <ContenidoDashboard/>
       </Box>
     </div>
   );
