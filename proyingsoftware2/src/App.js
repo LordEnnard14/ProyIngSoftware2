@@ -1,10 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Eleccion from './PAGINAS/PAG_PRINCIPAL/Eleccion';
 import InicioSesion from './PAGINAS/REGISTROS/InicioSesion';
 import Registro from './PAGINAS/REGISTROS/Registro';
-import BusquedaMedicina from './PAGINAS/PAG_PRINCIPAL/BusquedaMedicina';
+import BusquedaMedicina from './PAGINAS/BUSCAR_MEDICINAS/BusquedaMedicina';
 import BoticasCercanas from './PAGINAS/BOTICAS_CERCANAS/BoticasCercanas';
 
 function App() {
