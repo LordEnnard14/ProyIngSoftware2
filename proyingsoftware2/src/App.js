@@ -8,7 +8,9 @@ import BusquedaMedicina from './PAGINAS/BUSCAR_MEDICINAS/BusquedaMedicina';
 import BoticasCercanas from './PAGINAS/BOTICAS_CERCANAS/BoticasCercanas';
 import DetallesProductos from './PAGINAS/BUSCAR_MEDICINAS/Detalles';
 import ResultadoBusqueda from './PAGINAS/BUSCAR_MEDICINAS/Resultado_Busqueda';
-import Footer from './COMPONENTES/Footer_Principal'; // Importa tu Footer
+//Vistas de administrador
+import Dashboard from './PAGINAS/ADMINISTRADOR/Dashboard';
+import Footer from './COMPONENTES/Footer_Principal'; 
 
 function App() {
   return (
@@ -29,6 +31,7 @@ function App() {
             <Route path="/BoticasCercanas" element={<BoticasCercanas />} />
             <Route path="/detalles/:id" element={<DetallesProductos />} />
             <Route path="/ResultadoBusqueda" element={<ResultadoBusqueda />} />
+            <Route path="/Dashboard" element={<Dashboard/>} />
             
           </Routes>
         </Box>
