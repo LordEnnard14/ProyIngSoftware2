@@ -16,12 +16,12 @@ const ListaProductos = () => {
   ];
 
   return (
-    
-    <div>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <HeaderAdmin />
       <BarraHorizontalAdmin />
 
-      <Box sx={{ mt: 4, mx: 4 }}>
+      {/* Contenido principal con flexGrow para ocupar el resto del espacio disponible */}
+      <Box sx={{ flexGrow: 1, mx: 4, mt: 4 }}>
         {/* Caja de "Productos" similar a la de "Usuarios Registrados" */}
         <Box
           sx={{
@@ -35,12 +35,11 @@ const ListaProductos = () => {
           }}
         >
           <Typography variant="h6">Productos</Typography>
-          <Button onClick={() => navigate('/AgregarProducto')}  > Agregar Producto </Button>
-
+          <Button onClick={() => navigate('/AgregarProducto')}> Agregar Producto </Button>
         </Box>
 
         {/* Tabla de productos */}
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ height: '100%' }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -76,7 +75,7 @@ const ListaProductos = () => {
           </Table>
         </TableContainer>
       </Box>
-    </div>
+    </Box>
   );
 };
 

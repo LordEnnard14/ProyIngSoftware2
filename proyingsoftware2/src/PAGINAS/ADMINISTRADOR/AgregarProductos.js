@@ -29,11 +29,11 @@ const AgregarProducto = () => {
     };
 
     return(
-        <div>
+        <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
             <HeaderAdmin/>
             <BarraHorizontal/>
-            <Box sx={{ mt: 4, mx: 4 }}>
-
+            <Box sx={{ flex: 1, mt: 4, mx: 4, overflow: 'auto' }}>
+                
                 {/* Sección de Agregar Producto */}
                 <Box
                   sx={{
@@ -53,122 +53,128 @@ const AgregarProducto = () => {
                 </Box>
 
                 {/* Formulario para agregar producto */}
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={4}>
-                        <Paper
-                          elevation={4}
-                          sx={{
-                            backgroundColor: '#F5F5F5', // Fondo gris claro
-                            padding: 2,
-                            height: '100%', // Asegura que el Paper ocupe todo el espacio
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                            {/* Imagen del Producto */}
-                            <Button variant="outlined" component="label">
-                                Agregar Imagen
-                                <input type="file" hidden />
-                            </Button>
-                        </Paper>
-                    </Grid>
+                <Grid container spacing={3} sx={{ flex: 1 }}>
+                <Grid container spacing={3} sx={{ height: '100%' }}>
+    <Grid item xs={12} md={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Paper
+          elevation={4}
+          sx={{
+            backgroundColor: '#F5F5F5', // Fondo gris claro
+            padding: 2,
+            flexGrow: 1, // Esto permite que el Paper ocupe todo el espacio disponible dentro del Grid
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+            {/* Imagen del Producto */}
+            <Button variant="outlined" component="label">
+                Agregar Imagen
+                <input type="file" hidden />
+            </Button>
+        </Paper>
+    </Grid>
 
-                    <Grid item xs={12} md={8}>
-                        <Paper
-                          elevation={4}
-                          sx={{
-                            backgroundColor: '#F5F5F5', // Fondo gris claro
-                            padding: 4
-                          }}
-                        >
-                            {/* Nombre */}
-                            <TextField
-                              fullWidth
-                              label="Nombre"
-                              name="nombre"
-                              value={producto.nombre}
-                              onChange={handleChange}
-                              sx={{ mb: 2 }}
-                            />
+    <Grid item xs={12} md={8} sx={{ display: 'flex', flexDirection: 'column' }}>
+        <Paper
+          elevation={4}
+          sx={{
+            backgroundColor: '#F5F5F5', // Fondo gris claro
+            padding: 4,
+            flexGrow: 1, // Esto permite que el Paper ocupe todo el espacio disponible dentro del Grid
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+            {/* Nombre */}
+            <TextField
+              fullWidth
+              label="Nombre"
+              name="nombre"
+              value={producto.nombre}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
 
-                            {/* Descripción */}
-                            <TextField
-                              fullWidth
-                              label="Descripción"
-                              name="descripcion"
-                              value={producto.descripcion}
-                              onChange={handleChange}
-                              sx={{ mb: 2 }}
-                            />
+            {/* Descripción */}
+            <TextField
+              fullWidth
+              label="Descripción"
+              name="descripcion"
+              value={producto.descripcion}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
 
-                            {/* Características */}
-                            <TextField
-                              fullWidth
-                              label="Características"
-                              name="caracteristicas"
-                              value={producto.caracteristicas}
-                              onChange={handleChange}
-                              multiline
-                              rows={3}
-                              sx={{ mb: 2 }}
-                            />
+            {/* Características */}
+            <TextField
+              fullWidth
+              label="Características"
+              name="caracteristicas"
+              value={producto.caracteristicas}
+              onChange={handleChange}
+              multiline
+              rows={3}
+              sx={{ mb: 2 }}
+            />
 
-                            {/* Marca, Serie, Precio */}
-                            <Grid container spacing={2}>
-                                <Grid item xs={4}>
-                                    <TextField
-                                      fullWidth
-                                      label="Precio"
-                                      name="precio"
-                                      value={producto.precio}
-                                      onChange={handleChange}
-                                      InputProps={{
-                                        startAdornment: <Typography sx={{ mr: 1 }}>S/</Typography>,
-                                      }}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                      fullWidth
-                                      label="Tipo"
-                                      name="tipo"
-                                      value={producto.tipo}
-                                      onChange={handleChange}
-                                    />
-                                </Grid>
-                            </Grid>
+            {/* Marca, Serie, Precio */}
+            <Grid container spacing={2}>
+                <Grid item xs={4}>
+                    <TextField
+                      fullWidth
+                      label="Precio"
+                      name="precio"
+                      value={producto.precio}
+                      onChange={handleChange}
+                      InputProps={{
+                        startAdornment: <Typography sx={{ mr: 1 }}>S/</Typography>,
+                      }}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      label="Tipo"
+                      name="tipo"
+                      value={producto.tipo}
+                      onChange={handleChange}
+                    />
+                </Grid>
+            </Grid>
 
-                            {/* Tipo, Stock */}
-                            <Grid container spacing={2} sx={{ mt: 2 }}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                      fullWidth
-                                      label="Stock"
-                                      name="stock"
-                                      value={producto.stock}
-                                      onChange={handleChange}
-                                    />
-                                </Grid>
-                            </Grid>
+            {/* Tipo, Stock */}
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      label="Stock"
+                      name="stock"
+                      value={producto.stock}
+                      onChange={handleChange}
+                    />
+                </Grid>
+            </Grid>
 
-                            {/* Botón Guardar */}
-                            <Box sx={{ mt: 4, textAlign: 'right' }}>
-                                <Button 
-                                  variant="contained" 
-                                  color="primary"
-                                  onClick={handleSubmit}
-                                  sx={{ backgroundColor: 'black' }} // Fondo negro para el botón
-                                >
-                                    Guardar
-                                </Button>
-                            </Box>
-                        </Paper>
-                    </Grid>
+            {/* Botón Guardar */}
+            <Box sx={{ mt: 'auto', textAlign: 'right' }}>
+                <Button 
+                  variant="contained" 
+                  color="primary"
+                  onClick={handleSubmit}
+                  sx={{ backgroundColor: 'black' }} // Fondo negro para el botón
+                >
+                    Guardar
+                </Button>
+            </Box>
+        </Paper>
+    </Grid>
+</Grid>
+
                 </Grid>
 
             </Box>
-        </div>
+        </Box>
     );
 };
 

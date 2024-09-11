@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Grid } from '@mui/material';
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
 import HeaderAdmin from '../../COMPONENTES/Header_Admin';
 import BarraHorizontalAdmin from '../../COMPONENTES/BarraHorizontalAdmin';
 
@@ -12,12 +12,14 @@ const ListaUsuarios = () => {
   ];
 
   return (
-    <div>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Header fijo */}
       <HeaderAdmin />
+      
       <BarraHorizontalAdmin />
 
-      <Box sx={{ mt: 4, mx: 4 }}>
-
+      {/* Cuerpo ajustado */}
+      <Box sx={{ flexGrow: 1, mx: 4, mt: 4, overflow: 'auto' }}>
         <Box
           sx={{
             display: 'flex',
@@ -32,6 +34,7 @@ const ListaUsuarios = () => {
           <Typography variant="h6">Usuarios Registrados</Typography>
         </Box>
 
+        {/* Tabla con usuarios */}
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -68,7 +71,7 @@ const ListaUsuarios = () => {
           </Table>
         </TableContainer>
       </Box>
-    </div>
+    </Box>
   );
 };
 
