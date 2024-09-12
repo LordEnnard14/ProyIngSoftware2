@@ -45,6 +45,7 @@ const Header1 = () => {
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
+  const [cartItemCount, setCartItemCount] = useState(0);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -55,13 +56,27 @@ const Header1 = () => {
       setLoggedIn(false);
       setUserName('');
     }
-  }, [loggedIn]); // Dependencia en `loggedIn` para actualizar el estado después del cierre de sesión
+
+    // Actualiza el conteo de elementos del carrito
+    const updateCartCount = () => {
+      const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      setCartItemCount(cartItems.length);
+    };
+
+    updateCartCount(); // Inicializar el conteo
+
+    // Escuchar el evento personalizado
+    window.addEventListener('cartUpdated', updateCartCount);
+
+    // Limpiar el listener cuando el componente se desmonta
+    return () => window.removeEventListener('cartUpdated', updateCartCount);
+  }, [loggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    setLoggedIn(false); // Actualiza el estado para reflejar que el usuario ha cerrado sesión
-    setUserName(''); // Borra el nombre del usuario
-    navigate('/InicioSesion'); // Redirige a la página de inicio de sesión
+    setLoggedIn(false);
+    setUserName('');
+    navigate('/InicioSesion');
   };
 
   const handleNavigate = (path, section) => {
@@ -89,6 +104,26 @@ const Header1 = () => {
             
             <IconButton onClick={() => handleNavigate('/CarritoCompras')} sx={{ color: '#2F4156' }}>
               <ShoppingCartIcon />
+              {cartItemCount > 0 && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    backgroundColor: '#FF0000',
+                    color: '#FFFFFF',
+                    borderRadius: '50%',
+                    width: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '12px',
+                  }}
+                >
+                  {cartItemCount}
+                </Box>
+              )}
             </IconButton>
 
             <Grow in={true} timeout={1300}>

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, TextField, Button, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Grid, MenuItem, Select } from '@mui/material';
 import HeaderAdmin from '../../COMPONENTES/Header_Admin';
-import BarraHorizontalAdmin from '../../COMPONENTES/BarraHorizontalAdmin';
 
 const PaginaPago = () => {
   const [metodoEntrega, setMetodoEntrega] = useState('recojo');  // Controla el método de entrega
@@ -10,6 +9,13 @@ const PaginaPago = () => {
   const [errorTarjeta, setErrorTarjeta] = useState('');  // Mensaje de error para la tarjeta
   const [cvv, setCvv] = useState('');  // CVV
   const [errorCvv, setErrorCvv] = useState('');  // Mensaje de error para el CVV
+  const [productos, setProductos] = useState([]);  // Productos del carrito
+
+  useEffect(() => {
+    // Leer productos del carrito desde localStorage
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    setProductos(cartItems);
+  }, []);
 
   const handleMetodoEntregaChange = (event) => {
     setMetodoEntrega(event.target.value);
@@ -19,14 +25,11 @@ const PaginaPago = () => {
     setBotica(event.target.value);
   };
 
-  // Función de validación para el número de tarjeta
   const validarNumeroTarjeta = (numero) => {
     const visaMastercardRegex = /^4[0-9]{12}(?:[0-9]{3})?$|^5[1-5][0-9]{14}$/; // Visa o Mastercard
     const amexRegex = /^3[47][0-9]{13}$/; // American Express
 
-    if (visaMastercardRegex.test(numero)) {
-      setErrorTarjeta('');
-    } else if (amexRegex.test(numero)) {
+    if (visaMastercardRegex.test(numero) || amexRegex.test(numero)) {
       setErrorTarjeta('');
     } else {
       setErrorTarjeta('Número de tarjeta inválido. Visa/Mastercard: 16 dígitos, American Express: 15 dígitos');
@@ -39,7 +42,6 @@ const PaginaPago = () => {
     validarNumeroTarjeta(numero);
   };
 
-  // Función de validación para el CVV
   const validarCvv = (numeroCvv) => {
     const visaMastercardRegex = /^4[0-9]{12}(?:[0-9]{3})?$|^5[1-5][0-9]{14}$/; // Visa o Mastercard
     const amexRegex = /^3[47][0-9]{13}$/; // American Express
@@ -68,16 +70,35 @@ const PaginaPago = () => {
     validarCvv(cvvValue);
   };
 
-  // Simulación de productos en el carrito (para el resumen)
-  const productos = [
-    { id: 1, nombre: 'Producto A', precio: 50.00, cantidad: 2 },
-    { id: 2, nombre: 'Producto B', precio: 30.00, cantidad: 1 },
-    { id: 3, nombre: 'Producto C', precio: 45.00, cantidad: 3},
-  ];
-
-  // Calcular el total
   const calcularTotal = () => {
     return productos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0).toFixed(2);
+  };
+
+  const handleFinalizarCompra = () => {
+    // Validar que toda la información necesaria esté completa
+    if (!metodoEntrega) {
+      alert('Selecciona un método de entrega.');
+      return;
+    }
+
+    if (metodoEntrega === 'recojo' && !botica) {
+      alert('Selecciona una botica para el recojo.');
+      return;
+    }
+
+    if (!numeroTarjeta || errorTarjeta) {
+      alert('Ingrese un número de tarjeta válido.');
+      return;
+    }
+
+    if (!cvv || errorCvv) {
+      alert('Ingrese un CVV válido.');
+      return;
+    }
+
+    // Aquí se puede manejar la lógica para finalizar la compra, como enviar datos al servidor o actualizar el estado
+    alert('Compra realizada con éxito!');
+    // Redirigir a una página de confirmación o finalizar el proceso
   };
 
   return (
@@ -85,7 +106,6 @@ const PaginaPago = () => {
       <HeaderAdmin />
       
       <Box sx={{ flexGrow: 1, mx: 4, mt: 4 }}>
-        {/* Título del Pago */}
         <Box
           sx={{
             display: 'flex',
@@ -100,12 +120,11 @@ const PaginaPago = () => {
           <Typography variant="h6">Proceso de Pago</Typography>
         </Box>
 
-        {/* Resumen del pedido */}
         <Paper sx={{ padding: '20px', mb: 4 }}>
           <Typography variant="h6">Resumen del Pedido</Typography>
           {productos.map((producto) => (
             <Box key={producto.id} sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-              <Typography>{producto.nombre} (x{producto.cantidad})</Typography>
+              <Typography>{producto.name} (x{producto.cantidad})</Typography>
               <Typography>S/ {(producto.precio * producto.cantidad).toFixed(2)}</Typography>
             </Box>
           ))}
@@ -115,7 +134,6 @@ const PaginaPago = () => {
           </Box>
         </Paper>
 
-        {/* Información del cliente */}
         <Paper sx={{ padding: '20px', mb: 4 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>Información del Cliente</Typography>
           <Grid container spacing={2}>
@@ -131,7 +149,6 @@ const PaginaPago = () => {
           </Grid>
         </Paper>
 
-        {/* Método de entrega */}
         <Paper sx={{ padding: '20px', mb: 4 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>Método de Entrega</Typography>
           <FormControl component="fieldset">
@@ -146,7 +163,6 @@ const PaginaPago = () => {
             </RadioGroup>
           </FormControl>
 
-          {/* Selección de botica */}
           {metodoEntrega === 'recojo' && (
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle1">Selecciona la Botica para Recojo:</Typography>
@@ -168,7 +184,6 @@ const PaginaPago = () => {
           )}
         </Paper>
 
-        {/* Información de pago */}
         <Paper sx={{ padding: '20px', mb: 4 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>Método de Pago</Typography>
           <Grid container spacing={2}>
@@ -202,9 +217,14 @@ const PaginaPago = () => {
           </Grid>
         </Paper>
 
-        {/* Botón de finalizar compra */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <Button variant="contained" color="primary" sx={{ width: '50%' }} disabled={!!errorTarjeta || !!errorCvv}>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ width: '50%' }}
+            onClick={handleFinalizarCompra}
+            disabled={!!errorTarjeta || !!errorCvv}
+          >
             Finalizar Compra
           </Button>
         </Box>

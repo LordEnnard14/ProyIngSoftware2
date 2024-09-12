@@ -1,30 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, IconButton, TextField, Grid, Divider } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HeaderAdmin from '../../COMPONENTES/Header_Admin';
 
-
 const CarritoCompras = () => {
-  const [productos, setProductos] = useState([
-    { id: 1, nombre: 'Producto A', precio: 50.00, cantidad: 2, imagen: 'https://via.placeholder.com/100' },
-    { id: 2, nombre: 'Producto B', precio: 30.00, cantidad: 1, imagen: 'https://via.placeholder.com/100' },
-    { id: 3, nombre: 'Producto C', precio: 45.00, cantidad: 3, imagen: 'https://via.placeholder.com/100' },
-  ]);
+  const [productos, setProductos] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    setProductos(cartItems);
+  }, []);
+
   const handleEliminarProducto = (id) => {
-    setProductos(productos.filter(producto => producto.id !== id));
+    const updatedProducts = productos.filter(producto => producto.id !== id);
+    setProductos(updatedProducts);
+    localStorage.setItem('cartItems', JSON.stringify(updatedProducts));
   };
 
   const handleCantidadChange = (id, nuevaCantidad) => {
-    setProductos(productos.map(producto =>
-      producto.id === id ? { ...producto, cantidad: nuevaCantidad } : producto
-    ));
+    const cantidad = parseInt(nuevaCantidad, 10);
+    if (isNaN(cantidad) || cantidad < 1) return;
+
+    const updatedProducts = productos.map(producto =>
+      producto.id === id ? { ...producto, cantidad } : producto
+    );
+    setProductos(updatedProducts);
+    localStorage.setItem('cartItems', JSON.stringify(updatedProducts));
   };
 
   const calcularSubtotal = () => {
-    return productos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0).toFixed(2);
+    return productos.reduce((total, producto) => {
+      const precio = producto.precio || 0;
+      const cantidad = producto.cantidad || 0;
+      return total + (precio * cantidad);
+    }, 0).toFixed(2);
   };
+
   const handleNavigate = (path, section) => {
     navigate(path);
     if (section) {
@@ -33,12 +46,12 @@ const CarritoCompras = () => {
       }, 0);
     }
   };
+
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <HeaderAdmin />
 
       <Box sx={{ flexGrow: 1, mx: 4, mt: 4 }}>
-        {/* Título */}
         <Box
           sx={{
             display: 'flex',
@@ -53,7 +66,6 @@ const CarritoCompras = () => {
           <Typography variant="h6">Carrito de Compras</Typography>
         </Box>
 
-        {/* Tabla de productos */}
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
             <TableContainer component={Paper}>
@@ -72,20 +84,24 @@ const CarritoCompras = () => {
                   {productos.map((producto) => (
                     <TableRow key={producto.id}>
                       <TableCell>
-                        <img src={producto.imagen} alt={producto.nombre} style={{ width: '100px', height: '100px' }} />
+                        <img
+                          src={producto.image || 'https://via.placeholder.com/100'}
+                          alt={producto.name || 'Nombre no disponible'}
+                          style={{ width: '100px', height: '100px' }}
+                        />
                       </TableCell>
-                      <TableCell>{producto.nombre}</TableCell>
-                      <TableCell>S/ {producto.precio.toFixed(2)}</TableCell>
+                      <TableCell>{producto.name || 'Nombre no disponible'}</TableCell>
+                      <TableCell>S/ {(producto.precio || 0).toFixed(2)}</TableCell>
                       <TableCell>
                         <TextField
                           type="number"
-                          value={producto.cantidad}
+                          value={producto.cantidad || 1}
                           onChange={(e) => handleCantidadChange(producto.id, e.target.value)}
                           inputProps={{ min: 1 }}
                           sx={{ width: '60px' }}
                         />
                       </TableCell>
-                      <TableCell>S/ {(producto.precio * producto.cantidad).toFixed(2)}</TableCell>
+                      <TableCell>S/ {((producto.precio || 0) * (producto.cantidad || 1)).toFixed(2)}</TableCell>
                       <TableCell>
                         <IconButton onClick={() => handleEliminarProducto(producto.id)}>
                           <DeleteIcon color="error" />
@@ -98,7 +114,6 @@ const CarritoCompras = () => {
             </TableContainer>
           </Grid>
 
-          {/* Resumen del carrito */}
           <Grid item xs={12} md={4}>
             <Paper sx={{ padding: '20px' }}>
               <Typography variant="h6">Resumen del Pedido</Typography>
@@ -116,7 +131,7 @@ const CarritoCompras = () => {
               <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => handleNavigate('/PaginaPago')}>
                 Proceder al Pago
               </Button>
-              <Button variant="outlined" color="secondary" fullWidth sx={{ mt: 2 }}>
+              <Button variant="outlined" color="secondary" fullWidth sx={{ mt: 2 }} onClick={() => handleNavigate('/')}>
                 Seguir Comprando
               </Button>
             </Paper>
