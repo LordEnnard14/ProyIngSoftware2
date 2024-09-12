@@ -70,7 +70,7 @@ const Header1 = () => {
               <BarraBusqueda />
             </Box>
             
-            <IconButton onClick={() => handleNavigate('/carritocompra')} sx={{ color: '#2F4156' }}>
+            <IconButton onClick={() => handleNavigate('/CarritoCompras')} sx={{ color: '#2F4156' }}>
               <ShoppingCartIcon />
             </IconButton>
             <Grow in={true} timeout={1300}>

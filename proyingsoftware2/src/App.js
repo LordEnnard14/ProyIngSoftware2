@@ -8,6 +8,8 @@ import BusquedaMedicina from './PAGINAS/BUSCAR_MEDICINAS/BusquedaMedicina';
 import BoticasCercanas from './PAGINAS/BOTICAS_CERCANAS/BoticasCercanas';
 import DetallesProductos from './PAGINAS/BUSCAR_MEDICINAS/Detalles';
 import ResultadoBusqueda from './PAGINAS/BUSCAR_MEDICINAS/Resultado_Busqueda';
+import CarritoCompras from './PAGINAS/CARRITO_COMPRAS/CarritoCompras';
+import PaginaPago from './PAGINAS/CARRITO_COMPRAS/PaginaPago';
 //Vistas de administrador
 import Dashboard from './PAGINAS/ADMINISTRADOR/Dashboard';
 import Footer from './COMPONENTES/Footer_Principal'; 
@@ -41,10 +43,11 @@ function App() {
             <Route path="/AgregarProducto" element={<AgregarProducto/>} />
             <Route path="/ListaUsuarios" element={<ListaUsuarios/>} />
             <Route path="/ListaProductos" element={<ListaProductos/>} />
-
+            <Route path="/CarritoCompras" element={<CarritoCompras/>} />
+            <Route path='/PaginaPago' element={<PaginaPago/>}/>
           </Routes>
         </Box>
-        <Footer /> 
+       
       </Box>
     </Router>
   );
