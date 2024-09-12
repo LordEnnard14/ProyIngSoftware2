@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -9,12 +9,11 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Slide from '@mui/material/Slide';
 import Grow from '@mui/material/Grow';
-import BarraBusqueda from './Barra_Busqueda'
+import Typography from '@mui/material/Typography';
+import BarraBusqueda from './Barra_Busqueda';
 
 const Barra = styled('div')(({ theme }) => ({
   flexGrow: 1,
-  
-  
 }));
 
 const Titulo_Boton = styled(Button)(({ theme }) => ({
@@ -39,13 +38,31 @@ const Navegar = styled(Button)(({ theme }) => ({
   '&:hover': {
     color: '#2F4156',
     transform: 'scale(1.1)',
-    
-    
   },
 }));
 
 const Header1 = () => {
   const navigate = useNavigate();
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setLoggedIn(true);
+      setUserName(`${user.nombres} ${user.apellidos}`);
+    } else {
+      setLoggedIn(false);
+      setUserName('');
+    }
+  }, [loggedIn]); // Dependencia en `loggedIn` para actualizar el estado después del cierre de sesión
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setLoggedIn(false); // Actualiza el estado para reflejar que el usuario ha cerrado sesión
+    setUserName(''); // Borra el nombre del usuario
+    navigate('/InicioSesion'); // Redirige a la página de inicio de sesión
+  };
 
   const handleNavigate = (path, section) => {
     navigate(path);
@@ -73,20 +90,37 @@ const Header1 = () => {
             <IconButton onClick={() => handleNavigate('/CarritoCompras')} sx={{ color: '#2F4156' }}>
               <ShoppingCartIcon />
             </IconButton>
+
             <Grow in={true} timeout={1300}>
               <Navegar onClick={() => handleNavigate('/ayuda')}>
                 Ayuda
               </Navegar>
             </Grow>
-            <Grow in={true} timeout={1500}>
-              <Button
-                variant="contained"
-                sx={{ marginLeft: 2, backgroundColor: '#567C8D', color: '#ffffff' }}
-                onClick={() => navigate('/InicioSesion')}
-              >
-                Iniciar Sesión
-              </Button>
-            </Grow>
+
+            {loggedIn ? (
+              <>
+                <Typography sx={{ marginLeft: 2, color: '#000000' }}>
+                  {userName}
+                </Typography>
+                <Button
+                  variant="contained"
+                  sx={{ marginLeft: 2, backgroundColor: '#567C8D', color: '#ffffff' }}
+                  onClick={handleLogout}
+                >
+                  Cerrar Sesión
+                </Button>
+              </>
+            ) : (
+              <Grow in={true} timeout={1500}>
+                <Button
+                  variant="contained"
+                  sx={{ marginLeft: 2, backgroundColor: '#567C8D', color: '#ffffff' }}
+                  onClick={() => navigate('/InicioSesion')}
+                >
+                  Iniciar Sesión
+                </Button>
+              </Grow>
+            )}
           </Toolbar>
         </AppBar>
       </Slide>
