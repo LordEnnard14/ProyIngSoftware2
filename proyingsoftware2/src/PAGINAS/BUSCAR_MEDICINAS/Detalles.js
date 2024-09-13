@@ -8,12 +8,10 @@ import productos from '../BUSCAR_MEDICINAS/productosData';
 const DetalleProducto = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
   const [product, setProduct] = useState(null);
   const [cantidad, setCantidad] = useState(1);
 
   useEffect(() => {
-    // Buscar el producto usando el id
     const selectedProduct = productos.find(product => product.id === id);
     if (selectedProduct) {
       setProduct(selectedProduct);
@@ -27,7 +25,9 @@ const DetalleProducto = () => {
       const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
       cartItems.push({ ...product, cantidad });
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
-      navigate('/carrito');
+      // Notificar a otros componentes
+      const event = new Event('cartUpdated');
+      window.dispatchEvent(event);
     }
   };
 
@@ -55,8 +55,8 @@ const DetalleProducto = () => {
               alignItems="center"
               sx={{
                 borderRadius: 5,
-                overflow: 'hidden', // Asegura que la imagen no se salga del contenedor
-                backgroundColor: '#f0f0f0', // Color de fondo para cuando la imagen no se carga
+                overflow: 'hidden',
+                backgroundColor: '#f0f0f0',
               }}
             >
               <img
@@ -66,11 +66,11 @@ const DetalleProducto = () => {
                   maxWidth: '100%',
                   maxHeight: '100%',
                   objectFit: 'contain',
-                  display: 'block', // Elimina el espacio blanco alrededor de la imagen
+                  display: 'block',
                 }}
                 onError={(e) => {
-                  e.target.onerror = null; // Evita bucles de error
-                  e.target.src = '/path/to/default-image.png'; // Imagen por defecto
+                  e.target.onerror = null;
+                  e.target.src = '/path/to/default-image.png';
                 }}
               />
             </Box>

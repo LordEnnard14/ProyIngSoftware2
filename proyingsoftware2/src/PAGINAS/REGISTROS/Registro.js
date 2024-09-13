@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TextField, Grid, Button, Box, Typography, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Header2 from '../../COMPONENTES/Header_2'; // Importa el componente Header_2
@@ -8,10 +8,29 @@ import { blue } from '@mui/material/colors';
 const Registro = () => {
 
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    nombres: '',
+    apellidos: '',
+    email: '',
+    celular: '',
+    password: '',
+    confirmarPassword: ''
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Aquí puedes manejar el envío del formulario, por ejemplo, enviando los datos al backend.
+    // Almacena los datos en localStorage
+    localStorage.setItem('user', JSON.stringify(formData));
+    console.log('Datos guardados en localStorage:', formData);
+    navigate('/BusquedaMedicina');
   };
 
   return (
