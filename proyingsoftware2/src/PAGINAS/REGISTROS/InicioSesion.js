@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import Header2 from '../../COMPONENTES/Header_2'; 
 import './IScss.css'
 
-
 const InicioSesion = () => {
   const navigate = useNavigate();
 
