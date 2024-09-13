@@ -1,7 +1,8 @@
 import React from 'react';
 import { TextField, Grid, Button, Box, Typography, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Header2 from '../../COMPONENTES/Header_2';
+import Header2 from '../../COMPONENTES/Header_2'; 
+import './IScss.css'
 
 const InicioSesion = () => {
   const navigate = useNavigate();
@@ -25,25 +26,36 @@ const InicioSesion = () => {
   };
 
   return (
-    <div>
-      <Header2 />
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+    <section id="BodyOne">
+      <Header2/>
+      <Box className="RectanguloBase">
         <form onSubmit={handleSubmit}>
-          <Typography variant="h5" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
-            Ingrese sus datos
+          <div>
+          <Typography variant="h5" gutterBottom align="center" sx={{ fontWeight: 'bold', color: 'white', marginBottom:'100px', fontSize:'30px'}}>
+            Iniciar Sesión
           </Typography>
+          </div>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid sx={{width:'100%'}}>
               <TextField
                 name="email"  // Nombre del campo
                 fullWidth
                 label="Correo electrónico"
                 variant="outlined"
                 required
-                InputProps={{ style: { borderRadius: 50 } }}
+                InputProps={{ style: { borderRadius: 50, backgroundColor: 'white' } }}
+                InputLabelProps={{
+                  sx: {
+                    '&.Mui-focused': {
+                      top: '-20px',  // Mueve la etiqueta cuando está enfocada
+                      fontSize: '1.4rem', // Cambia el tamaño cuando está enfocada
+                      color: 'white'
+                    }
+                  }
+                }}
               />
-            </Grid>
-            <Grid item xs={12}>
+            </Grid> 
+            <Grid sx={{marginTop: '50px', width:'100%', marginBottom: '5px'}}>
               <TextField
                 name="password"  // Nombre del campo
                 fullWidth
@@ -51,28 +63,45 @@ const InicioSesion = () => {
                 variant="outlined"
                 required
                 type="password"
-                InputProps={{ style: { borderRadius: 50 } }}
+                InputProps={{ style: { borderRadius: 50, backgroundColor: 'white' } }}
+                InputLabelProps={{
+                  sx: {
+                    '&.Mui-focused': {
+                      top: '-20px',  // Mueve la etiqueta cuando está enfocada
+                      fontSize: '1.4rem', // Cambia el tamaño cuando está enfocada
+                      color: 'white'
+                  }}
+                }}
+                
               />
             </Grid>
             <Grid item xs={12}>
+              
+              <div className='divolvide'>
+                <a className='olvide' href=''>
+                  Olvidé mi contraseña
+                </a>
+              </div>
+
               <Button
                 fullWidth
                 type="submit"
                 variant="contained"
-                sx={{ backgroundColor: '#567C8D', color: '#ffffff', borderRadius: 50 }}
+                sx={{ fontSize:'17px', backgroundColor: '#28639B', color: '#ffffff', borderRadius: 20, width: '50%', display: 'flex' ,marginRight: 'auto', marginLeft: 'auto', height: '50px', width: '100%'}}
               >
-                Iniciar Sesión
+                <b>Entrar</b>
               </Button>
             </Grid>
           </Grid>
-          <Box mt={2} textAlign="center">
-            <Link onClick={() => navigate('/Registro')} sx={{ textDecoration: 'none' }}>
-              ¿Aún no tienes cuenta? Regístrate aquí
-            </Link>
+          <Box mt={2} className="RA">
+            <p>¿Aún no tienes cuenta?</p>
+            <a onClick={() => navigate('/Registro')}>
+              <b>Regístrate aquí</b>
+            </a>
           </Box>
         </form>
       </Box>
-    </div>
+    </section>
   );
 };
 
