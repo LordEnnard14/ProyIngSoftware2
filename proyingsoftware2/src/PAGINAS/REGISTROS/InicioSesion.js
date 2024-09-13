@@ -3,6 +3,7 @@ import { TextField, Grid, Button, Box, Typography, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Header2 from '../../COMPONENTES/Header_2'; 
 import './IScss.css'
+import Footer from '../../COMPONENTES/Footer_Principal';
 
 const InicioSesion = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const InicioSesion = () => {
   };
 
   return (
+    <>
     <section id="BodyOne">
       <Header2/>
       <Box className="RectanguloBase">
@@ -102,6 +104,8 @@ const InicioSesion = () => {
         </form>
       </Box>
     </section>
+    <Footer/>
+    </>
   );
 };
 

@@ -3,6 +3,7 @@ import { TextField, Grid, Button, Box, Typography, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Header2 from '../../COMPONENTES/Header_2'; // Importa el componente Header_2
 import './Rcss.css'
+import Footer from '../../COMPONENTES/Footer_Principal';
 import { blue } from '@mui/material/colors';
 
 const Registro = () => {
@@ -190,6 +191,7 @@ const Registro = () => {
           </form>
         </Box>
     </section>
+    <Footer/>
     </>
   );
 };
