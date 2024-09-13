@@ -4,12 +4,26 @@ import { useNavigate } from 'react-router-dom';
 import Header2 from '../../COMPONENTES/Header_2'; 
 import './IScss.css'
 
+
 const InicioSesion = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-   
+    event.preventDefault(); // Evita que la página se recargue
+    
+    const formData = new FormData(event.target); // Captura los datos del formulario
+    const email = formData.get('email'); // Obtiene el valor del campo "email"
+    const password = formData.get('password'); // Obtiene el valor del campo "password"
+    
+    const storedUser = JSON.parse(localStorage.getItem('user')); // Recupera los datos almacenados en localStorage
+    
+    // Verifica si el correo y la contraseña coinciden con los datos almacenados
+    if (storedUser && storedUser.email === email && storedUser.password === password) {
+      alert('Inicio de sesión exitoso');
+      navigate('/BusquedaMedicina'); // Redirige a la página deseada
+    } else {
+      alert('Correo o contraseña incorrectos');
+    }
   };
 
   return (
@@ -25,8 +39,9 @@ const InicioSesion = () => {
           <Grid container spacing={2}>
             <Grid sx={{width:'100%'}}>
               <TextField
+                name="email"  // Nombre del campo
                 fullWidth
-                label="Nombre de usuario"
+                label="Correo electrónico"
                 variant="outlined"
                 required
                 InputProps={{ style: { borderRadius: 50, backgroundColor: 'white' } }}
@@ -43,6 +58,7 @@ const InicioSesion = () => {
             </Grid> 
             <Grid sx={{marginTop: '50px', width:'100%', marginBottom: '5px'}}>
               <TextField
+                name="password"  // Nombre del campo
                 fullWidth
                 label="Contraseña"
                 variant="outlined"

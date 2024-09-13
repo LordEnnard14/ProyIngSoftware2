@@ -45,7 +45,7 @@ const BusquedaMedicina = () => {
                     S/. {producto.price}
                   </Typography>
                   <Button variant="contained" color="primary" sx={{ borderRadius: '20px', backgroundColor: '#4a6a7d' }}>
-                    Agregar al carrito
+                    VER MÁS
                   </Button>
                 </Paper>
               </Link>
