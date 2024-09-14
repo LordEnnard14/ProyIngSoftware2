@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../database/database.js';
-import { Usuario } from './Usuario.js';
+import { Usuario } from './Usuario';
 export const Orden = sequelize.define('Orden', {
     id: {
         type: DataTypes.INTEGER,
@@ -11,20 +11,23 @@ export const Orden = sequelize.define('Orden', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
     },
+    subTotal: {
+        type: DataTypes.FLOAT
+    },
+    impuestos: {
+        type: DataTypes.FLOAT
+    },
     total: {
         type: DataTypes.FLOAT
     },
     estado: {
         type: DataTypes.STRING
     },
-    metodoEnvio: {
-        type: DataTypes.STRING
+    costoEnvio: {
+        type: DataTypes.FLOAT
     },
-    metodoPago: {
+    direccionEnvio: {
         type: DataTypes.STRING
-    },
-    direccion: {
-        type: DataTypes.ARRAY(DataTypes.STRING)
     },usuarioId: {
         type: DataTypes.INTEGER,
         references: {
