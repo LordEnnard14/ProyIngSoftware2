@@ -6,6 +6,7 @@ import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import HeaderPrincipal from '../../COMPONENTES/Header_Principal';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../COMPONENTES/Footer_Principal';
+import NavegacionMedicinas from '../../COMPONENTES/NavegacionMedicinas';
 
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -26,6 +27,7 @@ const Eleccion = () => {
   return (
     <>
       <HeaderPrincipal/>
+      <NavegacionMedicinas />
       <Carousel responsive={responsiveWall} infinite={true} autoPlay={true} autoPlaySpeed={3000} showDots={true} draggable={false}>
       <div className="Wall">
           <img src={'https://images-1.eucerin.com/~/media/eucerin%20relaunch%20media/eucerin/local/latam/2024/especiales/proteccion-solar-que-va-contigo/cambios-cl/banner_sun_face_range_hero-desktop.gif'}/>
