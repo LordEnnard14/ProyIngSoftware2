@@ -1,0 +1,62 @@
+
+.Wall{
+    padding-bottom: 20px;
+}
+
+.Wall img{
+    height: 400px;
+    width: 100%;
+    object-fit: cover;
+
+}
+
+.medicinasbton {
+    width: 400px;
+    height: 500px;
+    background-color:aliceblue; /* Fondo inicial con transparencia */
+    background-image: url('../../imagenes/ImgIconos/Medicinas.jpg');
+    background-blend-mode:luminosity;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: grid;
+    transition: background-color 0.2s ease /* Transición */
+}
+
+.medicinasbton:hover {
+    background-color: #486f99; 
+}
+
+.boticasbton {
+    width: 400px;
+    height: 500px;
+    background-color:aliceblue; /* Fondo inicial con transparencia */
+    background-image: url('../../imagenes/ImgIconos/Boticas.jpg');
+    background-blend-mode:luminosity;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: grid;
+    transition: background-color 0.2s ease /* Transición */
+}
+
+.boticasbton:hover {
+    background-color: #486f99; 
+}
+
+.consultasbton {
+    width: 400px;
+    height: 500px;
+    background-image: url('../../imagenes/ImgIconos/Asistencia.png');
+    background-blend-mode: luminosity;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: grid;
+    transition: background-color 0.2s ease /* Transición */
+}
+
+.consultasbton:hover {
+    background-color: #5b7da1; 
+}
+
