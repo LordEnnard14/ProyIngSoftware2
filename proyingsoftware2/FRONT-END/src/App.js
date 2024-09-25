@@ -12,12 +12,15 @@ import CarritoCompras from './PAGINAS/CARRITO_COMPRAS/CarritoCompras';
 import PaginaPago from './PAGINAS/CARRITO_COMPRAS/PaginaPago';
 //Vistas de administrador
 import Dashboard from './PAGINAS/ADMINISTRADOR/Dashboard';
-import Footer from './COMPONENTES/Footer_Principal'; 
 import OrdenesUsuario from './PAGINAS/ADMINISTRADOR/OrdenesUsuario'
 import AgregarProducto from './PAGINAS/ADMINISTRADOR/AgregarProductos'
 import ListaUsuarios from './PAGINAS/ADMINISTRADOR/ListaUsuarios'
 import ListaProductos from './PAGINAS/ADMINISTRADOR/ListaProductos'
-
+//Vistas de Botica
+import AgregarProductoBotica from './PAGINAS/USUARIO_BOTICA/AgregarProductoBotica';
+import DashboardBotica from './PAGINAS/USUARIO_BOTICA/DashboardBotica';
+import ListaProductosBotica from './PAGINAS/USUARIO_BOTICA/ListaProductoBotica';
+import OrdenesBotica from './PAGINAS/USUARIO_BOTICA/OrdenesBotica';
 
 function App() {
   return (
@@ -45,6 +48,10 @@ function App() {
             <Route path="/ListaProductos" element={<ListaProductos/>} />
             <Route path="/CarritoCompras" element={<CarritoCompras/>} />
             <Route path='/PaginaPago' element={<PaginaPago/>}/>
+            <Route path='/AgregarProductoBotica' element={<AgregarProductoBotica/>}/>
+            <Route path='/DashboardBotica' element={<DashboardBotica/>}/>
+            <Route path='/ListaProductosBotica' element={<ListaProductosBotica/>}/>
+            <Route path='/OrdenesBotica' element={<OrdenesBotica/>}/>
           </Routes>
         </Box>
        
