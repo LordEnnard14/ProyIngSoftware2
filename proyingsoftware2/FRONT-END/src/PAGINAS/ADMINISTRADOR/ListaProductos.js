@@ -3,7 +3,7 @@ import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, Ta
 import HeaderAdmin from '../../COMPONENTES/Header_Admin';
 import BarraHorizontalAdmin from '../../COMPONENTES/BarraHorizontalAdmin';
 import { useNavigate } from 'react-router-dom';
-
+import ContenidoTablaProductoAdmin from './ContenidoTablas/ContenidoListaProductoAdmin';
 const ListaProductos = () => {
   const navigate = useNavigate();
 
@@ -54,22 +54,7 @@ const ListaProductos = () => {
             </TableHead>
             <TableBody>
               {productos.map((producto) => (
-                <TableRow key={producto.id}>
-                  <TableCell>{producto.id}</TableCell>
-                  <TableCell>{producto.nombre}</TableCell>
-                  <TableCell>{producto.precio}</TableCell>
-                  <TableCell>{producto.fechaRegistro}</TableCell>
-                  <TableCell>{producto.stock}</TableCell>
-                  <TableCell>{producto.estado}</TableCell>
-                  <TableCell>
-                    <Button size="small" sx={{ mr: 1 }} color="primary">Ver</Button>
-                    {producto.estado === 'Disponible' ? (
-                      <Button size="small" color="secondary">Desactivar</Button>
-                    ) : (
-                      <Button size="small" color="primary">Activar</Button>
-                    )}
-                  </TableCell>
-                </TableRow>
+               <ContenidoTablaProductoAdmin key={producto.id} producto={producto}/> 
               ))}
             </TableBody>
           </Table>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
 import HeaderAdmin from '../../COMPONENTES/Header_Admin';
 import BarraHorizontalAdmin from '../../COMPONENTES/BarraHorizontalAdmin';
+import ContenidoListaUsuariosAdmin from './ContenidoTablas/ContenidoListaUsuariosAdmin';
 
 const ListaUsuarios = () => {
   const usuarios = [
@@ -49,23 +50,8 @@ const ListaUsuarios = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {usuarios.map((usuario) => (
-                <TableRow key={usuario.id}>
-                  <TableCell>{usuario.id}</TableCell>
-                  <TableCell>{usuario.nombre}</TableCell>
-                  <TableCell>{usuario.apellido}</TableCell>
-                  <TableCell>{usuario.correo}</TableCell>
-                  <TableCell>{usuario.fechaRegistro}</TableCell>
-                  <TableCell>{usuario.estado}</TableCell>
-                  <TableCell>
-                    <Button size="small" sx={{ mr: 1 }} color="primary">Ver</Button>
-                    {usuario.estado === 'Activo' ? (
-                      <Button size="small" color="secondary">Desactivar</Button>
-                    ) : (
-                      <Button size="small" color="primary">Activar</Button>
-                    )}
-                  </TableCell>
-                </TableRow>
+            {usuarios.map((usuario) => (
+               <ContenidoListaUsuariosAdmin key={usuario.id} usuario={usuario}/> 
               ))}
             </TableBody>
           </Table>

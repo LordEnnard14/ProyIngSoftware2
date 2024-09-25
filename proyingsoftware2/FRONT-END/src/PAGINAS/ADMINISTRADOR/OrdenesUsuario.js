@@ -1,5 +1,6 @@
 import HeaderAdmin from '../../COMPONENTES/Header_Admin'; 
 import BarraHorizontal from '../../COMPONENTES/BarraHorizontalAdmin';
+import ContenidoOrdenesUsuarioAdmin from './ContenidoTablas/ContenidoOrdenesUsuarioAdmin';
 import React, { useState } from 'react';
 import { Box, Typography, Paper, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Button, Pagination } from '@mui/material';
 
@@ -69,16 +70,9 @@ const Ordenes = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {ordenes.map((orden, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{orden.id}</TableCell>
-                                    <TableCell>{orden.usuario}</TableCell>
-                                    <TableCell>{orden.fecha}</TableCell>
-                                    <TableCell>{orden.total}</TableCell>
-                                    <TableCell>{orden.correo}</TableCell>
-                                    <TableCell>{orden.estado}</TableCell>
-                                    <TableCell><Button variant="contained" color="primary">Ver</Button></TableCell>
-                                </TableRow>
+                            {ordenes.map((orden) => (
+                                <ContenidoOrdenesUsuarioAdmin key={orden.id} orden={orden} 
+                                />
                             ))}
                         </TableBody>
                     </Table>
