@@ -1,6 +1,6 @@
 import Header_Botica from '../../COMPONENTES/Header_Botica';
 import BarraHorizontalBotica from '../../COMPONENTES/BarraHorizontalBotica';
-import ContenidoTablaOrdenesBotica from './ContenidoTablas/ContenidoTablaOrdenesBotica';
+import ContenidoTablaOrdenesBotica from '../USUARIO_BOTICA/Contenido Tablas/ContenidoTablaOrdenesBotica';
 import React, { useState } from 'react';
 import { Box, Typography, Paper, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Button, Pagination } from '@mui/material';
 

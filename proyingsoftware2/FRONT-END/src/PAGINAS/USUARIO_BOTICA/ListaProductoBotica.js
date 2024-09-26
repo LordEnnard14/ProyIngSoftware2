@@ -3,8 +3,7 @@ import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, Ta
 import Header_Botica from '../../COMPONENTES/Header_Botica';
 import BarraHorizontalBotica from '../../COMPONENTES/BarraHorizontalBotica';
 import { useNavigate } from 'react-router-dom';
-import ContenidoTablaProductoBotica from './ContenidoTablas/ContenidoTablaProductoBotica';
-
+import ContenidoTablaProductoBotica from '../USUARIO_BOTICA/Contenido Tablas/ContenidoTablaProductoBotica';
 const ListaProductosBotica = () => {
   const navigate = useNavigate();
 
