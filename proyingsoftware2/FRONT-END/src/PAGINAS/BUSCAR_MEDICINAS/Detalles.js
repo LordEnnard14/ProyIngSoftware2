@@ -81,7 +81,7 @@ const DetalleProducto = () => {
                 <Box borderBottom={1} borderColor="black" pb={1} mb={1}>
                   <Typography variant="h6">DISPONIBLE</Typography>
                 </Box>
-                <Typography variant="h4" color="black" fontWeight="bold">S/{product.price?.toFixed(2)}</Typography>
+                <Typography variant="h4" color="black" fontWeight="bold">S/{product.precio?.toFixed(2)}</Typography>
                 <Button variant="contained" style={{ marginTop: 8, backgroundColor: '#4a6a7d', color: '#ffffff' }} onClick={handleAddToCart}>
                   AÑADIR AL CARRITO
                 </Button>

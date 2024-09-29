@@ -26,128 +26,171 @@ const productos = [
     id: '1',
     image: amoxicilina, 
     name: 'Amoxicilina 500 mg', 
-    description: 'Antibiótico de amplio espectro utilizado para tratar diversas infecciones bacterianas, como infecciones respiratorias, del oído y del tracto urinario.' 
+    description: 'Antibiótico de amplio espectro utilizado para tratar infecciones.',
+    caracteristicas: ['Antibiótico', '500 mg', 'Cápsulas'],
+    precio: 12.50
   },
   { 
     id: '2',
     image: aspirina, 
     name: 'Aspirina 100 mg', 
-    description: 'Medicamento antiinflamatorio no esteroideo (AINE) usado para aliviar el dolor, reducir la inflamación y bajar la fiebre. También se usa en dosis bajas para prevenir ataques cardíacos y accidentes cerebrovasculares.' 
+    description: 'AINE usado para aliviar el dolor y prevenir accidentes cerebrovasculares.',
+    caracteristicas: ['Anti-inflamatorio', '100 mg', 'Tabletas'],
+    precio: 4.00
   },
   { 
     id: '3',
     image: azitromicina, 
     name: 'Azitromicina 500 mg', 
-    description: 'Antibiótico macrólido utilizado para tratar infecciones bacterianas en el tracto respiratorio, piel y tejidos blandos, así como algunas infecciones de transmisión sexual.' 
+    description: 'Antibiótico utilizado para tratar infecciones bacterianas.',
+    caracteristicas: ['Antibiótico', '500 mg', 'Tabletas'],
+    precio: 25.00
   },
   { 
     id: '4',
     image: cetirizina, 
     name: 'Cetirizina 10 mg', 
-    description: 'Antihistamínico usado para aliviar los síntomas de alergias estacionales y perennes, como estornudos, secreción nasal, picazón y ojos llorosos.' 
+    description: 'Antihistamínico para aliviar síntomas de alergias.',
+    caracteristicas: ['Antihistamínico', '10 mg', 'Tabletas'],
+    precio: 8.00
   },
   { 
     id: '5',
     image: clonazepam, 
     name: 'Clonazepam 0.5 mg', 
-    description: 'Medicamento ansiolítico y anticonvulsivo de la clase de las benzodiazepinas, utilizado para tratar trastornos de ansiedad y ciertos tipos de convulsiones.' 
+    description: 'Ansiolítico y anticonvulsivo para tratar la ansiedad y convulsiones.',
+    caracteristicas: ['Ansiolítico', '0.5 mg', 'Tabletas'],
+    precio: 15.00
   },
   { 
     id: '6',
     image: diazepam, 
     name: 'Diazepam 5 mg', 
-    description: 'Benzodiazepina usada para tratar la ansiedad, los espasmos musculares y como sedante antes de procedimientos médicos. También se usa para tratar el síndrome de abstinencia alcohólica.' 
+    description: 'Benzodiazepina usada para tratar la ansiedad y espasmos musculares.',
+    caracteristicas: ['Ansiolítico', '5 mg', 'Tabletas'],
+    precio: 10.00
   },
   { 
     id: '7',
     image: diclofenaco, 
     name: 'Diclofenaco 50 mg', 
-    description: 'AINE utilizado para reducir el dolor, la inflamación y la fiebre en condiciones como artritis, dolor muscular y dolor postoperatorio.' 
+    description: 'AINE para reducir el dolor y la inflamación.',
+    caracteristicas: ['Anti-inflamatorio', '50 mg', 'Tabletas'],
+    precio: 7.00
   },
   { 
     id: '8',
     image: enalapril, 
     name: 'Enalapril 10 mg', 
-    description: 'Inhibidor de la enzima convertidora de angiotensina (ECA) usado para tratar la hipertensión arterial y la insuficiencia cardíaca.' 
+    description: 'Inhibidor de ECA para tratar la hipertensión.',
+    caracteristicas: ['Antihipertensivo', '10 mg', 'Tabletas'],
+    precio: 6.50
   },
   { 
     id: '9',
     image: furosemida, 
     name: 'Furosemida 40 mg', 
-    description: 'Diurético de asa utilizado para tratar la retención de líquidos y la hipertensión, al promover la eliminación de sodio y agua del cuerpo.' 
+    description: 'Diurético usado para tratar la retención de líquidos.',
+    caracteristicas: ['Diurético', '40 mg', 'Tabletas'],
+    precio: 5.00
   },
   { 
     id: '10',
     image: gluconatoCalcio, 
     name: 'Gluconato de calcio 500 mg', 
-    description: 'Suplemento de calcio utilizado para prevenir o tratar la deficiencia de calcio en el cuerpo, esencial para la salud ósea y dental.' 
+    description: 'Suplemento de calcio para la salud ósea y dental.',
+    caracteristicas: ['Suplemento', '500 mg', 'Tabletas'],
+    precio: 12.00
   },
   { 
     id: '11',
     image: ibuprofeno, 
     name: 'Ibuprofeno 400 mg', 
-    description: 'AINE usado para aliviar el dolor, reducir la inflamación y bajar la fiebre. Se usa comúnmente para dolor de cabeza, dolor muscular y dolor menstrual.' 
+    description: 'AINE para el dolor y la inflamación.',
+    caracteristicas: ['Anti-inflamatorio', '400 mg', 'Tabletas'],
+    precio: 5.50
   },
   { 
     id: '12',
     image: insulina, 
     name: 'Insulina glargina', 
-    description: 'Insulina de acción prolongada utilizada para el tratamiento de la diabetes tipo 1 y tipo 2, ayudando a controlar los niveles de glucosa en sangre.' 
+    description: 'Insulina de acción prolongada para tratar la diabetes.',
+    caracteristicas: ['Insulina', 'Inyección', 'Acción prolongada'],
+    precio: 90.00
   },
   { 
     id: '13',
     image: loratadina, 
     name: 'Loratadina 10 mg', 
-    description: 'Antihistamínico no sedante utilizado para aliviar los síntomas de la rinitis alérgica y urticaria.' 
+    description: 'Antihistamínico no sedante para rinitis alérgica y urticaria.',
+    caracteristicas: ['Antihistamínico', '10 mg', 'Tabletas'],
+    precio: 6.00
   },
   { 
     id: '14',
     image: losartan, 
     name: 'Losartán 50 mg', 
-    description: 'Antagonista de los receptores de angiotensina II usado para tratar la hipertensión arterial y reducir el riesgo de accidente cerebrovascular en pacientes con hipertensión.' 
+    description: 'Antagonista de angiotensina para la hipertensión.',
+    caracteristicas: ['Antihipertensivo', '50 mg', 'Tabletas'],
+    precio: 14.00
   },
   { 
     id: '15',
     image: metformina, 
     name: 'Metformina 850 mg', 
-    description: 'Medicamento utilizado para controlar los niveles de azúcar en sangre en pacientes con diabetes tipo 2, mejorando la sensibilidad a la insulina.' 
+    description: 'Medicamento para controlar el azúcar en pacientes con diabetes.',
+    caracteristicas: ['Antidiabético', '850 mg', 'Tabletas'],
+    precio: 18.00
   },
   { 
     id: '16',
     image: omeprazol, 
     name: 'Omeprazol 20 mg', 
-    description: 'Inhibidor de la bomba de protones usado para tratar el reflujo gastroesofágico, úlceras gástricas y esofagitis por reflujo.' 
+    description: 'Inhibidor de la bomba de protones para tratar el reflujo.',
+    caracteristicas: ['Antiácido', '20 mg', 'Tabletas'],
+    precio: 10.00
   },
   { 
     id: '17',
     image: paracetamol, 
     name: 'Paracetamol 500 mg', 
-    description: 'Medicamento utilizado para aliviar el dolor y reducir la fiebre. Es comúnmente usado para dolores de cabeza, dolores musculares y fiebre.' 
+    description: 'Medicamento para aliviar el dolor y reducir la fiebre.',
+    caracteristicas: ['Analgésico', '500 mg', 'Tabletas'],
+    precio: 4.50
   },
   { 
     id: '18',
     image: prednisona, 
     name: 'Prednisona 5 mg', 
-    description: 'Corticosteroide utilizado para reducir la inflamación y tratar una variedad de condiciones médicas, como enfermedades autoinmunes, alergias y ciertos tipos de cáncer.' 
+    description: 'Corticosteroide para reducir la inflamación.',
+    caracteristicas: ['Anti-inflamatorio', '5 mg', 'Tabletas'],
+    precio: 6.00
   },
   { 
     id: '19',
     image: ranitidina, 
     name: 'Ranitidina 150 mg', 
-    description: 'Antagonista de los receptores H2 de histamina utilizado para tratar úlceras gástricas, reflujo gastroesofágico y otros trastornos relacionados con la producción de ácido en el estómago.' 
+    description: 'Antagonista de histamina para tratar el reflujo y úlceras.',
+    caracteristicas: ['Antiácido', '150 mg', 'Tabletas'],
+    precio: 8.00
   },
   { 
     id: '20',
     image: salbutamol, 
     name: 'Salbutamol 100 mcg', 
-    description: 'Broncodilatador utilizado para aliviar los síntomas del asma y otras enfermedades pulmonares obstructivas, como la EPOC.' 
+    description: 'Broncodilatador para el asma y otras enfermedades pulmonares.',
+    caracteristicas: ['Broncodilatador', '100 mcg', 'Inhalador'],
+    precio: 18.50
   },
   { 
     id: '21',
     image: simvastatina, 
     name: 'Simvastatina 20 mg', 
-    description: 'Estatina utilizada para reducir los niveles de colesterol LDL en sangre, ayudando a prevenir enfermedades cardiovasculares.' 
-  },
+    description: 'Estatina para reducir el colesterol LDL.',
+    caracteristicas: ['Reductor de colesterol', '20 mg', 'Tabletas'],
+    precio: 15.00
+  }
 ];
+
 
 export default productos;

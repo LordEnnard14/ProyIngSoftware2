@@ -57,8 +57,10 @@ const ResultadoBusqueda = () => {
                       {producto.name}
                     </Typography>
                     <Typography variant="h6" component="div" sx={{ color: '#4CAF50', fontWeight: 'bold' }}>
-                      S/. {producto.price}
-                    </Typography>
+  S/. {producto.precio.toFixed(2)} {/* Asegúrate de que la propiedad se llame 'precio' */}
+</Typography>
+
+
                     <Button
                       variant="contained"
                       color="primary"
