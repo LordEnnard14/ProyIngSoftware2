@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import { sequelize } from '../database/database.js';
+import { sequelize } from '../Database/database.js';
 export const Botica = sequelize.define('Botica', {
     id: {
         type: DataTypes.INTEGER,
@@ -7,7 +7,7 @@ export const Botica = sequelize.define('Botica', {
         autoIncrement: true
     },
     ruc: {
-        type = DataTypes.INTEGER
+        type: DataTypes.INTEGER
     },
     nombreBotica: {
         type: DataTypes.STRING

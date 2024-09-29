@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import { sequelize } from '../database/database.js';
+import { sequelize } from '../Database/database.js';
 import { Presentacion } from './Presentacion.js';
 import { Marca } from './Marca.js';
 export const Producto = sequelize.define('Producto', {
