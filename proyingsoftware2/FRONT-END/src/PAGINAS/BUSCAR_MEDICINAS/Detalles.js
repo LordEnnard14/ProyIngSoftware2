@@ -3,22 +3,33 @@ import { Container, Grid, Box, Typography, Button, Link } from '@mui/material';
 import Header1 from '../../COMPONENTES/Header_Principal';
 import CantidadProducto from '../BUSCAR_MEDICINAS/DETALLES/Cantidad';
 import { useNavigate, useParams } from 'react-router-dom';
-import productos from '../BUSCAR_MEDICINAS/productosData';
 
 const DetalleProducto = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [cantidad, setCantidad] = useState(1);
+  const [loading, setLoading] = useState(true); // Estado de carga
 
   useEffect(() => {
-    const selectedProduct = productos.find(product => product.id === id);
-    if (selectedProduct) {
-      setProduct(selectedProduct);
-    } else {
-      navigate('/404');
+    async function fetchProduct() {
+      setLoading(true); // Inicia el estado de carga
+      try {
+        const response = await fetch(`http://localhost:4000/api/productos/detalle/${id}`);
+        if (!response.ok) {
+          throw new Error('Error al obtener los datos del producto');
+        }
+        const producto = await response.json();
+        // Asegúrate de actualizar imageUrl con la ruta completa del servidor si no lo has hecho ya
+        setProduct({ ...producto, imageUrl: `http://localhost:4000/api/productos${producto.image}` });
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false); // Finaliza el estado de carga
+      }
     }
-  }, [id, navigate]);
+    fetchProduct();
+  }, [id]);
 
   const handleAddToCart = () => {
     if (product) {
@@ -34,8 +45,12 @@ const DetalleProducto = () => {
   const aumentarCantidad = () => setCantidad(cantidad + 1);
   const disminuirCantidad = () => cantidad > 1 && setCantidad(cantidad - 1);
 
+  if (loading) {
+    return <div>Loading...</div>; // Muestra "Loading..." si está cargando
+  }
+
   if (!product) {
-    return <div>Loading...</div>;
+    return <div>No se encontró el producto.</div>; // Muestra mensaje si no hay producto
   }
 
   return (
@@ -60,7 +75,7 @@ const DetalleProducto = () => {
               }}
             >
               <img
-                src={product.image}
+                src={product.imageUrl} // Asegúrate de usar imageUrl
                 alt={product.name}
                 style={{
                   maxWidth: '100%',
@@ -70,7 +85,7 @@ const DetalleProducto = () => {
                 }}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '/path/to/default-image.png';
+                  e.target.src = '/path/to/default-image.png'; // Ruta de la imagen por defecto
                 }}
               />
             </Box>

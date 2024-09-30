@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Grid, Paper, Typography, Button } from '@mui/material';
-import { Link } from 'react-router-dom'; // Importa el componente Link
+import { Link } from 'react-router-dom';
 import Header1 from '../../COMPONENTES/Header_Principal';
 import NavegacionMedicinas from '../../COMPONENTES/NavegacionMedicinas';
 import Footer from '../../COMPONENTES/Footer_Principal';
-import productos from '../BUSCAR_MEDICINAS/productosData';
 
 const BusquedaMedicina = () => {
+  const [productos, setProductos] = useState([]); 
+
   const StyleDivImg = {
     margin: 'auto',
     height: '200px',
@@ -18,11 +19,38 @@ const BusquedaMedicina = () => {
     marginBottom: '20px',
   };
 
-  const NombreSytle = {
+  const NombreStyle = {
     fontSize: '18px',
     color: 'rgb(1, 33, 61)',
     marginBottom: '10px',
   };
+
+  const fetchData = async () => {
+  try {
+    const respuesta = await fetch('http://localhost:4000/api/productos/productoAll'); 
+    const resultado = await respuesta.json();
+
+    
+    const baseUrl = `http://localhost:4000/api/productos/`;
+    const productosConImagenes = resultado.map(producto => {
+      const imageUrl = `${baseUrl}${producto.image}`;
+      console.log(imageUrl); 
+      return {
+        ...producto,
+        image: imageUrl 
+      };
+    });
+
+    setProductos(productosConImagenes); 
+  } catch (error) {
+    console.error('Error al obtener productos:', error);
+  }
+};
+
+
+  useEffect(() => {
+    fetchData(); 
+  }, []);
 
   return (
     <div>
@@ -41,7 +69,7 @@ const BusquedaMedicina = () => {
             <Grid item xs={12} sm={6} md={3} key={producto.id}>
               <Link
                 to={`/detalles/${producto.id}`}
-                style={{ textDecoration: 'none' }} // Elimina el subrayado del enlace
+                style={{ textDecoration: 'none' }}
               >
                 <Paper
                   sx={{
@@ -71,7 +99,7 @@ const BusquedaMedicina = () => {
                   <Typography
                     variant="h6"
                     component="div"
-                    style={NombreSytle}
+                    style={NombreStyle}
                   >
                     {producto.name}
                   </Typography>
