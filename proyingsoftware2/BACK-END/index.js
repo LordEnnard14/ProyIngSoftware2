@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { sequelize } from "./Database/database.js";
+// import { sequelize } from "./Database/database.js";  // Comenta esta línea si no usarás Sequelize aún
 import productoRoutes from "./Controladores/Productos.js";
 import usuarioRoutes from "./Controladores/Usuarios.js";
 
@@ -14,21 +14,21 @@ app.use(
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Deshabilitar la verificación de conexión a la base de datos por ahora
 // async function verificacionConexion() {
 //     try {
 //         await sequelize.authenticate();
-//         console.log("Conexion satisfactoria con la BD");
+//         console.log("Conexión satisfactoria con la BD");
 //         await sequelize.sync();
 //     } catch (error) {
-//         // Comentar o eliminar la línea de error
-//         // console.error("No se puede conectar a la BD", error);
+//         console.error("No se puede conectar a la BD", error);
 //     }
 // }
 
 app.use("/api/productos", productoRoutes);
-app.use("/api/usuarios", usuarioRoutes);
+app.use("/api", usuarioRoutes);
 
 app.listen(port, function () {
     console.log("Servidor escuchando en el puerto " + port);
-    // verificacionConexion();
+    // verificacionConexion();  // Comenta esta línea también
 });

@@ -1,69 +1,29 @@
 import express from "express";
-import { sequelize } from "./Database/database.js";
-import Usuario from "../Models/Usuario.js";
 
-const app = express();
+const router = express.Router();
 
-app.get("/usuarios", async function (req, res) {
-    const usuarios = await Usuario.findAll();
+// Datos estáticos de ejemplo
+const usuarios = [
+    { id: 1, nombre: "Juan", apellido: "Pérez", correo: "juan.perez@mail.com", estado: "activo" },
+    { id: 2, nombre: "María", apellido: "González", correo: "maria.gonzalez@mail.com", estado: "inactivo" },
+    { id: 3, nombre: "Carlos", apellido: "Rodríguez", correo: "carlos.rodriguez@mail.com", estado: "activo" }
+];
+
+// Endpoint para obtener información de un usuario por su ID
+router.get("/usuarios/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const usuario = usuarios.find(usuario => usuario.id === id);
+    if (usuario) {
+        res.json(usuario);
+    } else {
+        res.status(404).json("Usuario no encontrado");
+    }
+});
+
+// Se obtiene a todos los usuarios
+router.get("/usuarios", (req, res) => {
     res.json(usuarios);
-  });
+});
 
-/* SIRVE PARA BUSCAR UN USUARIO POR SU NOMBRE */
-app.get("/usuarios/:busqueda", async function (req, res) {
-    const query = req.params.busqueda.toLowerCase();
-    try {
-      const usuarios = await Usuario.findAll({
-        where: {
-          [Op.or]: [
-            {
-              nombre: {
-                [Op.iLike]: `%${query}%`,
-              },
-            },
-            {
-              apellido: {
-                [Op.iLike]: `%${query}%`,
-              },
-            },
-            {
-              correo: {
-                [Op.iLike]: `%${query}%`,
-              },
-            },
-          ],
-        },
-      });
-      if (usuarios.length > 0) {
-        res.json(usuarios);
-      } else {
-        res
-          .status(404)
-          .send("No se encontraron usuarios que coincidan con la búsqueda.");
-      }
-    } catch (error) {
-      console.error("Error al buscar usuarios:", error);
-      res.status(500).send("Error interno del servidor");
-    }
-  });
+export default router;
 
-  /* ESTO SIRVE PARA CAMBIAR ESTADO A UN USUARIO PERO USANDO EL PUT*/
-app.put("/usuarios/cambioEstado/:id", async function (req, res) {
-    const { id } = req.params;
-    try {
-      const usuario = await Usuario.findByPk(id);
-      if (usuario) {
-        const nuevoEstado = usuario.estado === "Activo" ? "Inactivo" : "Activo";
-        await usuario.update({ estado: nuevoEstado });
-        res.json({
-          mensaje: `Usuario actualizado a estado: ${nuevoEstado}`,
-          usuario,
-        });
-      } else {
-        res.status(404).send("Usuario no encontrado");
-      }
-    } catch (error) {
-      console.error("Ocurrió un error al cambiar el estado del usuario:", error);
-      res.status(500).send("Ocurrió un error al cambiar el estado del usuario");
-    }
-  });
