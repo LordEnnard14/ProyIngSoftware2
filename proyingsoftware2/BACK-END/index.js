@@ -45,6 +45,15 @@ const sequelize = new Sequelize({
     },
     dni: {
         type: DataTypes.STRING,
+    },
+    direcciones:{
+        type: DataTypes.ARRAY(DataTypes.STRING)
+    },
+    direccion_activa_latitude: {
+        type: DataTypes.DOUBLE
+    },
+    direccion_activa_longitude:{
+        type: DataTypes.DOUBLE
     }
     },
     {
@@ -59,6 +68,12 @@ const Producto = sequelize.define( 'Producto', {
     nRegistroSanitario:{
         type: DataTypes.STRING,  
     },
+    presentacion: {
+        type: DataTypes.STRING,
+    },
+    categoria: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+    },
     descripcion: {
         type: DataTypes.STRING,
     },
@@ -71,36 +86,12 @@ const Producto = sequelize.define( 'Producto', {
     }
 }
 );
-
-const Categoria = sequelize.define('Categoria',{
-    nombre:{
-        type: DataTypes.STRING,
-    },
-    descripcion:{
-        type: DataTypes.STRING,
-    }
-});
-
 const Marca = sequelize.define('Marca',{
     nombre:{
         type: DataTypes.STRING,
     }
 });
 
-const Presentacion = sequelize.define('Presentacion',{
-    nombre: {
-        type: DataTypes.STRING,
-    },
-    concentracion: {
-        type: DataTypes.STRING,
-    },
-    cantidad: {
-        type: DataTypes.STRING
-    },
-    descrpicion: {
-        type: DataTypes.STRING,
-    }
-});
 
 const StockProducto = sequelize.define('StockProducto',{
     cantidad: {
@@ -165,7 +156,14 @@ const Botica = sequelize.define('Botica',{
     },
     horarioCierre: {
         type: DataTypes.STRING, 
+    },
+    direccion_latitude: {
+        type:DataTypes.DOUBLE
+    },
+    direccion_longitude: {
+        type:DataTypes.DOUBLE
     }
+
 });
 
 const Admin = sequelize.define('Admin',{
@@ -183,17 +181,6 @@ const Admin = sequelize.define('Admin',{
     },
 });
 
-const Direccion = sequelize.define('Direccion',{
-    dir: {
-        type: DataTypes.STRING,
-    },
-    latitude: {
-        type: DataTypes.DOUBLE,
-    },
-    longitude: {
-        type: DataTypes.DOUBLE,
-    }
-});
 
 Usuario.hasOne(Carrito);
 Carrito.belongsTo(Usuario);
@@ -201,57 +188,20 @@ Usuario.hasMany(Orden);
 Orden.belongsTo(Usuario);
 Marca.hasMany(Producto);
 Producto.belongsTo(Marca);
-Producto.hasMany(Presentacion);
-Presentacion.belongsTo(Producto);
-Presentacion.hasMany(StockProducto);
-StockProducto.belongsTo(Presentacion);
+Producto.hasMany(StockProducto);
+StockProducto.belongsTo(Producto);
 Producto.hasMany(ProductoCarrito);
 ProductoCarrito.belongsTo(Producto);
 Producto.hasMany(ProductoOrden);
 ProductoOrden.belongsTo(Producto);
 Orden.hasMany(ProductoOrden);
 ProductoOrden.belongsTo(Orden);
-Direccion.hasMany(Orden);
-Orden.belongsTo(Direccion);
 Carrito.hasMany(ProductoCarrito);
 ProductoCarrito.belongsTo(Carrito);
-Presentacion.hasMany(ProductoCarrito);
-ProductoCarrito.belongsTo(Presentacion);
-Presentacion.hasMany(ProductoOrden);
-ProductoOrden.belongsTo(Presentacion);
 Botica.hasMany(StockProducto);
 StockProducto.belongsTo(Botica);
-Botica.hasOne(Direccion);
-Direccion.belongsTo(Botica);
 Botica.hasMany(Admin);
 Admin.belongsTo(Botica);
-Categoria.belongsToMany(Producto, {through: 'CategoriaProductos'});
-Producto.belongsToMany(Categoria,{through: 'CategoriaProductos'});
-Direccion.belongsToMany(Usuario,{through: 'DireccionUsuarios'});
-Usuario.belongsToMany(Direccion,{through:'DireccionUsuarios'});
-
-//Direccion
-app.post('/newDireccion', async (req,res)=>{
-    const direccionNueva = await Direccion.create({
-        dir: req.body.direccion,
-        latitude: req.body.latitude,
-        longitude: req.body.longitude
-    })
-    res.send(direccionNueva.toJSON());
-})
-app.post('/addDireccionUsuario', async (req,res)=>{
-    const user = await Usuario.findByPk(req.body.UsuarioId)
-    const direc = await Direccion.findByPk(req.body.DireccionId)
-
-    await user.addDireccion(direc);
-
-    const result = await Usuario.findOne({
-        where: {id: req.body.UsuarioId},
-        include: Direccion,
-    })
-    res.send(result.toJSON());
-
-})
 
 
 //Usuarios API
@@ -356,25 +306,7 @@ app.post('/newMarca', async (req, res) => {
     })
     res.send(marcaNueva.toJSON());
 })
-//Presentacion
-app.post('/newPresentacion', async (req, res) => { 
-    const presentacionNueva = await Presentacion.create({
-        ProductoId: req.body.ProductoId,
-        nombre: req.body.nombre,
-        concentracion: req.body.concentracion,
-        cantidad: req.body.cantidad,
-        descripcion: req.body.descripcion
-    })
-    res.send(presentacionNueva.toJSON());
-})
-//Categoria
-app.post('/categoria', async (req, res) => {
-    const categoriaNueva = await Categoria.create ({
-        nombre: req.body.nombre,
-        descripcion: req.body.descripcion
-    })
-    res.send(categoriaNueva.toJSON());
-})
+
 //Productos
 //revisar caracteristicas necesarias para crear
 app.post('/newProducto', async (req, res) => {
@@ -419,7 +351,7 @@ app.post('/newProducto', async (req, res) => {
 app.post('/newStock', async (req, res)=>{
     const stockNuevo = await StockProducto.create({
         BoticaID: req.body.BoticaID,
-        PresentacionId: req.body.PresentacionId,
+        ProductoId: req.body.ProductoId,
         cantidad: req.body.cantidad,
         precio: req.body.precio
 
@@ -432,10 +364,7 @@ app.post('/newStock', async (req, res)=>{
 //api para añadir productos al carrito a la db
 app.post('/carrito', async (req, res) => { 
 
-    const stock = await StockProducto.findOne({where:{
-            PresentacionId: req.body.presentacionId,
-            BoticaID: req.body.boticaId 
-    }});
+    const stock = await StockProducto.findByPk(req.body.productoId);
     const productoEnCarrito = await ProductoCarrito.findOne( {where: {
         ProductoId: req.body.productoId,
         CarritoId: req.body.carritoId
@@ -478,8 +407,7 @@ app.get('/carrito', async(req,res)=>{
 app.put('/carrito', async(req,res)=>{
     const producto = await ProductoCarrito.findOne( {where: {
         CarritoId: req.body.id,
-        ProductoId: req.body.productoId,
-        PresentacionId: req.body.presentacionId    
+        ProductoId: req.body.productoId, 
     }})
     console.log(producto)
     if(req.body.operacion == "aumentar"){
@@ -532,13 +460,12 @@ app.post('/completarOrden',async(req,res)=>{
         const productoOrden = await ProductoOrden.create({
             OrdenId: orden.id,
             ProductoId: producto.ProductoId,
-            PresentacionId: producto.PresentacionId,
             cantidad: producto.cantidad,
             precio: producto.precio
         })
 
         const stock = await StockProducto.findOne({
-            where: { id: producto.ProductoId} 
+            where: { id: producto.ProductoId} //realizar cambio unir con botica
         })
         
         stock.cantidad = stock.cantidad - producto.cantidad
