@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { sequelize } from "./Database/database.js";
 import productoRoutes from "./Controladores/Productos.js";
+import usuarioRoutes from "./Controladores/Usuarios.js";
 
 const app = express(); 
 const port = process.env.PORT || 4000;
@@ -25,6 +26,7 @@ app.use(express.json());
 // }
 
 app.use("/api/productos", productoRoutes);
+app.use("/api/usuarios", usuarioRoutes);
 
 app.listen(port, function () {
     console.log("Servidor escuchando en el puerto " + port);
