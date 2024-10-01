@@ -47,7 +47,16 @@ const sequelize = new Sequelize({
         type: DataTypes.STRING,
     },
     direcciones:{
-        type: DataTypes.ARRAY(DataTypes.STRING)
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+        validate: {
+            validarSize(value) {
+                if(value.length > 3){
+                    throw new Error("No puedes tener más de 3 direcciones")
+                }
+            }
+        }
     },
     direccion_activa_latitude: {
         type: DataTypes.DOUBLE
@@ -157,6 +166,9 @@ const Botica = sequelize.define('Botica',{
     horarioCierre: {
         type: DataTypes.STRING, 
     },
+    direccion: {
+        type: DataTypes.STRING,
+    },
     direccion_latitude: {
         type:DataTypes.DOUBLE
     },
@@ -242,11 +254,8 @@ app.post('/signUp', async (req,res)=>{
         apellidoMaterno: req.body.apellidoMaterno,
         password: req.body.password,
         correo: req.body.correo,
-        direccionId: req.body.direccionId,
         telefono: req.body.telefono,
         dni: req.body.dni,
-        estado: req.body.estado
-        
     });
     
     const carrito = await Carrito.create({
@@ -258,6 +267,34 @@ app.post('/signUp', async (req,res)=>{
     res.send(createdUser.toJSON());   
 
 })
+
+app.put('/addDireccion', async (req,res)=>{
+    try{
+    const usuarioExistente = await Usuario.findByPk(req.body.id)
+    if(!usuarioExistente){
+        return res.status(404).send("Usuario no encontrado");
+    }
+    const direcciones = usuarioExistente.direcciones
+    if (direcciones.length >= 3){
+        return res.status(400).send('El maximo son 3 direcciones')
+    }
+    usuarioExistente.direcciones = direcciones.concat([req.body.direccion])
+    await usuarioExistente.save()
+    return res.status(200).send(usuarioExistente.toJSON());
+    } catch (error) {
+        console.error('Error al agregar direccion', error);
+        res.status(500).send('Error al agregar direccion');
+    }
+});
+
+app.put('/updateNombre', async (req,res)=>{
+    const usuarioExistente = await Usuario.findByPk(req.body.id)
+    usuarioExistente.nombre = req.body.nombre
+    await usuarioExistente.save()
+    res.send(usuarioExistente.toJSON());
+    
+});
+
 
 app.get('/login', async(req,res)=>{
     const usuarioExistente = await Usuario.findOne({ where:{
@@ -279,7 +316,8 @@ app.post('/newAdmin', async (req,res)=>{
         nombre: req.body.nombre,
         apellidoPaterno: req.body.apellidoPaterno,
         apellidoMaterno: req.body.apellidoMaterno,
-        dni: req.body.dni
+        dni: req.body.dni,
+        BoticaId: req.body.boticaId
     })
     res.send(adminNuevo.toJSON());
 })
@@ -288,10 +326,12 @@ app.post('/newBotica', async (req,res)=>{
     const boticaNueva = await Botica.create({
         ruc: req.body.ruc,
         nombre: req.body.nombre,
-        direccionId: req.body.direccionId,
         horarioAbre: req.body.horarioAbre,
         horarioCierre: req.body.horarioCierre,
         adminId: req.body.adminId,
+        direccion: req.body.direccion,
+        direccion_latitude: req.body.latitude,
+        direccion_longitude: req.body.longitude,
 
     })
     console.log(result)
@@ -308,55 +348,71 @@ app.post('/newMarca', async (req, res) => {
 })
 
 //Productos
-//revisar caracteristicas necesarias para crear
 app.post('/newProducto', async (req, res) => {
-    const productoExistente = await Producto.findOne( {where: {
-        nombre: req.body.nombre,
-        nRegistroSanitario: req.body.rs,
-
-    } })
-    if (productoExistente == null){
-        const productoNuevo = await Producto.create({
+    try {
+        const productoExistente = await Producto.findOne( {where: {
             nombre: req.body.nombre,
             nRegistroSanitario: req.body.rs,
-            MarcaId: req.body.marcaId,
-            descripcion: req.body.descripcion,
-            caracteristicas: req.body.caracteristicas,
-            estado: req.body.estado,
-        })
-        if(req.body.categorias && req.body.categorias.length > 0){
-            const categoriasEncontradas = await Categoria.findAll({where: {
-                id: {
-                    [Op.in]: req.body.categorias
-                },
-            },
-        });
-            for(let i =0; i < categoriasEncontradas.length; i++){
-                await productoNuevo.addCategoria(categoriasEncontradas[i])
-            }
-            console.log(categoriasEncontradas)
+        } })
+        if(productoExistente !== null){
+            return res.status(409).send({
+                Mensaje: 'Producto existente',
+                Producto: productoExistente
+            });
+        }else {
+            const productoNuevo = await Producto.create({
+                nombre: req.body.nombre,
+                presentacion: req.body.presentacion,
+                nRegistroSanitario: req.body.registroSanitario,
+                categoria: req.body.categorias,
+                MarcaId: req.body.marcaId,
+                descripcion: req.body.descripcion,
+                caracteristicas: req.body.caracteristicas,
+            })
+            return res.status(201).send({
+                Mensaje: 'Producto creado exitosamente',
+                Producto: productoNuevo
+            });
         }
-        const result = await Producto.findOne({
-            where: {nombre: req.body.nombre},
-            include: Categoria,
-        })
-        res.send(result.toJSON());
-    } else {
-        res.send("ERROR");
-    }
-
+    } catch (error){
+        console.error("Error al crear producto", error);
+        res.status(500).send('Error al crear producto');
+    }   
 })
+
 
 //Stock
 app.post('/newStock', async (req, res)=>{
-    const stockNuevo = await StockProducto.create({
-        BoticaID: req.body.BoticaID,
-        ProductoId: req.body.ProductoId,
-        cantidad: req.body.cantidad,
-        precio: req.body.precio
+    try{
+        const stockExistente = await StockProducto.findOne({ where: {
+                BoticaId: req.body.Botica.Id,
+                ProductoId: req.body.Productoid
+            }
+        })
+        if (stockExistente !== null){
+            return res.status(409).send({
+                Mensaje: 'Stock existente',
+                Producto: stockExistente
+            });
+        }else{
+            const stockNuevo = await StockProducto.create({
+                BoticaID: req.body.BoticaId,
+                ProductoId: req.body.ProductoId,
+                cantidad: req.body.cantidad,
+                precio: req.body.precio
+        
+            })
+            res.status(201).send({
+                mensaje: 'Stock creado exitosamente',
+                stock: stockNuevo
+            });
+        }
+    } catch (error){
+        console.error("Error al crear stock", error);
+        res.status(500).send('Error al crear stock');
+    }
 
-    })
-    res.send(stockNuevo.toJSON());
+
 })
 
 
@@ -364,7 +420,10 @@ app.post('/newStock', async (req, res)=>{
 //api para añadir productos al carrito a la db
 app.post('/carrito', async (req, res) => { 
 
-    const stock = await StockProducto.findByPk(req.body.productoId);
+    const stock = await StockProducto.findOne({where:{
+            ProductoId: req.body.productoId,
+            BoticaId: req.body.boticaId
+    }});
     const productoEnCarrito = await ProductoCarrito.findOne( {where: {
         ProductoId: req.body.productoId,
         CarritoId: req.body.carritoId
@@ -447,7 +506,7 @@ app.post('/completarOrden',async(req,res)=>{
 
     const orden = await Orden.create({
         UsuarioId: req.body.carritoId,
-        direccionEnvio: req.body.direccionId,
+        direccionEnvio: req.body.direccion,
         subtotal: subtotal,
         costoEnvio: subtotal*0.05,
         impuestos: subtotal * 0.18,
@@ -465,7 +524,10 @@ app.post('/completarOrden',async(req,res)=>{
         })
 
         const stock = await StockProducto.findOne({
-            where: { id: producto.ProductoId} //realizar cambio unir con botica
+            where: { 
+                ProductoId: producto.ProductoId,
+                BoticaId: req.body.boticaId
+            } //realizar cambio unir con botica
         })
         
         stock.cantidad = stock.cantidad - producto.cantidad
