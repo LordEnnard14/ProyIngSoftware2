@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import productoRoutes from "./Controladores/Productos.js";
 import usuarioRoutes from "./Controladores/Usuarios.js";
+import ordenRoutes from "./Controladores/Ordenes.js";
 import Botica from "./Models/Botica.js";
 import Producto from "./Models/Producto.js";
 import Marca from "./Models/Marca.js";
@@ -34,6 +35,7 @@ async function verificacionConexion() {
 // Rutas de la API
 app.use("/api/productos", productoRoutes);
 app.use("/api", usuarioRoutes);
+app.use("/api", ordenRoutes);
 
 app.listen(port, function () {
     console.log("Servidor escuchando en el puerto " + port);
