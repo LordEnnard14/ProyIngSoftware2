@@ -1,15 +1,15 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../database/database.js';
-export const Marca = sequelize.define('Marca', {
+import { DataTypes } from "sequelize";
+import sequelize from "../Database/database.js"; 
+
+const Marca = sequelize.define('Marca', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true, // Auto-incremental
     },
-    nombreMarca: {
-        type: DataTypes.STRING
+    nombre: {
+        type: DataTypes.STRING,
     }
-}, {
-    freezeTableName: true,
-    timestamps: false
 });
+
+export default Marca;

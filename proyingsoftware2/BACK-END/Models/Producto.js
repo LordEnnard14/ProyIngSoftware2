@@ -1,49 +1,37 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../Database/database.js';
-import { Presentacion } from './Presentacion.js';
-import { Marca } from './Marca.js';
-export const Producto = sequelize.define('Producto', {
+import { DataTypes } from "sequelize";
+import sequelize from "../Database/database.js"; 
+
+const Producto = sequelize.define('Producto', {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true, // Auto-incremental
     },
     nombre: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
     },
-    descripcion: {
-        type: DataTypes.STRING
+    nRegistroSanitario: {
+        type: DataTypes.STRING,
     },
-    caracteristicas: {
-        type: DataTypes.STRING
+    presentacion: {
+        type: DataTypes.STRING,
     },
     categoria: {
-        type: DataTypes.STRING
+        type: DataTypes.ARRAY(DataTypes.STRING),
+    },
+    descripcion: {
+        type: DataTypes.STRING,
+    },
+    caracteristicas: {
+        type: DataTypes.STRING,
     },
     estado: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+    imageUrl: {
         type: DataTypes.STRING
-    },
-    fechaRegistro: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
-    },
-    presentacionId: {
-        type: DataTypes.INTEGER,
-        references: {
-          model: Presentacion,
-          key: 'id'
-        }
-      },
-    marcaId: {
-        type: DataTypes.INTEGER,
-        references: {
-          model: Marca,
-          key: 'id'
-        }
-      }
-
-}, {
-    freezeTableName: true,
-    timestamps: false
+    }
 });
+
+export default Producto;

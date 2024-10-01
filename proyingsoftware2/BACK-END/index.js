@@ -1,36 +1,41 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-// import { sequelize } from "./Database/database.js";  // Comenta esta línea si no usarás Sequelize aún
 import productoRoutes from "./Controladores/Productos.js";
 import usuarioRoutes from "./Controladores/Usuarios.js";
-//import ordenesRoutes from "./Controladores/Ordenes.js";
+import Botica from "./Models/Botica.js";
+import Producto from "./Models/Producto.js";
+import Marca from "./Models/Marca.js";
+import StockProducto from "./Models/StockProducto.js";
+import sequelize from "./Database/database.js"; 
 
-const app = express(); 
+const app = express();
 const port = process.env.PORT || 4000;
 
-app.use(
-    cors({ origin: "http://localhost:3000" })
-);
+// Middleware
+app.use(cors({ origin: "http://localhost:3000" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Deshabilitar la verificación de conexión a la base de datos por ahora
-// async function verificacionConexion() {
-//     try {
-//         await sequelize.authenticate();
-//         console.log("Conexión satisfactoria con la BD");
-//         await sequelize.sync();
-//     } catch (error) {
-//         console.error("No se puede conectar a la BD", error);
-//     }
-// }
+// Verificación de conexión a la base de datos
+async function verificacionConexion() {
+    try {
+        await sequelize.authenticate(); // Verifica la conexión
+        console.log("Conexión satisfactoria con la BD");
 
+        // Sincroniza el modelo Botica
+        await sequelize.sync(); // Sincroniza todos los modelos
+        console.log("Modelos sincronizados con la BD");
+    } catch (error) {
+        console.error("No se puede conectar a la BD", error);
+    }
+}
+
+// Rutas de la API
 app.use("/api/productos", productoRoutes);
 app.use("/api", usuarioRoutes);
-//app.use("/api", ordenesRoutes);
 
 app.listen(port, function () {
     console.log("Servidor escuchando en el puerto " + port);
-    // verificacionConexion();  // Comenta esta línea también
+    verificacionConexion(); 
 });
