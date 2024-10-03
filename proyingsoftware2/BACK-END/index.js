@@ -82,6 +82,8 @@ const Producto = sequelize.define( 'Producto', {
     },
     categoria: {
         type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
     },
     descripcion: {
         type: DataTypes.STRING,
@@ -212,7 +214,7 @@ Carrito.hasMany(ProductoCarrito);
 ProductoCarrito.belongsTo(Carrito);
 Botica.hasMany(StockProducto);
 StockProducto.belongsTo(Botica);
-Botica.hasMany(Admin);
+Botica.hasOne(Admin);
 Admin.belongsTo(Botica);
 
 
@@ -334,7 +336,6 @@ app.post('/newBotica', async (req,res)=>{
         direccion_longitude: req.body.longitude,
 
     })
-    console.log(result)
     res.send(boticaNueva.toJSON());
 })
 
@@ -385,8 +386,8 @@ app.post('/newProducto', async (req, res) => {
 app.post('/newStock', async (req, res)=>{
     try{
         const stockExistente = await StockProducto.findOne({ where: {
-                BoticaId: req.body.Botica.Id,
-                ProductoId: req.body.Productoid
+                BoticaId: req.body.BoticaId,
+                ProductoId: req.body.ProductoId
             }
         })
         if (stockExistente !== null){
