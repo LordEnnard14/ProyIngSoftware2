@@ -7,6 +7,10 @@ import ordenRoutes from "./Controladores/Ordenes.js";
 import Botica from "./Models/Botica.js";
 import Producto from "./Models/Producto.js";
 import Marca from "./Models/Marca.js";
+import Admin from "./Models/Admin.js";
+import ProductoCarrito from "./Models/ProductoCarrito.js";
+import ProductoOrden from "./Models/ProductoOrden.js";
+import Carrito from "./Models/Carrito.js";
 import StockProducto from "./Models/StockProducto.js";
 import sequelize from "./Database/database.js"; 
 

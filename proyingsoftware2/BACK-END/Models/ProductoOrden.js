@@ -1,11 +1,12 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
 
-const StockProducto = sequelize.define('StockProducto', {
+const ProductoOrden = sequelize.define('ProductoOrden',{
+    
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true, // Auto-incremental
+        autoIncrement: true, 
     },
     cantidad: {
         type: DataTypes.INTEGER,
@@ -13,9 +14,6 @@ const StockProducto = sequelize.define('StockProducto', {
     precio: {
         type: DataTypes.DOUBLE,
     },
-    fecha_vencimiento: {
-        type: DataTypes.STRING,
-    }
 });
 
-export default StockProducto;
+export default ProductoOrden;
