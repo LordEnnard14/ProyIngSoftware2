@@ -14,6 +14,7 @@ router.get("/ordenes", async (req, res) => {
 });
 
 router.get("/ordenes/:id", async (req, res) => {
+    console.log(req.body);
     try {
         const id = parseInt(req.params.id);
         const orden = await Orden.findByPk(id);

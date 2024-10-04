@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
-import Carrito from "./Carrito.js";
-import Orden from "./Orden.js";
+import moment from 'moment-timezone';
 
 const Usuario = sequelize.define('Usuario', {
 
@@ -45,12 +44,12 @@ const Usuario = sequelize.define('Usuario', {
     },
     fechaRegistro: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
         defaultValue: () => moment.tz('America/Lima').toDate // Hora de Lima, Perú
     },
     direcciones:{
         type: DataTypes.ARRAY(DataTypes.STRING),
-        allowNull: false,
+        allowNull: true,
         defaultValue: [],
         validate: {
             validarSize(value) {
@@ -62,11 +61,11 @@ const Usuario = sequelize.define('Usuario', {
     },
     direccion_activa_latitude: {
         type: DataTypes.DOUBLE,
-        allowNull: false
+        allowNull: true
     },
     direccion_activa_longitude:{
         type: DataTypes.DOUBLE,
-        allowNull: false
+        allowNull: true
     }
     },
 {

@@ -31,8 +31,8 @@ async function verificacionConexion() {
 
 // Rutas de la API
 app.use("/api/productos", productoRoutes);
-app.use("/api", usuarioRoutes);
-app.use("/api", ordenRoutes);
+app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/ordenes", ordenRoutes);
 
 app.listen(port, function () {
     console.log("Servidor escuchando en el puerto " + port);

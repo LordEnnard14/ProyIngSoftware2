@@ -3,9 +3,8 @@ import Usuario from "../Models/Usuario.js";
 
 const router = express.Router();
 
-
 // Endpoint para obtener a todos los usuarios registrados 
-router.get("/usuarios", async (req, res) => {
+router.get("/", async (req, res) => {
     try {
         // Obtener todos los usuarios en la base de datos
         const usuarios = await Usuario.findAll();
@@ -17,7 +16,7 @@ router.get("/usuarios", async (req, res) => {
 });
 
 // Obtener un usuario específico a partir de su ID
-router.get("/usuarios/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const usuario = await Usuario.findByPk(id);
@@ -35,27 +34,61 @@ router.get("/usuarios/:id", async (req, res) => {
 
 //Este endpoint sirve para poder guardar a un usuario en la base de datos
 //Esto se lleva cabo al registrarse a la página web
-router.post('/usuarios', async (req, res) => {
-    const {nombre, apellidoPaterno, apellidoMaterno, correo, telefono, password, dni, direcciones,
-      direccion_activa_latitude, direccion_activa_longitude, estado} = req.body;
-  
-    try {
-        //Se verifica si existen estos datos
-      if (!nombre || !apellidoPaterno || !correo || !password || !dni) {
-        return res.status(400).json("Por favor, complete los campos obligatorios");
-      }
-  
-      // Creamos un nuevo usuario para guardarlo en la base de datos
-      const nuevoUsuario = await Usuario.create({nombre, apellidoPaterno, apellidoMaterno, correo, telefono,
-        password, dni, direcciones, direccion_activa_latitude, direccion_activa_longitude,
-        estado: estado || true,
+router.post("/registrar", async (req, res) => {
+  try {
+      const {nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni} = req.body;
+      const nuevoUsuario = await Usuario.create({
+          nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni});
+
+      res.status(201).json({
+          mensaje: "Usuario registrado exitosamente",
+          usuario: nuevoUsuario
       });
 
-      res.status(201).json(nuevoUsuario);
-    } catch (error) {
-      console.error('Error al crear el usuario:', error);
-      res.status(500).json('Error al crear el usuario');
+  } catch (error) {
+      console.error("Error al registrar usuario:", error);
+      res.status(500).json({
+          error: "Error al registrar usuario. Por favor, intenta nuevamente.",
+          detalles: error.message  // Añade el mensaje de error aquí
+      });
+  }
+});
+
+
+router.post('/iniciarSesion', async (req, res) => {
+  const { correo, password } = req.body;
+  // Verifica que se haya proporcionado el correo y la contraseña
+  if (!correo || !password) {
+    return res.status(400).json({ message: "Correo y contraseña son requeridos" });
+  }
+  try {
+    // Buscar el usuario por correo
+    const usuario = await Usuario.findOne({ where: { correo } });
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
-  });
+
+    // Comparar la contraseña proporcionada con la contraseña almacenada
+    if (password !== usuario.password) {
+      return res.status(401).json({ message: "Contraseña incorrecta" });
+    }
+
+    // Si todo está correcto, devolver el detalle del usuario
+    res.json({
+      message: "Inicio de sesión exitoso",
+      user: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        correo: usuario.correo,
+      },
+    });
+  } catch (error) {
+    console.error("Error en el inicio de sesión:", error);
+    res.status(500).json({ message: "Error en el inicio de sesión" });
+  }
+});
+
+
 
 export default router;
