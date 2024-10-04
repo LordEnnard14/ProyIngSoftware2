@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
-
+import Usuario from "./Usuario.js";
+import ProductoCarrito from "./ProductoCarrito.js";
 
 const Carrito = sequelize.define('Carrito', {
     id: {
@@ -10,6 +11,9 @@ const Carrito = sequelize.define('Carrito', {
     },
    
     
-});
+}, {
+    freezeTableName: true,
+    timestamps: false
+});;
 
 export default Carrito;

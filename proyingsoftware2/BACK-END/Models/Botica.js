@@ -1,5 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
+import Admin from "./Admin.js";
+import StockProducto from "./StockProducto.js";
 
 const Botica = sequelize.define('Botica', {
     id: {
@@ -9,25 +11,35 @@ const Botica = sequelize.define('Botica', {
     },
     ruc: {
         type: DataTypes.STRING,
+        allowNull: false,
     },
     nombre: {
         type: DataTypes.STRING,
+        allowNull: false,
     },
     horarioAbre: {
         type: DataTypes.STRING,
+        allowNull: false,
     },
     horarioCierre: {
         type: DataTypes.STRING,
+        allowNull: false,
     },
     direccion: {
         type: DataTypes.STRING,
+        allowNull: false,
     },
     direccion_latitude: {
         type: DataTypes.DOUBLE,
+        allowNull: false,
     },
     direccion_longitude: {
         type: DataTypes.DOUBLE,
+        allowNull: false,
     }
-});
+}, {
+    freezeTableName: true,
+    timestamps: false
+});;
 
 export default Botica;
