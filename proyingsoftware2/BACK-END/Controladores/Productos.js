@@ -1,6 +1,6 @@
 // Archivo: Controladores/Productos.js
-import express, { Router } from "express";
-import productos from "../Producto/Data/productosData.js";
+import express from "express";
+import Producto from "../models/Producto.js";
 
 
 const router = express.Router();
@@ -9,7 +9,7 @@ const router = express.Router();
 router.use('/images', express.static('Imgs'));
 
 
-router.get('/productoAll', (req, res) => {
+/*router.get('/productoAll', (req, res) => {
     res.json(productos);
 });
 
@@ -35,7 +35,19 @@ router.get('/detalle/:id', function(req, res) {
     } else {
         res.status(404).json({ error: "Producto no encontrado" }); // 
     }
+});*/
+
+router.get('/productoAll', async (req, res) => {
+    try {
+        const result = await Producto.findAll(); // Consulta para obtener todos los productos
+        console.log(result); // Para depuración, si es necesario
+        res.json(result); // Respuesta directa en formato JSON
+    } catch (error) {
+        console.error("Error al obtener los productos:", error);
+        res.status(500).json({ error: "Error al obtener los productos" });
+    }
 });
+
 
 
 
