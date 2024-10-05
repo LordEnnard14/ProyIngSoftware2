@@ -5,6 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Slide from '@mui/material/Slide';
@@ -51,29 +52,47 @@ const Header1 = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setLoggedIn(true);
-      setUserName(`${user.nombres} ${user.apellidos}`);
+      // Asegúrate de ajustar aquí las propiedades de tu modelo de usuario
+      setUserName(`${user.nombre} ${user.apellidoPaterno}`);
     } else {
       setLoggedIn(false);
       setUserName('');
     }
 
-    // Actualiza el conteo de elementos del carrito
     const updateCartCount = () => {
       const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
       setCartItemCount(cartItems.length);
     };
 
-    updateCartCount(); // Inicializar el conteo
+    updateCartCount(); // Inicializa el conteo
 
     // Escuchar el evento personalizado
     window.addEventListener('cartUpdated', updateCartCount);
 
-    // Limpiar el listener cuando el componente se desmonta
-    return () => window.removeEventListener('cartUpdated', updateCartCount);
-  }, [loggedIn]);
+    // Verificar cambios en el localStorage (para pruebas)
+    const storageChangeHandler = () => {
+      const updatedUser = JSON.parse(localStorage.getItem('user'));
+      if (updatedUser) {
+        setLoggedIn(true);
+        setUserName(`${updatedUser.nombre} ${updatedUser.apellidoPaterno}`);
+      } else {
+        setLoggedIn(false);
+        setUserName('');
+      }
+      updateCartCount();
+    };
+
+    window.addEventListener('storage', storageChangeHandler);
+
+    return () => {
+      window.removeEventListener('cartUpdated', updateCartCount);
+      window.removeEventListener('storage', storageChangeHandler);
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
+    console.log("Usuario eliminado del localStorage");
     setLoggedIn(false);
     setUserName('');
     navigate('/InicioSesion');
@@ -82,9 +101,7 @@ const Header1 = () => {
   const handleNavigate = (path, section) => {
     navigate(path);
     if (section) {
-      setTimeout(() => {
-        document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
-      }, 0);
+      document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -101,7 +118,7 @@ const Header1 = () => {
             <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', mx: 2 }}>
               <BarraBusqueda />
             </Box>
-            
+
             <IconButton onClick={() => handleNavigate('/CarritoCompras')} sx={{ color: '#2F4156' }}>
               <ShoppingCartIcon />
               {cartItemCount > 0 && (
@@ -134,9 +151,14 @@ const Header1 = () => {
 
             {loggedIn ? (
               <>
-                <Typography sx={{ marginLeft: 2, color: '#000000' }}>
-                  {userName}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: 2 }}>
+                  <Typography sx={{ color: '#000000', marginRight: 1 }}>
+                    {userName}
+                  </Typography>
+                  <IconButton onClick={() => console.log('Abrir perfil')} sx={{ color: '#000000' }}>
+                    <AccountCircleIcon />
+                  </IconButton>
+                </Box>
                 <Button
                   variant="contained"
                   sx={{ marginLeft: 2, backgroundColor: '#567C8D', color: '#ffffff' }}

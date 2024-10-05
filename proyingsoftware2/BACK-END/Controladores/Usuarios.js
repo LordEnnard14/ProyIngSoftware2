@@ -57,29 +57,29 @@ router.post("/registrar", async (req, res) => {
 
 router.post('/iniciarSesion', async (req, res) => {
   const { correo, password } = req.body;
-  // Verifica que se haya proporcionado el correo y la contraseña
+  
   if (!correo || !password) {
     return res.status(400).json({ message: "Correo y contraseña son requeridos" });
   }
+
   try {
-    // Buscar el usuario por correo
+
     const usuario = await Usuario.findOne({ where: { correo } });
     if (!usuario) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Comparar la contraseña proporcionada con la contraseña almacenada
     if (password !== usuario.password) {
       return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
-    // Si todo está correcto, devolver el detalle del usuario
     res.json({
       message: "Inicio de sesión exitoso",
       user: {
         id: usuario.id,
         nombre: usuario.nombre,
-        apellido: usuario.apellido,
+        apellidoPaterno: usuario.apellidoPaterno,
+        apellidoMaterno: usuario.apellidoMaterno,
         correo: usuario.correo,
       },
     });
@@ -88,6 +88,7 @@ router.post('/iniciarSesion', async (req, res) => {
     res.status(500).json({ message: "Error en el inicio de sesión" });
   }
 });
+
 
 
 

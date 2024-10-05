@@ -30,37 +30,48 @@ const Registro = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Aca se verifica si las contraseñas coinciden o no
+  
+    // Verifica si las contraseñas coinciden
     if (formData.password !== formData.confirmarPassword) {
       setErrorMessage('Las contraseñas no coinciden');
       return;
     }
-
-    // Se hace el llamado del endpoint para utilizar el metodo POST
+  
+    // Realiza la solicitud POST al backend
     try {
-      const response = await fetch('http://localhost:3100/usuarios', {
+      const response = await fetch('http://localhost:4000/api/usuarios/registrar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          nombre: formData.nombre,
+          apellidoPaterno: formData.apellidoPaterno,
+          apellidoMaterno: formData.apellidoMaterno,
+          password: formData.password,
+          correo: formData.email,
+          telefono: formData.telefono,
+          dni: formData.dni,
+        }), 
       });
-
+  
       if (response.ok) {
+        const data = await response.json();
+        // Guarda el nombre y apellido en localStorage
+        localStorage.setItem('usuarioNombre', `${data.nombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`);
         console.log('Usuario registrado con éxito');
-        navigate('/BusquedaMedicina');
+        navigate('/InicioSesion');; // Redirige a donde necesites
       } else {
         const errorData = await response.json();
+        console.error('Detalles del error:', errorData); // Imprimir el error completo
         setErrorMessage(errorData.message || 'Error al registrar el usuario');
-        console.error('Error al registrar:', errorData);
       }
     } catch (error) {
       setErrorMessage('Hubo un problema con la solicitud, intente nuevamente más tarde');
       console.error('Error en la solicitud:', error);
     }
   };
-
+  
   return (
     <>
       <Header2 />
@@ -198,7 +209,7 @@ const Registro = () => {
                   name="dni"
                   onChange={handleInputChange}
                   value={formData.dni}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'20px', backgroundColor: 'white' } }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
                   InputLabelProps={{
                     sx: {
                       '&.Mui-focused': {
@@ -213,14 +224,14 @@ const Registro = () => {
               <Grid item xs={12} sm={6} md={4}>
                 <TextField
                   fullWidth
-                  label="Ingrese Contraseña"
+                  label="Contraseña"
                   variant="outlined"
                   required
-                  name="password"
                   type="password"
+                  name="password"
                   onChange={handleInputChange}
                   value={formData.password}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'20px', backgroundColor: 'white' } }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
                   InputLabelProps={{
                     sx: {
                       '&.Mui-focused': {
@@ -238,11 +249,11 @@ const Registro = () => {
                   label="Confirmar Contraseña"
                   variant="outlined"
                   required
-                  name="confirmarPassword"
                   type="password"
+                  name="confirmarPassword"
                   onChange={handleInputChange}
                   value={formData.confirmarPassword}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'20px', backgroundColor: 'white' } }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
                   InputLabelProps={{
                     sx: {
                       '&.Mui-focused': {
@@ -255,23 +266,16 @@ const Registro = () => {
                 />
               </Grid>
             </Grid>
-
-            {/* Mostrar mensaje de error */}
-            {errorMessage && (
-              <Typography color="error" align="center" sx={{ mt: 2 }}>
-                {errorMessage}
-              </Typography>
-            )}
-
-            {/* Box para centrar el botón en la parte inferior */}
-            <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 4 }}>
+            <Box display="flex" flexDirection="column" alignItems="center">
               <Button
                 type="submit"
                 variant="contained"
-                sx={{ backgroundColor: '#567C8D', color: '#ffffff', borderRadius: 50, height: '50px', width: '200px', fontWeight: 'bold', fontSize: '16px' }}
+                color="primary"
+                sx={{ borderRadius: '50px', marginTop: '20px', backgroundColor: 'rgb(1, 33, 61)', '&:hover': { backgroundColor: 'rgb(0, 25, 50)' } }}
               >
-                Crear cuenta
+                Registrarse
               </Button>
+              {errorMessage && <Typography color="red" sx={{ mt: 2 }}>{errorMessage}</Typography>}
             </Box>
           </form>
         </Box>

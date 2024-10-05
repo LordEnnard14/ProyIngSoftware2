@@ -4,7 +4,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography'; // Agrega esta línea
+import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Slide from '@mui/material/Slide';
 import Grow from '@mui/material/Grow';
@@ -27,8 +27,13 @@ const Header_Admin = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    // Elimina el nombre del usuario de localStorage al cerrar sesión
+    localStorage.removeItem('usuarioNombre');
     navigate('/login'); // Ajusta la ruta para cerrar sesión si es necesario
   };
+
+  // Recupera el nombre del usuario de localStorage
+  const usuarioNombre = localStorage.getItem('usuarioNombre');
 
   return (
     <Box>
@@ -36,12 +41,14 @@ const Header_Admin = () => {
         <AppBar position="static" sx={{ backgroundColor: '#FFFFFF' }} elevation={4}>
           <Toolbar sx={{ justifyContent: 'space-between' }}>
             <Box>
-              <Titulo_Boton  onClick={() => navigate('/BusquedaMedicina')} >DosisXtra</Titulo_Boton>
+              <Titulo_Boton onClick={() => navigate('/BusquedaMedicina')}>
+                DosisXtra
+              </Titulo_Boton>
             </Box>
 
             <Grow in={true} timeout={1000}>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                Modo administrador
+                {usuarioNombre ? `Bienvenido, ${usuarioNombre}` : 'Modo administrador'}
               </Typography>
             </Grow>
 
