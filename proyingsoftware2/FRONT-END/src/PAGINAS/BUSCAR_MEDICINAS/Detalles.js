@@ -5,60 +5,72 @@ import CantidadProducto from '../BUSCAR_MEDICINAS/DETALLES/Cantidad';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const DetalleProducto = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Obtenemos el ID de los parámetros de la URL
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
-  const [cantidad, setCantidad] = useState(1);
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [stockProducto, setStockProducto] = useState(null); // Estado para el stockProducto
+  const [cantidad, setCantidad] = useState(1); // Estado para la cantidad de producto
 
+  // Usamos useEffect para obtener los datos del producto
   useEffect(() => {
-    async function fetchProduct() {
-      setLoading(true); // Inicia el estado de carga
+    async function fetchStockProducto() {
       try {
-        const response = await fetch(`http://localhost:4000/api/productos/detalle/${id}`);
+        const response = await fetch(`http://localhost:4000/api/productos/stockProductos/${id}`); // Cambia la URL al nuevo endpoint
         if (!response.ok) {
-          throw new Error('Error al obtener los datos del producto');
+          throw new Error('Error al obtener los datos del stockProducto');
         }
         const producto = await response.json();
-        // Asegúrate de actualizar imageUrl con la ruta completa del servidor si no lo has hecho ya
-        setProduct({ ...producto, imageUrl: `http://localhost:4000/api/productos${producto.image}` });
+        // Actualizamos el estado con los datos del producto
+        setStockProducto(producto);
       } catch (error) {
         console.error('Error:', error);
-      } finally {
-        setLoading(false); // Finaliza el estado de carga
       }
     }
-    fetchProduct();
+    fetchStockProducto(); // Llamamos a la función cuando el componente se monta
   }, [id]);
 
   const handleAddToCart = () => {
-    if (product) {
+    if (stockProducto) {
       const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-      cartItems.push({ ...product, cantidad });
+      cartItems.push({ ...stockProducto, cantidad });
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
-      // Notificar a otros componentes
       const event = new Event('cartUpdated');
       window.dispatchEvent(event);
     }
   };
 
-  const aumentarCantidad = () => setCantidad(cantidad + 1);
-  const disminuirCantidad = () => cantidad > 1 && setCantidad(cantidad - 1);
+  const aumentarCantidad = () => {
+    if (cantidad < stockProducto.cantidad) {
+      setCantidad(cantidad + 1);
+    }
+  };
 
-  if (loading) {
-    return <div>Loading...</div>; // Muestra "Loading..." si está cargando
+  const disminuirCantidad = () => {
+    if (cantidad > 1) {
+      setCantidad(cantidad - 1);
+    }
+  };
+
+  if (!stockProducto) {
+    return <div>No se encontró el stockProducto.</div>; // Mostramos mensaje si no hay producto
   }
 
-  if (!product) {
-    return <div>No se encontró el producto.</div>; // Muestra mensaje si no hay producto
-  }
+  // Construimos la URL de la imagen usando el ID del producto
+  const imagenUrl = `http://localhost:4000/api/productos/${stockProducto.Producto.imageUrl}`;
 
   return (
     <>
       <Header1 />
       <Container maxWidth="md">
         <Box my={4}>
-          <Typography variant="h4">{product.name}</Typography>
+          <Typography variant="h4">{stockProducto.Producto.nombre}</Typography>
+          {/* Aquí se muestra la marca */}
+          <Typography variant="body1" color="textSecondary">
+            Marca: {stockProducto.Producto.Marca.nombre}
+          </Typography>
+          {/* Aquí se muestra la tienda */}
+          <Typography variant="body1" color="textSecondary">
+            Vendido por: {stockProducto.Botica.nombre}
+          </Typography>
         </Box>
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
@@ -75,8 +87,8 @@ const DetalleProducto = () => {
               }}
             >
               <img
-                src={product.imageUrl} // Asegúrate de usar imageUrl
-                alt={product.name}
+                src={imagenUrl} // Usamos la URL construida
+                alt={stockProducto.Producto.nombre}
                 style={{
                   maxWidth: '100%',
                   maxHeight: '100%',
@@ -96,8 +108,14 @@ const DetalleProducto = () => {
                 <Box borderBottom={1} borderColor="black" pb={1} mb={1}>
                   <Typography variant="h6">DISPONIBLE</Typography>
                 </Box>
-                <Typography variant="h4" color="black" fontWeight="bold">S/{product.precio?.toFixed(2)}</Typography>
-                <Button variant="contained" style={{ marginTop: 8, backgroundColor: '#4a6a7d', color: '#ffffff' }} onClick={handleAddToCart}>
+                <Typography variant="h4" color="black" fontWeight="bold">
+                  S/{stockProducto.precio?.toFixed(2)}
+                </Typography>
+                <Button
+                  variant="contained"
+                  style={{ marginTop: 8, backgroundColor: '#4a6a7d', color: '#ffffff' }}
+                  onClick={handleAddToCart}
+                >
                   AÑADIR AL CARRITO
                 </Button>
                 <Box mt={2} />
@@ -115,19 +133,19 @@ const DetalleProducto = () => {
         <Box mt={4}>
           <Typography variant="h6">Descripción</Typography>
           <Typography variant="body1" paragraph>
-            {product.description}
+            {stockProducto.Producto.descripcion}
           </Typography>
         </Box>
 
         <Box mt={4} mb={4} bgcolor="grey.300" p={2} borderRadius={3}>
           <Typography variant="h6">Características del Producto:</Typography>
-          <ul>
-            {product.caracteristicas?.map((feature, index) => (
-              <li key={index}>
-                <Typography variant="body1">{feature}</Typography>
-              </li>
-            ))}
-          </ul>
+          {stockProducto?.Producto?.caracteristicas ? (
+            <Typography variant="body1">
+              {stockProducto.Producto.caracteristicas}
+            </Typography>
+          ) : (
+            <Typography variant="body1">No hay características disponibles.</Typography>
+          )}
         </Box>
       </Container>
     </>

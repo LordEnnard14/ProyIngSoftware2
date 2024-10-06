@@ -63,7 +63,7 @@ router.get('/productoAll', async (req, res) => {
     }
 });
 
-router.get('/stockproductos', async (req, res) => {
+router.get('/stockProductosAll', async (req, res) => {
     try {
       const stockProductos = await StockProducto.findAll({
         include: [
@@ -72,25 +72,58 @@ router.get('/stockproductos', async (req, res) => {
             include: [
               {
                 model: Marca,
-                attributes: ['id', 'nombre'] // Solo obtenemos el ID y el nombre de la marca
+                attributes: ['id', 'nombre'] 
               }
             ],
-            attributes: ['id', 'nombre','presentacion', 'imageUrl'] // Campos que queremos del producto
+            attributes: ['id', 'nombre','presentacion', 'imageUrl'] 
           },
           {
             model: Botica,
-            attributes: ['id', 'nombre', 'direccion'] // Información de la botica
+            attributes: ['id', 'nombre', 'direccion'] 
           }
         ]
       });
   
-      res.json(stockProductos); // Enviamos los resultados en formato JSON
+      res.json(stockProductos); 
     } catch (error) {
       console.error("Error al obtener los stockproductos:", error);
       res.status(500).json({ error: "Error al obtener los stockproductos" });
     }
   });
 
+  router.get('/stockProductos/:id', async (req, res) => {
+    const { id } = req.params; // Obtenemos el id de los parámetros de la URL
+    try {
+      const stockProducto = await StockProducto.findByPk(id, { // Usamos findByPk para buscar por la clave primaria
+        include: [
+          {
+            model: Producto,
+            include: [
+              {
+                model: Marca,
+                attributes: ['id', 'nombre']
+              }
+            ],
+            attributes: ['id', 'nombre', 'presentacion', 'imageUrl', 'categoria', 'descripcion', 'caracteristicas']
+          },
+          {
+            model: Botica,
+            attributes: ['id', 'nombre', 'direccion']
+          }
+        ]
+      });
+  
+      if (stockProducto) {
+        res.json(stockProducto); // Devolvemos el producto si se encuentra
+      } else {
+        res.status(404).json({ error: 'StockProducto no encontrado' }); // Si no se encuentra, devolver 404
+      }
+    } catch (error) {
+      console.error('Error al obtener el stockProducto:', error);
+      res.status(500).json({ error: 'Error al obtener el stockProducto' });
+    }
+  });
+  
 
 router.get("/searchProduct", async (req, res) => {
     const query = req.query.query.toLowerCase(); // Obtiene la consulta y la convierte a minúsculas

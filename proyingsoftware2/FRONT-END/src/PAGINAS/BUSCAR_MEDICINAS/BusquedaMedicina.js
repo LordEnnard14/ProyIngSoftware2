@@ -10,14 +10,14 @@ const BusquedaMedicina = () => {
 
   const fetchData = async () => {
     try {
-      const respuesta = await fetch('http://localhost:4000/api/productos/stockproductos'); // Cambiamos al nuevo endpoint
+      const respuesta = await fetch('http://localhost:4000/api/productos/stockProductosAll'); // Cambiamos al nuevo endpoint
       const resultado = await respuesta.json();
 
       const baseUrl = `http://localhost:4000/api/productos/`; // La URL base para las imágenes
 
       // Mapea los datos obtenidos del stock de productos
       const stockConDatos = resultado.map(stock => ({
-        id: stock.Producto?.id || 'Sin ID',
+        id: stock?.id || 'Sin ID',
         name: stock.Producto?.nombre || 'Sin nombre',
         marca: stock.Producto?.Marca?.nombre || 'Sin marca',
         botica: stock.Botica?.nombre || 'Sin botica',
