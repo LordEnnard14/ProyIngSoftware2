@@ -1,11 +1,6 @@
 // Archivo: Controladores/Productos.js
 import express from "express";
-import Producto from "../models/Producto.js";
-import {
-    StockProducto,   
-    Marca,
-    Botica,    
-  } from "../models/Relaciones.js";
+import {Producto, StockProducto, Marca, Botica} from "../models/Relaciones.js";
 import { Op } from "sequelize";
 
 
@@ -67,6 +62,35 @@ router.get('/productoAll', async (req, res) => {
         res.status(500).json({ error: "Error al obtener los productos" });
     }
 });
+
+router.get('/stockproductos', async (req, res) => {
+    try {
+      const stockProductos = await StockProducto.findAll({
+        include: [
+          {
+            model: Producto,
+            include: [
+              {
+                model: Marca,
+                attributes: ['id', 'nombre'] // Solo obtenemos el ID y el nombre de la marca
+              }
+            ],
+            attributes: ['id', 'nombre','presentacion', 'imageUrl'] // Campos que queremos del producto
+          },
+          {
+            model: Botica,
+            attributes: ['id', 'nombre', 'direccion'] // Información de la botica
+          }
+        ]
+      });
+  
+      res.json(stockProductos); // Enviamos los resultados en formato JSON
+    } catch (error) {
+      console.error("Error al obtener los stockproductos:", error);
+      res.status(500).json({ error: "Error al obtener los stockproductos" });
+    }
+  });
+
 
 router.get("/searchProduct", async (req, res) => {
     const query = req.query.query.toLowerCase(); // Obtiene la consulta y la convierte a minúsculas
