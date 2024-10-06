@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
-import Admin from "./Admin.js";
-import StockProducto from "./StockProducto.js";
+
 
 const Botica = sequelize.define('Botica', {
     id: {

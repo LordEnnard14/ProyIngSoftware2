@@ -27,7 +27,11 @@ const Usuario = sequelize.define('Usuario', {
     },
     correo: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isEmail: true, // Formato de e-mail
+        },
+        unique: true, // Unico
     },
     telefono: {
       type: DataTypes.STRING, 
@@ -41,6 +45,11 @@ const Usuario = sequelize.define('Usuario', {
     dni: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+            len: [8, 8], // DNI no tiene más de 8 digitos
+            isNumeric: true, // Son numeros
+        },
+        unique: true, // Unico
     },
     fechaRegistro: {
         type: DataTypes.DATE,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Grid, Box, Typography, Button, Link } from '@mui/material';
 import Header1 from '../../COMPONENTES/Header_Principal';
-import CantidadProducto from '../BUSCAR_MEDICINAS/DETALLES/Cantidad';
+import CantidadProducto from '../BUSCAR_MEDICINAS/DETALLES/Cantidad.js';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const DetalleProducto = () => {
@@ -139,10 +139,14 @@ const DetalleProducto = () => {
 
         <Box mt={4} mb={4} bgcolor="grey.300" p={2} borderRadius={3}>
           <Typography variant="h6">Características del Producto:</Typography>
-          {stockProducto?.Producto?.caracteristicas ? (
-            <Typography variant="body1">
-              {stockProducto.Producto.caracteristicas}
-            </Typography>
+          {stockProducto?.Producto?.caracteristicas?.length > 0 ? (
+            <ul>
+              {stockProducto.Producto.caracteristicas.map((caracteristica, index) => (
+                <li key={index}>
+                  <Typography variant="body1">{caracteristica}</Typography>
+                </li>
+              ))}
+            </ul>
           ) : (
             <Typography variant="body1">No hay características disponibles.</Typography>
           )}

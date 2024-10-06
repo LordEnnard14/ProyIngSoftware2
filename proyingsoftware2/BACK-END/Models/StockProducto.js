@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
-import Botica from "./Botica.js";
-import Producto from "./Producto.js";
+
 
 const StockProducto = sequelize.define('StockProducto', {
     id: {
@@ -20,7 +19,16 @@ const StockProducto = sequelize.define('StockProducto', {
     fecha_vencimiento: {
         type: DataTypes.STRING,
         allowNull: false,
-    }
+    },
+    estado: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: false,
+    },
+    nRegistroSanitario: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
 },{
     freezeTableName: true,
     timestamps: false
