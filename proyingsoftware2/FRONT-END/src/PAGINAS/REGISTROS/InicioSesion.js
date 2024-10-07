@@ -1,7 +1,7 @@
 import React from 'react';
 import { TextField, Grid, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Header2 from '../../COMPONENTES/Header_2'; 
+import Header2 from '../../COMPONENTES/Header_2';
 import './IScss.css';
 import Footer from '../../COMPONENTES/Footer_Principal';
 
@@ -44,8 +44,6 @@ const InicioSesion = () => {
       alert('Ocurrió un error al intentar iniciar sesión. Inténtalo nuevamente.');
     }
   };
-  
-  
 
   return (
     <>
@@ -110,7 +108,7 @@ const InicioSesion = () => {
               </Grid>
               <Grid item xs={12}>
                 <div className="divolvide">
-                  <a className="olvide" href="">
+                  <a className="olvide" onClick={() => navigate('/RecuperarContraseña')}>
                     Olvidé mi contraseña
                   </a>
                 </div>

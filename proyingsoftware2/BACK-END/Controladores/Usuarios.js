@@ -90,6 +90,45 @@ router.post('/iniciarSesion', async (req, res) => {
 });
 
 
+// Endpoint para consultar a la base de datos si existe un correo (se utiliza para poder establecer nueva contraseña)
+router.get('/verificarCorreo/:correo', async (req, res) => {
+  const { correo } = req.params; // Obtenemos el correo de los parámetros de la ruta
+
+  try {
+    const usuario = await Usuario.findOne({ where: { correo } }); // Verifica si el usuario existe
+
+    if (usuario) {
+      return res.status(200).json({ message: 'El correo existe' }); // Respuesta positiva si el usuario se encuentra
+    } else {
+      return res.status(404).json({ message: 'El correo no existe' }); // Respuesta negativa si no se encuentra
+    }
+  } catch (error) {
+    console.error('Error al verificar el correo:', error);
+    return res.status(500).json({ message: 'Ocurrió un error al verificar el correo.' });
+  }
+});
+
+
+//Endpoint que nos va a permitir reestablecer una contraseña para un correo existente
+
+router.put('/restablecerContrasena', async (req, res) => {
+  const { correo, password } = req.body;
+  try {
+    const user = await Usuario.findOne({ where: { correo } });
+    if (user) {
+      // Actualiza la contraseña del usuario sin hash
+      user.password = password; // Reemplaza la contraseña antigua con la nueva
+      await user.save(); // Guarda los cambios
+      
+      return res.status(200).json({ message: 'Contraseña actualizada con éxito' });
+    } else {
+      return res.status(404).json({ message: 'Correo no encontrado' });
+    }
+  } catch (error) {
+    console.error('Error al restablecer la contraseña:', error); // Log de error
+    return res.status(500).json({ message: 'Error en el servidor' });
+  }
+});
 
 
 export default router;
