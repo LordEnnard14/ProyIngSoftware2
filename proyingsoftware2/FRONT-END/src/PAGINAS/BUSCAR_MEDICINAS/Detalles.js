@@ -51,7 +51,7 @@ const DetalleProducto = () => {
   };
 
   if (!stockProducto) {
-    return <div>No se encontró el stockProducto.</div>; // Mostramos mensaje si no hay producto
+    return <div>No se encontró el Producto que esta buscando.</div>; // Mostramos mensaje si no hay producto
   }
 
   // Construimos la URL de la imagen usando el ID del producto
@@ -69,7 +69,7 @@ const DetalleProducto = () => {
           </Typography>
           {/* Aquí se muestra la tienda */}
           <Typography variant="body1" color="textSecondary">
-            Vendido por: {stockProducto.Botica.nombre}
+            Vendido por: {stockProducto.Producto.Botica.nombre}
           </Typography>
         </Box>
         <Grid container spacing={4}>
@@ -109,7 +109,7 @@ const DetalleProducto = () => {
                   <Typography variant="h6">DISPONIBLE</Typography>
                 </Box>
                 <Typography variant="h4" color="black" fontWeight="bold">
-                  S/{stockProducto.precio?.toFixed(2)}
+                  S/. {stockProducto.precio?.toFixed(2)}
                 </Typography>
                 <Button
                   variant="contained"

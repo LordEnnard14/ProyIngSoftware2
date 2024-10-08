@@ -20,8 +20,8 @@ const BusquedaMedicina = () => {
         id: stock?.id || 'Sin ID',
         name: stock.Producto?.nombre || 'Sin nombre',
         marca: stock.Producto?.Marca?.nombre || 'Sin marca',
-        botica: stock.Botica?.nombre || 'Sin botica',
-        direccion: stock.Botica?.direccion || 'Sin dirección',
+        botica: stock.Producto?.Botica?.nombre || 'Sin botica',
+        direccion: stock.Producto?.Botica?.direccion || 'Sin dirección',
         cantidad: stock.cantidad || 0,
         image: `${baseUrl}${stock.Producto?.imageUrl}`, // Ruta para la imagen del producto
         precio: stock.precio || 0

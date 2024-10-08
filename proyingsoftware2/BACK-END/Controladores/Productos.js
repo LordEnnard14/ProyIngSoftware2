@@ -20,13 +20,13 @@ router.get('/stockProductosAll', async (req, res) => {
               {
                 model: Marca,
                 attributes: ['id', 'nombre'] 
+              },
+              {
+                model: Botica,
+                attributes: ['id', 'nombre', 'direccion'] 
               }
             ],
             attributes: ['id', 'nombre','presentacion', 'imageUrl'] 
-          },
-          {
-            model: Botica,
-            attributes: ['id', 'nombre', 'direccion'] 
           }
         ]
       });
@@ -38,6 +38,7 @@ router.get('/stockProductosAll', async (req, res) => {
     }
   });
 
+  
   router.get('/stockProductos/:id', async (req, res) => {
     const { id } = req.params; // Obtenemos el id de los parámetros de la URL
     try {
@@ -49,13 +50,13 @@ router.get('/stockProductosAll', async (req, res) => {
               {
                 model: Marca,
                 attributes: ['id', 'nombre']
+              },
+              {
+                model: Botica,
+                attributes: ['id', 'nombre', 'direccion']
               }
             ],
             attributes: ['id', 'nombre', 'presentacion', 'imageUrl', 'categoria', 'descripcion', 'caracteristicas']
-          },
-          {
-            model: Botica,
-            attributes: ['id', 'nombre', 'direccion']
           }
         ]
       });
