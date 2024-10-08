@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import productoRoutes from "./Controladores/Productos.js";
 import usuarioRoutes from "./Controladores/Usuarios.js";
 import ordenRoutes from "./Controladores/Ordenes.js";
+import adminRoutes from "./Controladores/Admin.js";
 import "./Models/Relaciones.js"
 import sequelize from "./Database/database.js"; 
 
@@ -33,6 +34,7 @@ async function verificacionConexion() {
 app.use("/api/productos", productoRoutes);
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/ordenes", ordenRoutes);
+app.use("/api/admin",adminRoutes);
 
 app.listen(port, function () {
     console.log("Servidor escuchando en el puerto " + port);

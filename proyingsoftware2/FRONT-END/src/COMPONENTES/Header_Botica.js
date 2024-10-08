@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography'; // Agrega esta línea
+import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Slide from '@mui/material/Slide';
 import Grow from '@mui/material/Grow';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import IconButton from '@mui/material/IconButton';
 
 // Estilo para el título "DosisXtra"
 const Titulo_Boton = styled(Button)(({ theme }) => ({
@@ -25,9 +27,48 @@ const Titulo_Boton = styled(Button)(({ theme }) => ({
 
 const Header_Botica = () => {
   const navigate = useNavigate();
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setLoggedIn(true);
+      // Asegúrate de ajustar aquí las propiedades de tu modelo de usuario
+      setUserName(`${user.nombre} ${user.apellidoPaterno}`);
+    } else {
+      setLoggedIn(false);
+      setUserName('');
+    }
+
+    // Escuchar cambios en el localStorage
+    const storageChangeHandler = () => {
+      const updatedUser = JSON.parse(localStorage.getItem('user'));
+      if (updatedUser) {
+        setLoggedIn(true);
+        setUserName(`${updatedUser.nombre} ${updatedUser.apellidoPaterno}`);
+      } else {
+        setLoggedIn(false);
+        setUserName('');
+      }
+    };
+
+    window.addEventListener('storage', storageChangeHandler);
+
+    return () => {
+      window.removeEventListener('storage', storageChangeHandler);
+    };
+  }, []);
 
   const handleLogout = () => {
-    navigate('/login'); // Ajusta la ruta para cerrar sesión si es necesario
+    localStorage.removeItem('user');
+    setLoggedIn(false);
+    setUserName('');
+    navigate('/InicioSesionBotica'); // Ajusta la ruta para cerrar sesión si es necesario
+  };
+
+  const handleProfileClick = () => {
+    navigate('/dashboardbotica'); // Redirige al dashboard de botica
   };
 
   return (
@@ -36,7 +77,9 @@ const Header_Botica = () => {
         <AppBar position="static" sx={{ backgroundColor: '#FFFFFF' }} elevation={4}>
           <Toolbar sx={{ justifyContent: 'space-between' }}>
             <Box>
-              <Titulo_Boton  onClick={() => navigate('/')} >DosisXtra</Titulo_Boton>
+              <Titulo_Boton onClick={() => navigate('/')}>
+                DosisXtra
+              </Titulo_Boton>
             </Box>
 
             <Grow in={true} timeout={1000}>
@@ -45,13 +88,34 @@ const Header_Botica = () => {
               </Typography>
             </Grow>
 
-            <Button
-              variant="contained"
-              sx={{ backgroundColor: '#567C8D', color: '#ffffff' }}
-              onClick={handleLogout}
-            >
-              Cerrar Sesión
-            </Button>
+            {loggedIn ? (
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography sx={{ color: '#000000', marginRight: 2 }}>
+                  {userName}
+                </Typography>
+                <IconButton
+                  onClick={handleProfileClick} // Redirige al dashboard cuando se haga clic
+                  sx={{ color: '#000000' }}
+                >
+                  <AccountCircleIcon />
+                </IconButton>
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: '#567C8D', color: '#ffffff', marginLeft: 2 }}
+                  onClick={handleLogout}
+                >
+                  Cerrar Sesión
+                </Button>
+              </Box>
+            ) : (
+              <Button
+                variant="contained"
+                sx={{ backgroundColor: '#567C8D', color: '#ffffff' }}
+                onClick={() => navigate('/InicioSesion')}
+              >
+                Iniciar Sesión
+              </Button>
+            )}
           </Toolbar>
         </AppBar>
       </Slide>

@@ -1,19 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
 import Header_Botica from '../../COMPONENTES/Header_Botica';
 import BarraHorizontalBotica from '../../COMPONENTES/BarraHorizontalBotica';
 import { useNavigate } from 'react-router-dom';
 import ContenidoTablaProductoBotica from '../USUARIO_BOTICA/Contenido Tablas/ContenidoTablaProductoBotica';
+
 const ListaProductosBotica = () => {
+  const [productos, setProductos] = useState([]);
   const navigate = useNavigate();
 
-  // Datos simulados, puedes sustituirlos con datos de tu base de datos
-  const productos = [
-    { id: 1, nombre: 'Producto A', precio: 'S/ 50.00', fechaRegistro: '10/09/2023', stock: 100, estado: 'Disponible' },
-    { id: 2, nombre: 'Producto B', precio: 'S/ 30.00', fechaRegistro: '12/09/2023', stock: 50, estado: 'No disponible' },
-    { id: 3, nombre: 'Producto C', precio: 'S/ 45.00', fechaRegistro: '15/09/2023', stock: 20, estado: 'Disponible' },
-    { id: 4, nombre: 'Producto D', precio: 'S/ 25.00', fechaRegistro: '18/09/2023', stock: 0, estado: 'No disponible' },
-  ];
+  useEffect(() => {
+    const fetchProductos = async () => {
+      const user = JSON.parse(localStorage.getItem('user')); // Obtener el ID de la botica
+      const boticaID = user?.id; // Asignar el id de la botica
+
+      if (boticaID) {
+        try {
+          const respuesta = await fetch(`http://localhost:4000/api/admin/boticaProductos/${boticaID}`);
+          const resultado = await respuesta.json();
+
+          const productosBotica = resultado.map(producto => ({
+            id: producto?.id || 'Sin ID',
+            nombre: producto?.nombre || 'Sin nombre',
+            precio: producto?.StockProducto?.precio || 'Sin precio',
+            fechaRegistro: producto?.fechaRegistro || 'Fecha no disponible', // Ajuste del campo si está disponible
+            stock: producto?.StockProducto?.cantidad || 'Sin stock',
+            estado: producto?.StockProducto?.estado ? 'Disponible' : 'No disponible', // Mostrar 'Disponible' si es true, 'No disponible' si es false
+          }));
+
+          setProductos(productosBotica);
+        } catch (error) {
+          console.error("Error al obtener los productos:", error);
+        }
+      } else {
+        console.error("No se encontró el ID de la botica en el localStorage");
+      }
+    };
+
+    fetchProductos();
+  }, []);
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -43,18 +68,18 @@ const ListaProductosBotica = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Precio</TableCell>
-                <TableCell>Fecha de Registro</TableCell>
-                <TableCell>Stock</TableCell>
-                <TableCell>Estado</TableCell>
-                <TableCell>Acciones</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>ID</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Nombre</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Precio</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Fecha Registro</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Stock</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Estado</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {productos.map((producto) => (
-                <ContenidoTablaProductoBotica key={producto.id} producto={producto}/>
+                <ContenidoTablaProductoBotica key={producto.id} producto={producto} />
               ))}
             </TableBody>
           </Table>

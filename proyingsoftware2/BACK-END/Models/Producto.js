@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
-
+import moment from 'moment-timezone';
 
 const Producto = sequelize.define('Producto', {
     id: {
@@ -27,6 +27,11 @@ const Producto = sequelize.define('Producto', {
     caracteristicas: {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: false,
+    },
+    fechaRegistro: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: () => moment.tz('America/Lima').toDate // Hora de Lima, Perú
     },
     imageUrl: {
         type: DataTypes.STRING

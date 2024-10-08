@@ -7,13 +7,13 @@ function AgregarFilaProductoBotica(props) {
 
   return (
     <TableRow key={producto.id}>
-      <TableCell>{producto.id}</TableCell>
-      <TableCell>{producto.nombre}</TableCell>
-      <TableCell>{producto.precio}</TableCell>
-      <TableCell>{producto.fechaRegistro}</TableCell>
-      <TableCell>{producto.stock}</TableCell>
-      <TableCell>{producto.estado}</TableCell>
-      <TableCell>
+      <TableCell sx={{ textAlign: 'center' }}>{producto.id}</TableCell>
+      <TableCell sx={{ textAlign: 'center' }}>{producto.nombre}</TableCell>
+      <TableCell sx={{ textAlign: 'center' }}>S/. {parseFloat(producto.precio).toFixed(2)}</TableCell>
+      <TableCell sx={{ textAlign: 'center' }}>{producto.fechaRegistro.slice(0, 10)}</TableCell>
+      <TableCell sx={{ textAlign: 'center' }}>{producto.stock}</TableCell>
+      <TableCell sx={{ textAlign: 'center' }}>{producto.estado}</TableCell>
+      <TableCell sx={{ textAlign: 'center' }}>
         <Button size="small" sx={{ mr: 1 }} color="primary">Ver</Button>
         {producto.estado === 'Disponible' ? (
           <Button size="small" color="secondary">Desactivar</Button>
@@ -29,10 +29,10 @@ AgregarFilaProductoBotica.propTypes = {
   producto: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     nombre: PropTypes.string.isRequired,
-    precio: PropTypes.string.isRequired,
+    precio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     fechaRegistro: PropTypes.string.isRequired,
     stock: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    estado: PropTypes.string.isRequired,
+    estado: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired, // Permitir string o boolean
   }).isRequired,
 };
 

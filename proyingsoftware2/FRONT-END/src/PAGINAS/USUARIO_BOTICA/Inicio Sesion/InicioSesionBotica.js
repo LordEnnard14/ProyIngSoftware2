@@ -1,41 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TextField, Grid, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Header2 from '../../COMPONENTES/Header_2';
-import './IScss.css';
-import Footer from '../../COMPONENTES/Footer_Principal';
+import Header2 from '../../../COMPONENTES/Header_2.js';
+import '../../REGISTROS/IScss.css';
+import Footer from '../../../COMPONENTES/Footer_Principal.js';
 
-const InicioSesion = () => {
+const InicioSesionBotica = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Evita que la página se recargue
-  
-    const formData = new FormData(event.target); // Captura los datos del formulario
-    const email = formData.get('email'); // Obtiene el valor del campo "email"
-    const password = formData.get('password'); // Obtiene el valor del campo "password"
-    
+    event.preventDefault();
+
     try {
-      // Aquí haces la petición al endpoint de inicio de sesión
-      const response = await fetch('http://localhost:4000/api/usuarios/iniciarSesion', {
+      const response = await fetch('http://localhost:4000/api/admin/iniciarSesion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ correo: email, password: password }), // Envia los datos en el cuerpo de la petición
+        body: JSON.stringify({ correo: email, password }), // Usa las variables de estado
       });
-  
-      const data = await response.json(); // Convierte la respuesta a JSON
-  
+
+      const data = await response.json();
+
       if (response.ok) {
-        // Si el inicio de sesión es exitoso
         alert('Inicio de sesión exitoso');
-  
-        // Almacenar los datos del usuario en localStorage
+        // Guardar el id, nombre y apellido en localStorage
         localStorage.setItem('user', JSON.stringify({
-          nombre: data.user.nombre, // Acceder a los datos del usuario correctamente
-          apellidoPaterno: data.user.apellidoPaterno, // Acceder a los datos del usuario correctamente
+          id: data.user.id,               // Se guarda el id del usuario
+          nombre: data.user.nombre,        // Se guarda el nombre
+          apellidoPaterno: data.user.apellidoPaterno,  // Se guarda el apellido paterno
         }));
-  
-        navigate('/');
+        navigate('/DashboardBotica'); // Redirige a DashboardBotica
       } else {
         alert(data.message || 'Error en el inicio de sesión');
       }
@@ -62,6 +57,7 @@ const InicioSesion = () => {
                   marginBottom: '100px',
                   fontSize: '30px',
                 }}
+                onClick={() => navigate('/DashboardBotica')}
               >
                 Iniciar Sesión
               </Typography>
@@ -69,7 +65,8 @@ const InicioSesion = () => {
             <Grid container spacing={2}>
               <Grid sx={{ width: '100%' }}>
                 <TextField
-                  name="email"
+                  value={email} // Asignar el valor del estado
+                  onChange={(e) => setEmail(e.target.value)} // Captura el cambio en el input
                   fullWidth
                   label="Correo electrónico"
                   variant="outlined"
@@ -88,7 +85,8 @@ const InicioSesion = () => {
               </Grid>
               <Grid sx={{ marginTop: '50px', width: '100%', marginBottom: '5px' }}>
                 <TextField
-                  name="password"
+                  value={password} // Asignar el valor del estado
+                  onChange={(e) => setPassword(e.target.value)} // Captura el cambio en el input
                   fullWidth
                   label="Contraseña"
                   variant="outlined"
@@ -121,12 +119,8 @@ const InicioSesion = () => {
                     backgroundColor: '#28639B',
                     color: '#ffffff',
                     borderRadius: 20,
-                    width: '50%',
-                    display: 'flex',
-                    marginRight: 'auto',
-                    marginLeft: 'auto',
-                    height: '50px',
                     width: '100%',
+                    height: '50px',
                   }}
                 >
                   <b>Entrar</b>
@@ -134,15 +128,15 @@ const InicioSesion = () => {
               </Grid>
             </Grid>
             <Box mt={2} className="RA">
-              <p>¿Aún no tienes cuenta?</p>
-              <a onClick={() => navigate('/Registro')}>
-                <b>Regístrate aquí</b>
+              <p>¿Deseas que tu botica se una a nuestra página?</p>
+              <a onClick={() => navigate('/RegistroBotica')}>
+                <b>Registra a tu botica aquí</b>
               </a>
-                <div className="divolvide">
-                  <a className="olvide" onClick={() => navigate('/InicioSesionBotica')}>
-                    Iniciar Sesión Botica
-                  </a>
-                </div>
+              <div className="divolvide">
+                <a className="olvide" onClick={() => navigate('/InicioSesion')}>
+                  Iniciar Sesión Usuario
+                </a>
+              </div>
             </Box>
           </form>
         </Box>
@@ -152,4 +146,4 @@ const InicioSesion = () => {
   );
 };
 
-export default InicioSesion;
+export default InicioSesionBotica;

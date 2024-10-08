@@ -23,6 +23,7 @@ import AgregarProductoBotica from './PAGINAS/USUARIO_BOTICA/AgregarProductoBotic
 import DashboardBotica from './PAGINAS/USUARIO_BOTICA/DashboardBotica';
 import ListaProductosBotica from './PAGINAS/USUARIO_BOTICA/ListaProductoBotica';
 import OrdenesBotica from './PAGINAS/USUARIO_BOTICA/OrdenesBotica';
+import InicioSesionBotica from './PAGINAS/USUARIO_BOTICA/Inicio Sesion/InicioSesionBotica.js';
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
             <Route path='/DashboardBotica' element={<DashboardBotica/>}/>
             <Route path='/ListaProductosBotica' element={<ListaProductosBotica/>}/>
             <Route path='/OrdenesBotica' element={<OrdenesBotica/>}/>
+            <Route path='/InicioSesionBotica' element={<InicioSesionBotica/>}/>
           </Routes>
         </Box>
        
