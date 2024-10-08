@@ -16,10 +16,6 @@ const StockProducto = sequelize.define('StockProducto', {
         type: DataTypes.DOUBLE,
         allowNull: false,
     },
-    fecha_vencimiento: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
     estado: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

@@ -35,7 +35,11 @@ const Admin = sequelize.define('Admin', {
             isEmail: true, // Formato de e-mail
         },
         unique: true, // Unico
-    }
+    },
+    password: { 
+        type: DataTypes.STRING,
+        allowNull: false
+    },
 }, {
     freezeTableName: true,
     timestamps: false
