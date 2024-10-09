@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Box, Grid, Typography, Paper } from '@mui/material';
+import { Box, Grid, Button } from '@mui/material';
 import Header1 from '../../COMPONENTES/Header_Principal';
 import NavegacionMedicinas from '../../COMPONENTES/NavegacionMedicinas';
 import Footer from '../../COMPONENTES/Footer_Principal';
@@ -10,70 +10,152 @@ const ResultadoBusqueda = () => {
   const location = useLocation();
   const { query } = location.state || { query: '' }; // Obtenemos el término de búsqueda
   const [filteredStocks, setFilteredStocks] = useState([]); // Stocks filtrados
+  const [currentPage, setCurrentPage] = useState(1); // Página actual
+  const productsPerPage = 8; // Número de productos por página
+  const [isSearchEmpty, setIsSearchEmpty] = useState(false); // Para manejar si la búsqueda está vacía
+  const [totalPages, setTotalPages] = useState(1); // Total de páginas
+  const [searchError, setSearchError] = useState(''); // Para manejar errores de búsqueda
 
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        // Cambié la URL para que apunte correctamente a /searchStockProductos
-        const response = await fetch(`http://localhost:4000/api/productos/searchStockProductos?query=${query}`);
+        const endpoint = query
+          ? `http://localhost:4000/api/productos/searchStockProductos?query=${query}`
+          : `http://localhost:4000/api/productos/stockProductosAll`; // Todos los productos si no hay búsqueda
+
+        const response = await fetch(endpoint);
 
         if (!response.ok) {
-          throw new Error('Error al obtener los datos del servidor');
+          throw new Error('Error al obtener los datos del servidor'); // Esto se mantendrá si hay un error real
         }
         const data = await response.json();
 
-        // Asegúrate de que el API retorne los campos correctos
         console.log("Datos obtenidos:", data); // Para depurar
 
-        // Mapea los datos obtenidos del stock de productos
         const stockConDatos = data.map(stock => ({
           id: stock?.id || 'Sin ID',
           name: stock.Producto?.nombre || 'Sin nombre',
           marca: stock.Producto?.Marca?.nombre || 'Sin marca',
-          botica: stock.Botica?.nombre || 'Sin botica',
+          botica: stock.Producto?.Botica?.nombre || 'Sin botica',
           direccion: stock.Botica?.direccion || 'Sin dirección',
           cantidad: stock.cantidad || 0,
-          image: `http://localhost:4000/api/productos/${stock.Producto?.imageUrl}`, // Ruta para la imagen del producto
+          image: `http://localhost:4000/api/productos/${stock.Producto?.imageUrl}`,
           precio: stock.precio || 0,
         }));
 
-        setFilteredStocks(stockConDatos); 
+        setFilteredStocks(stockConDatos);
+        setTotalPages(Math.ceil(stockConDatos.length / productsPerPage));
+
+        // Actualizar isSearchEmpty según el resultado
+        if (query && stockConDatos.length === 0) {
+          setIsSearchEmpty(true);
+          setSearchError(`No se encontraron productos con '${query}'.`);
+        } else {
+          setIsSearchEmpty(false);
+          setSearchError(''); // Resetear el error si hay resultados
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
+        setSearchError('Error al obtener los datos del servidor.'); // Mensaje de error real
         setFilteredStocks([]);
       }
     };
 
-    if (query) {
-      fetchProductos();
-    }
+    fetchProductos();
   }, [query]);
+
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredStocks.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  const handlePageClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const renderPaginationButtons = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <Button
+          key={i}
+          variant="contained"
+          onClick={() => handlePageClick(i)}
+          style={{ margin: '0 5px', backgroundColor: '#567C8D' }}
+          disabled={currentPage === i}
+        >
+          {i}
+        </Button>
+      );
+    }
+    return pageNumbers;
+  };
 
   return (
     <div>
       <Header1 />
       <NavegacionMedicinas />
       <Box sx={{ flexGrow: 1, padding: 4 }}>
-        {filteredStocks.length === 0 ? (
+        {searchError ? (
           <Box textAlign="center" padding={4}>
-            No se encontraron productos con stock para "{query}".
+            {searchError} {/* Mensaje de error del servidor */}
+          </Box>
+        ) : isSearchEmpty ? (
+          <Box textAlign="center" padding={4}>
+            {query
+              ? `No se encontraron productos con '${query}'.` // Mensaje específico
+              : "No se encontraron productos disponibles."}
           </Box>
         ) : (
-          <Grid
-            container
-            spacing={3}
-            justifyContent="flex-start"
-            alignItems="flex-start"
-            paddingRight={'10%'}
-            paddingLeft={'10%'}
-          >
-            {filteredStocks.map((stock) => (
-              <ContenidoPaginaBusqueda
-                key={stock.id}
-                caractProducto={stock}
-              />
-            ))}
-          </Grid>
+          <>
+            <Grid
+              container
+              spacing={3}
+              justifyContent="flex-start"
+              alignItems="flex-start"
+              paddingRight={'10%'}
+              paddingLeft={'10%'}
+            >
+              {currentProducts.map((stock) => (
+                <ContenidoPaginaBusqueda
+                  key={stock.id}
+                  caractProducto={stock}
+                  style={{ marginLeft: '10px', backgroundColor: '#567C8D' }}
+                />
+              ))}
+            </Grid>
+
+            <Box textAlign="center" marginTop={4}>
+              <Button
+                variant="contained"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                style={{ marginLeft: '10px', backgroundColor: '#567C8D' }}
+              >
+                Anterior
+              </Button>
+              {renderPaginationButtons()}
+              <Button
+                variant="contained"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                style={{ marginLeft: '10px', backgroundColor: '#567C8D' }}
+              >
+                Siguiente
+              </Button>
+            </Box>
+          </>
         )}
       </Box>
       <Footer />

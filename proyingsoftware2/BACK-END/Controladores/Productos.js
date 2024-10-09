@@ -85,6 +85,10 @@ router.get('/stockProductosAll', async (req, res) => {
               {
                 model: Marca,
                 attributes: ['id', 'nombre'] 
+              },
+              {
+                model: Botica,
+                attributes: ['id', 'nombre', 'direccion'] 
               }
             ],
             attributes: ['id', 'nombre', 'presentacion', 'imageUrl'],
@@ -92,12 +96,11 @@ router.get('/stockProductosAll', async (req, res) => {
               nombre: {
                 [Op.iLike]: `%${query}%` // Búsqueda insensible a mayúsculas/minúsculas por nombre del producto
               }
+              
             }
+            
           },
-          {
-            model: Botica,
-            attributes: ['id', 'nombre', 'direccion'] 
-          }
+          
         ]
       });
   
