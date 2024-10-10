@@ -50,18 +50,38 @@ const Header1 = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
+    const usuarioID = user?.id;
+
     if (user) {
       setLoggedIn(true);
-      // Asegúrate de ajustar aquí las propiedades de tu modelo de usuario
       setUserName(`${user.nombre} ${user.apellidoPaterno}`);
     } else {
       setLoggedIn(false);
       setUserName('');
     }
 
-    const updateCartCount = () => {
-      const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-      setCartItemCount(cartItems.length);
+    const updateCartCount = async () => {
+      if (!usuarioID) {
+        console.error('Usuario no encontrado');
+        setCartItemCount(0); // O cualquier valor por defecto que desees
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:4000/api/carrito/cantidadProductos/${usuarioID}`);
+
+        if (!response.ok) {
+          throw new Error('Error al obtener la cantidad de productos');
+        }
+
+        const data = await response.json(); // Obtener el cuerpo de la respuesta
+        console.log('Cantidad de productos:', data.totalProductos); // Verificar qué se devuelve
+
+        setCartItemCount(data.totalProductos); // Asegúrate de que este campo exista
+      } catch (error) {
+        console.error('Error al actualizar el conteo del carrito:', error);
+        setCartItemCount(0); // O cualquier valor por defecto que desees
+      }
     };
 
     updateCartCount(); // Inicializa el conteo
@@ -90,6 +110,13 @@ const Header1 = () => {
     };
   }, []);
 
+
+
+
+
+
+
+
   const handleLogout = () => {
     localStorage.removeItem('user');
     console.log("Usuario eliminado del localStorage");
@@ -97,6 +124,23 @@ const Header1 = () => {
     setUserName('');
     navigate('/InicioSesion');
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
   const handleNavigate = (path, section) => {
     navigate(path);

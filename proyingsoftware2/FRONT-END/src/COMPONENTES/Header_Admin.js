@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -25,12 +25,17 @@ const Titulo_Boton = styled(Button)(({ theme }) => ({
 
 const Header_Admin = () => {
   const navigate = useNavigate();
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [userName, setUserName] = useState('');
 
   const handleLogout = () => {
-    // Elimina el nombre del usuario de localStorage al cerrar sesión
-    localStorage.removeItem('usuarioNombre');
-    navigate('/login'); // Ajusta la ruta para cerrar sesión si es necesario
+    localStorage.removeItem('user');
+    console.log("Usuario eliminado del localStorage");
+    setLoggedIn(false);
+    setUserName('');
+    navigate('/InicioSesion');
   };
+
 
   // Recupera el nombre del usuario de localStorage
   const usuarioNombre = localStorage.getItem('usuarioNombre');

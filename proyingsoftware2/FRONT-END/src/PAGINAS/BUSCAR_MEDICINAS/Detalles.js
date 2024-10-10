@@ -5,10 +5,11 @@ import CantidadProducto from '../BUSCAR_MEDICINAS/DETALLES/Cantidad.js';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const DetalleProducto = () => {
-  const { id } = useParams(); // Obtenemos el ID de los parámetros de la URL
+  const { id } = useParams(); // Obtenemos el ID del producto desde la URL
   const navigate = useNavigate();
-  const [stockProducto, setStockProducto] = useState(null); // Estado para el stockProducto
+  const [stockProducto, setStockProducto] = useState(null); // Estado para el stock del producto
   const [cantidad, setCantidad] = useState(1); // Estado para la cantidad de producto
+  const carritoID = 1;  // ID del carrito, asumiendo que ya existe uno (puedes cambiarlo dinámicamente)
 
   // Usamos useEffect para obtener los datos del producto
   useEffect(() => {
@@ -19,25 +20,81 @@ const DetalleProducto = () => {
           throw new Error('Error al obtener los datos del stockProducto');
         }
         const producto = await response.json();
-        // Actualizamos el estado con los datos del producto
-        setStockProducto(producto);
+        setStockProducto(producto);  // Actualizamos el estado con los datos del producto
       } catch (error) {
         console.error('Error:', error);
       }
     }
-    fetchStockProducto(); // Llamamos a la función cuando el componente se monta
+    fetchStockProducto();  // Llamamos a la función cuando el componente se monta
   }, [id]);
 
-  const handleAddToCart = () => {
+  // Función para agregar el producto al carrito
+  const handleAddToCart = async () => {
     if (stockProducto) {
-      const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-      cartItems.push({ ...stockProducto, cantidad });
-      localStorage.setItem('cartItems', JSON.stringify(cartItems));
-      const event = new Event('cartUpdated');
-      window.dispatchEvent(event);
-    }
-  };
+        try {
+            // Obtener el ID del usuario desde el LocalStorage
+            const usuario = JSON.parse(localStorage.getItem('user'));
+            const usuarioID = usuario?.id;
 
+            if (!usuarioID) {
+                alert('No se encontró información del usuario. Por favor, inicia sesión.');
+                return; // Si no hay un usuarioID, detiene la ejecución
+            }
+
+            // Intentar crear un carrito si no existe
+            const responseCarrito = await fetch(`http://localhost:4000/api/carrito/crearCarritoSiNoExiste/${usuarioID}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const dataCarrito = await responseCarrito.json();
+
+            if (!responseCarrito.ok) {
+                alert('Error al verificar o crear el carrito.');
+                return; // Detener si no se pudo crear o verificar el carrito
+            }
+
+            const carritoID = dataCarrito.carrito.id; // Obtener el ID del carrito desde la respuesta
+
+            // Verificar los datos antes de enviarlos al backend
+            console.log('Enviando datos al carrito:', {
+                productoID: stockProducto.Producto.id,
+                usuarioID: usuarioID,
+                carritoID: carritoID,
+                cantidad: cantidad,
+            });
+
+            // Llamamos al endpoint para agregar el producto al carrito
+            const response = await fetch('http://localhost:4000/api/carrito/agregarProductoCarrito', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productoID: stockProducto.Producto.id,
+                    carritoID: carritoID,
+                    cantidad: cantidad,
+                }),
+            });
+
+            if (response.ok) {
+                // alert('Producto agregado al carrito correctamente');
+                const event = new Event('cartUpdated');
+                window.dispatchEvent(event);
+            } else {
+                const errorData = await response.json();
+                alert('Error al agregar el producto al carrito: ' + errorData.mensaje);
+            }
+        } catch (error) {
+            console.error('Error al agregar el producto al carrito:', error);
+            alert('Error al agregar el producto al carrito. Intente nuevamente.');
+        }
+    }
+};
+
+ 
   const aumentarCantidad = () => {
     if (cantidad < stockProducto.cantidad) {
       setCantidad(cantidad + 1);
@@ -51,7 +108,7 @@ const DetalleProducto = () => {
   };
 
   if (!stockProducto) {
-    return <div>No se encontró el Producto que esta buscando.</div>; // Mostramos mensaje si no hay producto
+    return <div>No se encontró el Producto que está buscando.</div>; // Mostramos mensaje si no hay producto
   }
 
   // Construimos la URL de la imagen usando el ID del producto

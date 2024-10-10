@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, IconButton, TextField, Grid, Divider } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import HeaderAdmin from '../../COMPONENTES/Header_Admin';
 
 const CarritoCompras = () => {
@@ -9,25 +11,103 @@ const CarritoCompras = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    setProductos(cartItems);
-  }, []);
+    const usuario = JSON.parse(localStorage.getItem('user'));
+    const usuarioID = usuario?.id;
 
-  const handleEliminarProducto = (id) => {
-    const updatedProducts = productos.filter(producto => producto.id !== id);
-    setProductos(updatedProducts);
-    localStorage.setItem('cartItems', JSON.stringify(updatedProducts));
+    if (usuarioID) {
+      fetch(`http://localhost:4000/api/carrito/productos/${usuarioID}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error al obtener los productos del carrito');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Productos en el carrito:', data);
+          setProductos(data);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    } else {
+      alert('No se encontró información del usuario. Por favor, inicia sesión.');
+    }
+  }, []);
+  
+  const handleEliminarProducto = async (productoID) => {
+    const usuario = JSON.parse(localStorage.getItem('user'));
+    const usuarioID = usuario?.id;
+
+    if (!usuarioID) {
+      alert('No se encontró información del usuario. Por favor, inicia sesión.');
+      return;
+    }
+
+    try {
+      console.log(`Eliminando producto con ID ${productoID} para el usuario ${usuarioID}`);
+      const response = await fetch(`http://localhost:4000/api/carrito/eliminarProducto/${usuarioID}/${productoID}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Actualizar el estado localmente sin necesidad de recargar la página
+        setProductos(prevProductos => 
+          prevProductos.filter(producto => producto.productoID !== productoID)
+        );
+
+        // Disparar el evento para actualizar otros componentes si es necesario
+        const event = new Event('cartUpdated');
+        window.dispatchEvent(event);
+      } else {
+        const errorData = await response.json();
+        console.error('Error al eliminar el producto:', errorData.mensaje);
+        alert('Error al eliminar el producto: ' + errorData.mensaje);
+      }
+    } catch (error) {
+      console.error('Error al eliminar el producto:', error);
+      alert('Error al eliminar el producto. Intente nuevamente.');
+    }
   };
 
-  const handleCantidadChange = (id, nuevaCantidad) => {
-    const cantidad = parseInt(nuevaCantidad, 10);
-    if (isNaN(cantidad) || cantidad < 1) return;
+  const handleCantidadChange = async (id, accion) => {
+    const usuario = JSON.parse(localStorage.getItem('user'));
+    const usuarioID = usuario?.id;
 
-    const updatedProducts = productos.map(producto =>
-      producto.id === id ? { ...producto, cantidad } : producto
-    );
-    setProductos(updatedProducts);
-    localStorage.setItem('cartItems', JSON.stringify(updatedProducts));
+    if (!usuarioID) {
+        alert('No se encontró información del usuario. Por favor, inicia sesión.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:4000/api/carrito/actualizarCantidad/${usuarioID}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ accion })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error al actualizar la cantidad:', errorData.mensaje);
+            alert('Error al actualizar la cantidad: ' + errorData.mensaje);
+            return;
+        }
+
+        const data = await response.json();
+
+        setProductos(prevProductos => 
+            prevProductos.map(producto =>
+                producto.productoID === id ? { ...producto, cantidad: data.nuevaCantidad } : producto
+            )
+        );
+
+        const event = new Event('cartUpdated');
+        window.dispatchEvent(event);
+    } catch (error) {
+        console.error('Error al actualizar la cantidad:', error);
+        alert('Error al actualizar la cantidad. Intente nuevamente.');
+    }
   };
 
   const calcularSubtotal = () => {
@@ -36,15 +116,6 @@ const CarritoCompras = () => {
       const cantidad = producto.cantidad || 0;
       return total + (precio * cantidad);
     }, 0).toFixed(2);
-  };
-
-  const handleNavigate = (path, section) => {
-    navigate(path);
-    if (section) {
-      setTimeout(() => {
-        document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
-      }, 0);
-    }
   };
 
   return (
@@ -80,30 +151,41 @@ const CarritoCompras = () => {
                     <TableCell>Eliminar</TableCell>
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
                   {productos.map((producto) => (
                     <TableRow key={producto.id}>
                       <TableCell>
                         <img
-                          src={producto.image || 'https://via.placeholder.com/100'}
-                          alt={producto.name || 'Nombre no disponible'}
+                          src={producto.imagen || 'https://via.placeholder.com/100'}
+                          alt={producto.nombre || 'Nombre no disponible'}
                           style={{ width: '100px', height: '100px' }}
                         />
                       </TableCell>
-                      <TableCell>{producto.name || 'Nombre no disponible'}</TableCell>
+                      <TableCell>{producto.nombre || 'Nombre no disponible'}</TableCell>
                       <TableCell>S/ {(producto.precio || 0).toFixed(2)}</TableCell>
+
                       <TableCell>
+                        <IconButton onClick={() => handleCantidadChange(producto.productoID, 'decrementar')}>
+                          <RemoveIcon />
+                        </IconButton>
                         <TextField
                           type="number"
                           value={producto.cantidad || 1}
-                          onChange={(e) => handleCantidadChange(producto.id, e.target.value)}
                           inputProps={{ min: 1 }}
-                          sx={{ width: '60px' }}
+                          sx={{ width: '60px', textAlign: 'center' }}
+                          readOnly
                         />
+                        <IconButton onClick={() => handleCantidadChange(producto.productoID, 'incrementar')}>
+                          <AddIcon />
+                        </IconButton>
                       </TableCell>
-                      <TableCell>S/ {((producto.precio || 0) * (producto.cantidad || 1)).toFixed(2)}</TableCell>
+
                       <TableCell>
-                        <IconButton onClick={() => handleEliminarProducto(producto.id)}>
+                        S/ {((producto.precio || 0) * (producto.cantidad || 1)).toFixed(2)}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleEliminarProducto(producto.productoID)}>
                           <DeleteIcon color="error" />
                         </IconButton>
                       </TableCell>
@@ -128,10 +210,10 @@ const CarritoCompras = () => {
                 <Typography variant="h6">S/ {calcularSubtotal()}</Typography>
               </Box>
 
-              <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => handleNavigate('/PaginaPago')}>
+              <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => navigate('/PaginaPago')}>
                 Proceder al Pago
               </Button>
-              <Button variant="outlined" color="secondary" fullWidth sx={{ mt: 2 }} onClick={() => handleNavigate('/')}>
+              <Button variant="outlined" color="secondary" fullWidth sx={{ mt: 2 }} onClick={() => navigate('/')}>
                 Seguir Comprando
               </Button>
             </Paper>
