@@ -25,7 +25,7 @@ const ListaProductosBotica = () => {
             precio: producto?.StockProducto?.precio || 'Sin precio',
             fechaRegistro: producto?.fechaRegistro || 'Fecha no disponible', // Ajuste del campo si está disponible
             stock: producto?.StockProducto?.cantidad || 'Sin stock',
-            estado: producto?.StockProducto?.estado ? 'Disponible' : 'No disponible', // Mostrar 'Disponible' si es true, 'No disponible' si es false
+            estado: producto?.estado ? 'Disponible' : 'No disponible', // Mostrar 'Disponible' si es true, 'No disponible' si es false
           }));
 
           setProductos(productosBotica);

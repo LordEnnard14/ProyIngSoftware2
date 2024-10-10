@@ -17,7 +17,7 @@ const InicioSesionBotica = () => {
       const response = await fetch('http://localhost:4000/api/admin/iniciarSesion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ correo: email, password }), // Usa las variables de estado
+        body: JSON.stringify({ correo: email, password }),
       });
 
       const data = await response.json();
@@ -57,7 +57,6 @@ const InicioSesionBotica = () => {
                   marginBottom: '100px',
                   fontSize: '30px',
                 }}
-                onClick={() => navigate('/DashboardBotica')}
               >
                 Iniciar Sesión
               </Typography>

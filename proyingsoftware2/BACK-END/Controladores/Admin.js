@@ -49,7 +49,7 @@ router.post('/iniciarSesion', async (req, res) => {
                 },
                 {
                     model: StockProducto,
-                    attributes: ['cantidad', 'precio', 'estado'],
+                    attributes: ['cantidad', 'precio'],
                 }
             ]
         });

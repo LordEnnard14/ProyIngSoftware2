@@ -16,15 +16,7 @@ const StockProducto = sequelize.define('StockProducto', {
         type: DataTypes.DOUBLE,
         allowNull: false,
     },
-    estado: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-        allowNull: false,
-    },
-    nRegistroSanitario: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
+    
 },{
     freezeTableName: true,
     timestamps: false
