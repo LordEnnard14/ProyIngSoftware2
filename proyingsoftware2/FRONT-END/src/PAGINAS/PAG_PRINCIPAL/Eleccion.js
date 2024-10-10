@@ -23,31 +23,30 @@ const Eleccion = () => {
     }
   };
 
-
   return (
     <>
       <HeaderPrincipal/>
       <NavegacionMedicinas />
       <Carousel responsive={responsiveWall} infinite={true} autoPlay={true} autoPlaySpeed={3000} showDots={true} draggable={false}>
-      <div className="Wall">
+        <div className="Wall">
           <img src={'https://images-1.eucerin.com/~/media/eucerin%20relaunch%20media/eucerin/local/latam/2024/especiales/proteccion-solar-que-va-contigo/cambios-cl/banner_sun_face_range_hero-desktop.gif'}/>
-      </div>
-      <div className="Wall">
+        </div>
+        <div className="Wall">
           <img src={'https://www.farmaciasdirect.es/cdn/shop/files/x430dzE1KwJLUus6TvUb0I2sNfJbneqqCFKCRe2P_9d7c5838-283a-4cb6-9ddf-2f7a5a43baec.jpg?v=1725884791&width=1500'}/>
-      </div>
-      <div className="Wall">
+        </div>
+        <div className="Wall">
           <img src={'https://www.cerave.pe/-/media/project/loreal/brand-sites/cerave/shared/ciulad/mx-ciulad-landing-banner-lg.jpg?rev=-1'}/>
-      </div>
-      <div className="Wall">
+        </div>
+        <div className="Wall">
           <img src={'https://storage.googleapis.com/twg-content/images/cabeceragoogle2.width-1200.jpg'}/>
-      </div>
-      <div className="Wall">
+        </div>
+        <div className="Wall">
           <img src={'https://www.marvimundo.com/media/wysiwyg/Banner_Nivea_1.1.jpg'}/>
-      </div>
-
+        </div>
       </Carousel>
+
       <Box sx={{ 
-        position: 'relative', // Para la capa semi-transparente
+        position: 'relative', 
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
@@ -56,21 +55,17 @@ const Eleccion = () => {
         textAlign: 'center',
         backgroundColor: '#FDFAF8',
         marginBottom: '50px',
-        marginTop:'20px'
+        marginTop: '20px'
       }}>
 
         {/* Contenido */}
-        <Box sx={{ zIndex: 2}}>
+        <Box sx={{ zIndex: 2 }}>
           <Typography variant="h4" gutterBottom sx={{ mb: 4, fontSize: '28px', fontWeight: 'bold', color: '#223D53' }}>
             ¿En qué le podemos ayudar?
           </Typography>
           <Grid container spacing={4} justifyContent="center">
-            
-            
-            
             <Grid item>
-              <Button className='medicinasbton'
-                onClick={() => navigate('/BusquedaMedicina')}>
+              <Button className='medicinasbton' onClick={() => navigate('/BusquedaMedicina')}>
                 <Box>
                   <LocalPharmacyIcon sx={{ fontSize: 70, color: '#ffffff' }} />
                   <Typography variant="h6" sx={{ mt: 2, color: 'white', fontWeight: 'bold' }}>
@@ -80,11 +75,9 @@ const Eleccion = () => {
               </Button>
             </Grid>
 
-
-            
+            {/* Botón "Boticas Cercanas" deshabilitado */}
             <Grid item>
-            <Button className='boticasbton'
-                onClick={() => navigate('/BoticasCercanas')}>
+              <Button className='boticasbton' disabled>
                 <Box>
                   <StorefrontIcon sx={{ fontSize: 70, color: '#ffffff' }} />
                   <Typography variant="h6" sx={{ mt: 2, color: 'white', fontWeight: 'bold' }}>
@@ -92,13 +85,14 @@ const Eleccion = () => {
                   </Typography>
                 </Box>
               </Button>
+              <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold', color: '#555' }}>
+                Próximamente
+              </Typography>
             </Grid>
-            
-            
-            
+
+            {/* Botón "Asistencia Médica" deshabilitado */}
             <Grid item>
-            <Button className='consultasbton'
-              >
+              <Button className='consultasbton' disabled>
                 <Box>
                   <HealthAndSafetyIcon sx={{ fontSize: 70, color: '#ffffff' }} />
                   <Typography variant="h6" sx={{ mt: 2, color: 'white', fontWeight: 'bold' }}>
@@ -106,12 +100,15 @@ const Eleccion = () => {
                   </Typography>
                 </Box>
               </Button>
+              <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold', color: '#555' }}>
+                Próximamente
+              </Typography>
             </Grid>
           </Grid>
         </Box>
       </Box>
-                
-    <Footer/>
+
+      <Footer/>
     </>
   );
 };

@@ -26,10 +26,11 @@ const ResultadoBusqueda = () => {
         const response = await fetch(endpoint);
 
         if (!response.ok) {
-          throw new Error('Error al obtener los datos del servidor'); // Esto se mantendrá si hay un error real
+          const errorResponse = await response.json(); // Obtener mensaje de error del backend
+          throw new Error(errorResponse.message || 'Error al obtener los datos del servidor'); // Lanzar el error con mensaje
         }
-        const data = await response.json();
 
+        const data = await response.json();
         console.log("Datos obtenidos:", data); // Para depurar
 
         const stockConDatos = data.map(stock => ({
@@ -56,7 +57,7 @@ const ResultadoBusqueda = () => {
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-        setSearchError('Error al obtener los datos del servidor.'); // Mensaje de error real
+        setSearchError(error.message); // Usar el mensaje de error real
         setFilteredStocks([]);
       }
     };
