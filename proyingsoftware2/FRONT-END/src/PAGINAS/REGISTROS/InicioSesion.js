@@ -33,6 +33,8 @@ const InicioSesion = () => {
         localStorage.setItem('user', JSON.stringify({
           nombre: data.user.nombre, // Acceder a los datos del usuario correctamente
           apellidoPaterno: data.user.apellidoPaterno, // Acceder a los datos del usuario correctamente
+          id: data.user.id, // Acceder a los datos del usuario correctamente
+
         }));
   
         navigate('/');
