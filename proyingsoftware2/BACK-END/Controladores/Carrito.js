@@ -3,7 +3,7 @@ import { Usuario, Carrito, ProductoCarrito, Producto, StockProducto } from '../M
 
 const router = express.Router();
 
-
+//usado
 // Endpoint para crear un carrito para un usuario, si no existe
 router.post('/crearCarritoSiNoExiste/:usuarioID', async (req, res) => {
     try {
@@ -33,39 +33,7 @@ router.post('/crearCarritoSiNoExiste/:usuarioID', async (req, res) => {
     }
 });
 
-
-
-/**
- * Endpoint para listar todos los carritos de un usuario específico.
- * Se usa el usuarioID para buscar los carritos asociados a ese usuario.
- */
-router.get('/listarCarritos/:usuarioID', async (req, res) => {
-    try {
-        const { usuarioID } = req.params;
-
-        // Verificar que el usuario existe
-        const usuario = await Usuario.findByPk(usuarioID);
-        if (!usuario) {
-            return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
-        }
-
-        // Buscar los carritos asociados al usuario
-        const carritos = await Carrito.findAll({ where: { usuarioID } });
-
-        if (carritos.length === 0) {
-            return res.status(404).json({ mensaje: 'No se encontraron carritos para este usuario.' });
-        }
-
-        // Devolver los carritos encontrados
-        res.status(200).json(carritos);
-
-    } catch (error) {
-        console.error('Error al listar los carritos del usuario:', error);
-        res.status(500).json({ mensaje: 'Error interno del servidor' });
-    }
-});
-
-
+//usado
 router.post('/agregarProductoCarrito', async (req, res) => {
     try {
         const { productoID, carritoID, cantidad } = req.body;
@@ -134,7 +102,7 @@ router.post('/agregarProductoCarrito', async (req, res) => {
     }
 });
 
-
+//usado
 router.get('/productos/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params; // Obtenemos el usuarioID desde los parámetros
     const baseUrl = `http://localhost:4000/api/productos/`; // La URL base para las imágenes
@@ -186,10 +154,8 @@ router.get('/productos/:usuarioID', async (req, res) => {
     }
 });
 
-
-
-
-// En tu archivo de rutas de carrito.js
+// En tu archivo de rutas de carrito.js Usandose
+//usado
 router.delete('/eliminarProducto/:usuarioID/:productoID', async (req, res) => {
     const { usuarioID, productoID } = req.params;
 
@@ -229,6 +195,7 @@ router.delete('/eliminarProducto/:usuarioID/:productoID', async (req, res) => {
     }
 });
 
+//usado para la imagen de carrito de compras
 router.get('/cantidadProductos/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params;
 
@@ -252,7 +219,7 @@ router.get('/cantidadProductos/:usuarioID', async (req, res) => {
         res.status(500).json({ mensaje: 'Error interno del servidor.' });
     }
 });
-
+//usado
 router.put('/actualizarCantidad/:usuarioID/:productoID', async (req, res) => {
     const { usuarioID, productoID } = req.params; // Obtiene los IDs de los parámetros
     const { accion } = req.body; // Obtiene la acción desde el cuerpo de la solicitud (incrementar o decrementar)
@@ -296,34 +263,6 @@ router.put('/actualizarCantidad/:usuarioID/:productoID', async (req, res) => {
         res.status(200).json({ mensaje: 'Cantidad actualizada correctamente.', nuevaCantidad: productoEnCarrito.cantidad });
     } catch (error) {
         console.error('Error al actualizar la cantidad:', error);
-        res.status(500).json({ mensaje: 'Error interno del servidor.' });
-    }
-});
-
-router.get('/obtener/:usuarioID', async (req, res) => {
-    const { usuarioID } = req.params;
-
-    try {
-        // Busca el carrito del usuario
-        const carrito = await Carrito.findOne({ where: { usuarioID } });
-
-        if (!carrito) {
-            return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
-        }
-
-        // Obtiene todos los productos del carrito
-        const productosCarrito = await ProductoCarrito.findAll({
-            where: { carritoID: carrito.id }, // Usa el ID del carrito encontrado
-        });
-
-        // Mapea los resultados para devolver la información necesaria
-        const respuesta = productosCarrito.map(item => ({
-            productoID: item.productoID,
-        }));
-
-        res.status(200).json(respuesta);
-    } catch (error) {
-        console.error('Error al obtener los productos del carrito:', error);
         res.status(500).json({ mensaje: 'Error interno del servidor.' });
     }
 });
