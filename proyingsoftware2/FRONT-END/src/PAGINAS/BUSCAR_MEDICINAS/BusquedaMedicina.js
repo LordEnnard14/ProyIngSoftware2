@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Box, Grid } from '@mui/material';
 import Header1 from '../../COMPONENTES/Header_Principal';
 import NavegacionMedicinas from '../../COMPONENTES/NavegacionMedicinas';
@@ -8,12 +9,15 @@ import ContenidoPaginaBusqueda from './ContenidoBusquedaMedicina.js';
 const BusquedaMedicina = () => {
   const [stocks, setStocks] = useState([]);
 
+  const [searchParams] = useSearchParams();
+  const tipo = useMemo(() => searchParams.get('tipo'), [searchParams]);
+
   const fetchData = async () => {
     try {
-      const respuesta = await fetch('http://localhost:4000/api/productos/stockProductosAll'); // Cambiamos al nuevo endpoint
+      const respuesta = await fetch(`http://localhost:4000/api/productos/stockProductosAll?tipo=${tipo}`); // Cambiamos al nuevo endpoint
       const resultado = await respuesta.json();
 
-      const baseUrl = `http://localhost:4000/api/productos/`; // La URL base para las imágenes
+      const baseUrl = `http://localhost:4000/api/productos`; // La URL base para las imágenes
 
       // Mapea los datos obtenidos del stock de productos
       const stockConDatos = resultado.map(stock => ({
