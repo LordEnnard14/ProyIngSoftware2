@@ -15,6 +15,8 @@ const AgregarProductoBotica = () => {
         stock: '',
     });
 
+    const [errorMessage, setErrorMessage] = useState('');
+
     const handleChange = (e) => {
         setProducto({
             ...producto,
@@ -22,9 +24,36 @@ const AgregarProductoBotica = () => {
         });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         // Aquí iría la lógica para guardar el producto, como una llamada a la API.
-        console.log(producto);
+        console.log("esata funcionando")
+        try {
+          const response = await fetch('http://localhost:4000/api/productos/newProducto', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              nombre: "PRODUCTO casa",
+              presentacion: "PASTILLA",
+              registroSanitario: "EE-05129",
+              categorias: ["Gripe","medicina"],
+              marcaId: 1,
+              boticaId: 1,
+              descripcion: "PARA MATARTE",
+              caracteristicas: ["adulto mayor"],
+              imagen: "imagen chula"
+            }), 
+          });
+          if(response.Created){
+            const data = await response.json();
+            console.log(data);
+          }
+          
+        } catch (error) {
+          setErrorMessage('Hubo un problema con la solicitud, intente nuevamente más tarde');
+          console.error('Error en la solicitud:', error);
+        }
     };
 
     return(
@@ -164,6 +193,7 @@ const AgregarProductoBotica = () => {
                 >
                     Guardar
                 </Button>
+                {errorMessage && <Typography color="red" sx={{ mt: 2 }}>{errorMessage}</Typography>}
             </Box>
         </Paper>
     </Grid>
