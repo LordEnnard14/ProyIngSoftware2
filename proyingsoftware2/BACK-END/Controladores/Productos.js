@@ -62,11 +62,14 @@ router.post('/newProducto', upload.single('imagen'), async (req, res) => {
 
 
 router.get('/stockProductosAll', async (req, res) => {
+  const { categoria } = req.query;
+
     try {
       const stockProductos = await StockProducto.findAll({
         include: [
           {
             model: Producto,
+            where: categoria ? { categorias: { [Op.contains]: [categoria] } } : {},
             include: [
               {
                 model: Marca,
