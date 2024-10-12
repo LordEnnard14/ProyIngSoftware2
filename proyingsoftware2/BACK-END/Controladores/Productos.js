@@ -11,11 +11,14 @@ router.use('/images', express.static('Imgs'));
 
 
 router.get('/stockProductosAll', async (req, res) => {
+  const { categoria } = req.query;
+
     try {
       const stockProductos = await StockProducto.findAll({
         include: [
           {
             model: Producto,
+            where: categoria ? { categorias: { [Op.contains]: [categoria] } } : {},
             include: [
               {
                 model: Marca,
