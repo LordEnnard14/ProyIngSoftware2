@@ -18,7 +18,6 @@ router.get('/stockProductosAll', async (req, res) => {
         include: [
           {
             model: Producto,
-            where: categoria ? { categorias: { [Op.contains]: [categoria] } } : {},
             include: [
               {
                 model: Marca,
@@ -29,7 +28,8 @@ router.get('/stockProductosAll', async (req, res) => {
                 attributes: ['id', 'nombre', 'direccion'] 
               }
             ],
-            attributes: ['id', 'nombre','presentacion', 'imageUrl'] 
+            attributes: ['id', 'nombre','presentacion', 'imageUrl'],
+            where: categoria ? { categoria: { [Op.contains]: [categoria] } } : {},
           }
         ]
       });

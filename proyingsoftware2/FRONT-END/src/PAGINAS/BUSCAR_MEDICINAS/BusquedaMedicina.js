@@ -10,11 +10,11 @@ const BusquedaMedicina = () => {
   const [stocks, setStocks] = useState([]);
 
   const [searchParams] = useSearchParams();
-  const tipo = useMemo(() => searchParams.get('tipo'), [searchParams]);
+  const categoria = useMemo(() => searchParams.get('categoria'), [searchParams]);
 
   const fetchData = async () => {
     try {
-      const respuesta = await fetch(`http://localhost:4000/api/productos/stockProductosAll?tipo=${tipo}`); // Cambiamos al nuevo endpoint
+      const respuesta = await fetch(`http://localhost:4000/api/productos/stockProductosAll${categoria ? `?categoria=${categoria}` : ''}`); // Cambiamos al nuevo endpoint
       const resultado = await respuesta.json();
 
       const baseUrl = `http://localhost:4000/api/productos`; // La URL base para las imágenes
@@ -39,7 +39,7 @@ const BusquedaMedicina = () => {
 
   useEffect(() => {
     fetchData(); 
-  }, []);
+  }, [categoria]);
 
   return (
     <div>
