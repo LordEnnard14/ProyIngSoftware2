@@ -14,7 +14,7 @@ const Orden = sequelize.define('Orden',{
     },
     direccionEnvio: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     subtotal: {
         type: DataTypes.DOUBLE,
@@ -36,5 +36,5 @@ const Orden = sequelize.define('Orden',{
     freezeTableName: true,
     timestamps: false
 });;
-
+//AQUI SE PUEDEN AGRREGAR COLUMNAS O ELIMINARLAS
 export default Orden;

@@ -1,21 +1,60 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';  // Importa useNavigate
+
 import { Box, Typography, Paper, TextField, Button, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Grid, MenuItem, Select } from '@mui/material';
 import HeaderAdmin from '../../COMPONENTES/Header_Admin';
 
 const PaginaPago = () => {
   const [metodoEntrega, setMetodoEntrega] = useState('recojo');  // Controla el método de entrega
   const [botica, setBotica] = useState('');  // Botica seleccionada
+  const [direccion, setDireccion] = useState('');  // Dirección de entrega para "Entrega a casa"
   const [numeroTarjeta, setNumeroTarjeta] = useState('');  // Número de tarjeta
   const [errorTarjeta, setErrorTarjeta] = useState('');  // Mensaje de error para la tarjeta
   const [cvv, setCvv] = useState('');  // CVV
   const [errorCvv, setErrorCvv] = useState('');  // Mensaje de error para el CVV
   const [productos, setProductos] = useState([]);  // Productos del carrito
+  const TASA_IMPUESTO = 0.18;  // Por ejemplo, 18% de impuesto
+  const navigate = useNavigate(); 
 
   useEffect(() => {
-    // Leer productos del carrito desde localStorage
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    setProductos(cartItems);
+    const usuario = JSON.parse(localStorage.getItem('user'));
+    const usuarioID = usuario?.id;
+    if(usuarioID){
+      fetch(`http://localhost:4000/api/ordenes/${usuarioID}`)
+      .then(response=>{
+        if (!response.ok) {
+          throw new Error('Error al obtener los productos del carrito');
+        }
+        return response.json();  
+      })
+      .then(data=>{
+        console.log('Productos en el carrito:', data);
+        setProductos(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }else {
+      alert('No se encontró información del usuario. Por favor, inicia sesión.');
+    }
   }, []);
+
+  const calcularCostoEnvio = () => {
+    return metodoEntrega === 'entrega' ? 10.00 : 0.00; // 10 soles si es entrega a domicilio, 0 si es recojo en tienda
+  };
+  
+  const calcularImpuesto = () => {
+    const subtotal = parseFloat(calcularTotal());  // Subtotal del carrito
+    const costoEnvio = calcularCostoEnvio();
+    return (subtotal + costoEnvio) * TASA_IMPUESTO;  // Aplicar impuesto sobre subtotal + costo de envío
+  };
+  
+  const calcularTotalConImpuesto = () => {
+    const subtotal = parseFloat(calcularTotal());
+    const costoEnvio = calcularCostoEnvio();
+    const impuesto = calcularImpuesto();
+    return (subtotal + costoEnvio + impuesto).toFixed(2);  // Total con costo de envío e impuesto
+  };
 
   const handleMetodoEntregaChange = (event) => {
     setMetodoEntrega(event.target.value);
@@ -25,14 +64,17 @@ const PaginaPago = () => {
     setBotica(event.target.value);
   };
 
+  const handleDireccionChange = (event) => {
+    setDireccion(event.target.value);
+  };
+
   const validarNumeroTarjeta = (numero) => {
     const visaMastercardRegex = /^4[0-9]{12}(?:[0-9]{3})?$|^5[1-5][0-9]{14}$/; // Visa o Mastercard
-    const amexRegex = /^3[47][0-9]{13}$/; // American Express
 
-    if (visaMastercardRegex.test(numero) || amexRegex.test(numero)) {
+    if (visaMastercardRegex.test(numero)) {
       setErrorTarjeta('');
     } else {
-      setErrorTarjeta('Número de tarjeta inválido. Visa/Mastercard: 16 dígitos, American Express: 15 dígitos');
+      setErrorTarjeta('Número de tarjeta inválido. Visa/Mastercard: 16 dígitos');
     }
   };
 
@@ -46,16 +88,13 @@ const PaginaPago = () => {
     const visaMastercardRegex = /^4[0-9]{12}(?:[0-9]{3})?$|^5[1-5][0-9]{14}$/; // Visa o Mastercard
     const amexRegex = /^3[47][0-9]{13}$/; // American Express
 
-    // Si la tarjeta es Visa o Mastercard, el CVV debe tener 3 dígitos
     if (visaMastercardRegex.test(numeroTarjeta)) {
       if (numeroCvv.length !== 3) {
         setErrorCvv('El CVV para Visa/Mastercard debe ser de 3 dígitos');
       } else {
         setErrorCvv('');
       }
-    }
-    // Si la tarjeta es American Express, el CVV debe tener 4 dígitos
-    else if (amexRegex.test(numeroTarjeta)) {
+    } else if (amexRegex.test(numeroTarjeta)) {
       if (numeroCvv.length !== 4) {
         setErrorCvv('El CVV para American Express debe ser de 4 dígitos');
       } else {
@@ -74,32 +113,114 @@ const PaginaPago = () => {
     return productos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0).toFixed(2);
   };
 
-  const handleFinalizarCompra = () => {
-    // Validar que toda la información necesaria esté completa
+
+
+
+  const handleFinalizarCompra = async () => {
     if (!metodoEntrega) {
       alert('Selecciona un método de entrega.');
       return;
     }
-
+  
     if (metodoEntrega === 'recojo' && !botica) {
       alert('Selecciona una botica para el recojo.');
       return;
     }
-
+  
+    if (metodoEntrega === 'entrega' && !direccion) {
+      alert('Ingrese una dirección de entrega válida.');
+      return;
+    }
+  
     if (!numeroTarjeta || errorTarjeta) {
       alert('Ingrese un número de tarjeta válido.');
       return;
     }
-
+  
     if (!cvv || errorCvv) {
       alert('Ingrese un CVV válido.');
       return;
     }
-
-    // Aquí se puede manejar la lógica para finalizar la compra, como enviar datos al servidor o actualizar el estado
-    alert('Compra realizada con éxito!');
-    // Redirigir a una página de confirmación o finalizar el proceso
+  
+    const usuario = JSON.parse(localStorage.getItem('user'));
+    const usuarioID = usuario?.id;
+  
+    try {
+      // Llamada a la API para crear la orden
+      const response = await fetch(`http://localhost:4000/api/ordenes/crearOrden/${usuarioID}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          direccionEnvio: metodoEntrega === 'entrega' ? direccion : '',  // Enviar dirección si es "entrega"
+          metodoEntrega: metodoEntrega,
+          botica: metodoEntrega === 'recojo' ? botica : '',  // Enviar botica si es "recojo"
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok && data.orden?.id) {
+        const ordenID = data.orden.id; // Almacenar el ID de la orden
+  
+        // Almacenar el ID de la orden en el localStorage (opcional)
+        localStorage.setItem('orden', JSON.stringify({
+          id: ordenID,
+          estado: 'pendiente',
+          total: data.orden.total,
+        }));
+  
+        // Verificar si hay productos y actualizar el stock
+        const actualizarStockResponse = await fetch(`http://localhost:4000/api/ordenes/actualizarStockProductos/${usuarioID}`, {
+          method: 'PUT',
+        });
+  
+        const actualizarStockData = await actualizarStockResponse.json();
+  
+        if (!actualizarStockResponse.ok) {
+          // Si no hay productos o no se pudo actualizar el stock, se detiene el proceso
+          alert('Lo sentimos: ' + (actualizarStockData.mensaje || 'Error desconocido.'));
+          return; // Detener el proceso aquí
+        }
+  
+        // Ahora que tenemos el ordenID, realizamos la segunda llamada para llenar la tabla ProductoOrden
+        const llenarProductoOrdenResponse = await fetch(`http://localhost:4000/api/ordenes/llenarProductoOrden/${usuarioID}/${ordenID}`, {
+          method: 'POST',
+        });
+  
+        const productoOrdenData = await llenarProductoOrdenResponse.json();
+  
+        await fetch(`http://localhost:4000/api/ordenes/eliminarCarrito/${usuarioID}`, {
+          method: 'DELETE',
+        });
+  
+        if (llenarProductoOrdenResponse.ok) {
+          // Éxito en el llenado de ProductoOrden
+          alert('Compra realizada con éxito y productos añadidos a la orden.');
+          navigate('/')
+        } else {
+          console.log('Error al llenar ProductoOrden:', productoOrdenData);
+          alert('Error al añadir productos a la orden.');
+        }
+      } else {
+        console.log('Error en la respuesta del servidor:', data);
+        alert('Error al realizar la compra: ' + (data.mensaje || 'Error desconocido.'));
+      }
+    } catch (error) {
+      console.error('Error al realizar la compra:', error);
+      alert('Ocurrió un error al procesar tu compra.');
+    }
   };
+  
+
+
+
+
+
+
+
+
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -120,35 +241,32 @@ const PaginaPago = () => {
           <Typography variant="h6">Proceso de Pago</Typography>
         </Box>
 
-        <Paper sx={{ padding: '20px', mb: 4 }}>
-          <Typography variant="h6">Resumen del Pedido</Typography>
-          {productos.map((producto) => (
-            <Box key={producto.id} sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-              <Typography>{producto.name} (x{producto.cantidad})</Typography>
-              <Typography>S/ {(producto.precio * producto.cantidad).toFixed(2)}</Typography>
-            </Box>
-          ))}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-            <Typography variant="h6">Total:</Typography>
-            <Typography variant="h6">S/ {calcularTotal()}</Typography>
-          </Box>
-        </Paper>
+        {/* Resumen del Pedido */}
+<Paper sx={{ padding: '20px', mb: 4 }}>
+  <Typography variant="h6">Resumen del Pedido</Typography>
+  
+  {productos.map((producto) => (
+    <Box key={producto.id} sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+      <Typography>{producto.nombre} (x{producto.cantidad})</Typography>
+      <Typography>S/ {(producto.precio * producto.cantidad).toFixed(2)}</Typography>
+    </Box>
+  ))}
+ <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+    <Typography>Costo de Envío:</Typography>
+    <Typography>S/ {calcularCostoEnvio().toFixed(2)}</Typography> {/* Mostrar costo de envío */}
+  </Box>
+  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+    <Typography>Impuesto (18%):</Typography>
+    <Typography>S/ {calcularImpuesto().toFixed(2)}</Typography> {/* Mostrar impuesto */}
+  </Box>
+  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+    <Typography variant="h6">Total:</Typography>
+    <Typography variant="h6">S/ {calcularTotalConImpuesto()}</Typography> {/* Mostrar total */}
+  </Box>
+</Paper>
 
-        <Paper sx={{ padding: '20px', mb: 4 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>Información del Cliente</Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Nombre Completo" variant="outlined" required />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Correo Electrónico" variant="outlined" required />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label="Número de Teléfono" variant="outlined" required />
-            </Grid>
-          </Grid>
-        </Paper>
 
+        {/* Método de Entrega */}
         <Paper sx={{ padding: '20px', mb: 4 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>Método de Entrega</Typography>
           <FormControl component="fieldset">
@@ -160,6 +278,7 @@ const PaginaPago = () => {
               onChange={handleMetodoEntregaChange}
             >
               <FormControlLabel value="recojo" control={<Radio />} label="Recojo en Tienda (Gratis)" />
+              <FormControlLabel value="entrega" control={<Radio />} label="Entrega a Casa" />
             </RadioGroup>
           </FormControl>
 
@@ -182,8 +301,23 @@ const PaginaPago = () => {
               </Select>
             </Box>
           )}
+
+          {metodoEntrega === 'entrega' && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1">Ingrese la Dirección de Entrega:</Typography>
+              <TextField
+                fullWidth
+                label="Dirección de Entrega"
+                variant="outlined"
+                value={direccion}
+                onChange={handleDireccionChange}
+                required
+              />
+            </Box>
+          )}
         </Paper>
 
+        {/* Método de Pago */}
         <Paper sx={{ padding: '20px', mb: 4 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>Método de Pago</Typography>
           <Grid container spacing={2}>

@@ -213,6 +213,7 @@ const CarritoCompras = () => {
               <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => navigate('/PaginaPago')}>
                 Proceder al Pago
               </Button>
+              
               <Button variant="outlined" color="secondary" fullWidth sx={{ mt: 2 }} onClick={() => navigate('/')}>
                 Seguir Comprando
               </Button>

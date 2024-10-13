@@ -8,6 +8,7 @@ import adminRoutes from "./Controladores/Admin.js";
 import "./Models/Relaciones.js"
 import sequelize from "./Database/database.js"; 
 import carritoRoutes from "./Controladores/Carrito.js"
+import ordenesRoutes from "./Controladores/Carrito.js"
 
 
 const app = express();
@@ -38,6 +39,7 @@ app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/ordenes", ordenRoutes);
 app.use("/api/admin",adminRoutes);
 app.use("/api/carrito", carritoRoutes);
+app.use("/api/ordenes", ordenesRoutes);
 
 app.listen(port, function () {
     console.log("Servidor escuchando en el puerto " + port);
