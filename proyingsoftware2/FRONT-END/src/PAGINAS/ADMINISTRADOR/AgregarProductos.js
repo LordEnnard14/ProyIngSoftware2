@@ -1,5 +1,5 @@
 import HeaderAdmin from '../../COMPONENTES/Header_Admin'; // Asegúrate de importar el Header correcto
-import BarraHorizontal from '../../COMPONENTES/BarraHorizontalAdmin'; // Barra de navegación creada previamente
+import BarraHorizontal from '../../COMPONENTES/BarraHorizontalBotica.js'; // Barra de navegación creada previamente
 import React, { useState } from 'react';
 import { Box, Typography, Grid, Paper, TextField, Button, Input, InputLabel, Select, FormControl, MenuItem, Checkbox, ListItemText, useStepperContext } from '@mui/material';
 import { alignProperty } from '@mui/material/styles/cssUtils';

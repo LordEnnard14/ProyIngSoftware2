@@ -7,15 +7,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 const DetalleProducto = () => {
   const { id } = useParams(); // Obtenemos el ID del producto desde la URL
   const navigate = useNavigate();
-  const [stockProducto, setStockProducto] = useState(null); // Estado para el stock del producto
-  const [cantidad, setCantidad] = useState(1); // Estado para la cantidad de producto
+  const [stockProducto, setStockProducto] = useState(null); 
+  const [cantidad, setCantidad] = useState(1); 
   const carritoID = 1;  // ID del carrito, asumiendo que ya existe uno (puedes cambiarlo dinámicamente)
 
   // Usamos useEffect para obtener los datos del producto
   useEffect(() => {
     async function fetchStockProducto() {
       try {
-        const response = await fetch(`http://localhost:4000/api/productos/stockProductos/${id}`); // Cambia la URL al nuevo endpoint
+        const response = await fetch(`http://localhost:4000/api/productos/stockProductos/${id}`); 
         if (!response.ok) {
           throw new Error('Error al obtener los datos del stockProducto');
         }
@@ -25,7 +25,7 @@ const DetalleProducto = () => {
         console.error('Error:', error);
       }
     }
-    fetchStockProducto();  // Llamamos a la función cuando el componente se monta
+    fetchStockProducto();  
   }, [id]);
 
   // Función para agregar el producto al carrito
@@ -154,7 +154,7 @@ const DetalleProducto = () => {
                 }}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = '/path/to/default-image.png'; // Ruta de la imagen por defecto
+                  e.target.style.display = 'none';
                 }}
               />
             </Box>
