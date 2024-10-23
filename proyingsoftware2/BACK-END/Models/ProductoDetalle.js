@@ -1,43 +1,47 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
-import moment from 'moment-timezone';
 
-const Producto = sequelize.define('Producto', {
+
+const ProductoDetalle = sequelize.define('ProductoDetalle',{
+    
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true, // Auto-incremental
-    },
-    nombre: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    presentacion: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    categoria: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-        allowNull: false,
+        autoIncrement: true, 
     },
     estado: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
         allowNull: false,
     },
-    nRegistroSanitario: {
+    descripcion: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    //Desde aca cambio
+    caracteristicas: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+    },
     fechaRegistro: {
         type: DataTypes.DATE,
         allowNull: true,
         defaultValue: () => moment.tz('America/Lima').toDate // Hora de Lima, Perú
+    },
+    imageUrl: {
+        type: DataTypes.STRING
+        ,allowNull: false,
+    },
+    cantidad: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    precio: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
     },
 },{
     freezeTableName: true,
     timestamps: false
 });;
 
-export default Producto;
+export default ProductoDetalle;
