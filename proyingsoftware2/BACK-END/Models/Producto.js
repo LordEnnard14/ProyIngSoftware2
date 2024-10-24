@@ -20,11 +20,6 @@ const Producto = sequelize.define('Producto', {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: false,
     },
-    estado: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-        allowNull: false,
-    },
     nRegistroSanitario: {
         type: DataTypes.STRING,
         allowNull: false,

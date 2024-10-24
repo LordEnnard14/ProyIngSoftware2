@@ -190,7 +190,7 @@ const DetalleProducto = () => {
         <Box mt={4}>
           <Typography variant="h6">Descripción</Typography>
           <Typography variant="body1" paragraph>
-            {stockProducto.Producto.descripcion}
+            {stockProducto.descripcion}
           </Typography>
         </Box>
 
@@ -198,7 +198,7 @@ const DetalleProducto = () => {
           <Typography variant="h6">Características del Producto:</Typography>
           {stockProducto?.Producto?.caracteristicas?.length > 0 ? (
             <ul>
-              {stockProducto.Producto.caracteristicas.map((caracteristica, index) => (
+              {stockProducto.caracteristicas.map((caracteristica, index) => (
                 <li key={index}>
                   <Typography variant="body1">{caracteristica}</Typography>
                 </li>
