@@ -1,5 +1,5 @@
 import express from 'express';
-import { Usuario, Carrito, ProductoCarrito, Producto, StockProducto } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
+import { Usuario, Carrito, ProductoCarrito, Producto } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
 
 const router = express.Router();
 

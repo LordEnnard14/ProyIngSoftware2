@@ -13,7 +13,7 @@ export default function(app){
     app.use("/api/usuarios", usuarioRoutes);
     app.use("/api/ordenes", ordenRoutes);
     app.use("/api/admin",adminRoutes);
-    app.use("/api/stock",productoDetalleRoutes);
+    app.use("/api/productoDetalle",productoDetalleRoutes);
     app.use("/api/carrito", carritoRoutes);
     app.use("/api/ordenes", ordenesRoutes);    
     

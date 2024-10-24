@@ -1,32 +1,15 @@
 // Archivo: Controladores/Productos.js
 import express from "express";
-import {Producto, StockProducto, Marca, Botica} from "../models/Relaciones.js";
+import {Producto, Marca, Botica} from "../models/Relaciones.js";
 import { Op } from "sequelize";
-import multer from 'multer';
-import path from 'path';
-
 const router = express.Router();
 
 
-router.use('/images', express.static('Imgs'));
-
-const storage = multer.diskStorage({
-  destination: function(req,file,cb){
-     cb(null, 'Imgs/');
-  },
-  filename: function(req,file,cb){
-    cb(null,Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({storage: storage});
-
-router.post('/newProducto', upload.single('imagen'), async (req, res) => {
+router.post('/newProductos', async (req, res) => {
   try {
     const productoExistente = await Producto.findOne( {where: {
       nombre: req.body.nombre,
       nRegistroSanitario: req.body.registroSanitario,
-      boticaID: req.body.boticaID
     } })
     if(productoExistente !== null){
       return res.status(409).send({
@@ -35,19 +18,12 @@ router.post('/newProducto', upload.single('imagen'), async (req, res) => {
       });
     }else {
 
-      const imagen = req.file;
-      const imagenUrl= `/images/${imagen.filename}`;
-
       const productoNuevo = await Producto.create({
         nombre: req.body.nombre,
         presentacion: req.body.presentacion,
         nRegistroSanitario: req.body.registroSanitario,
         categoria: req.body.categorias,
         marcaID: req.body.marcaID,
-        boticaID: req.body.boticaID,
-        descripcion: req.body.descripcion,
-        caracteristicas: req.body.caracteristicas,
-        imageUrl: imagenUrl,
       })
       return res.status(201).send({
         Mensaje: 'Producto creado exitosamente',
@@ -58,6 +34,26 @@ router.post('/newProducto', upload.single('imagen'), async (req, res) => {
     console.error("Error al crear producto", error);
     res.status(500).send('Error al crear producto');
   }  
+})
+
+router.get('/ProductosAll', async (req,res)=>{
+  try{
+    return res.status(200).send({Productos: JSON.parse(JSON.stringify(await Producto.findAll()))});
+
+  }catch (error){
+    console.error("Error al encontrar productos", error);
+    res.status(404).send('Error al encontrar producto')
+  }
+})
+
+router.post('/Producto/:id', async (req,res)=>{
+  try{
+    return res.status(200).send(Producto.findByPk(req.params))
+
+  }catch (error){
+    console.error("Error al encontrar producto", error);
+    res.status(404).send('Error al encontrar producto')
+  } 
 })
 
 

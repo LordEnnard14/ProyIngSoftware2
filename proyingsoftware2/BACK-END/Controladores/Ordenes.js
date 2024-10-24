@@ -1,7 +1,7 @@
 //aqui se realiza la paga
 import express from "express";
 import Orden from "../Models/Orden.js"; 
-import { Usuario,ProductoOrden ,Carrito, ProductoCarrito, Producto, StockProducto } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
+import { Usuario,ProductoOrden ,Carrito, ProductoCarrito, Producto } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
 
 const router = express.Router();
 const TASA_IMPUESTO = 0.18;  // Representa el 18% de impuestos

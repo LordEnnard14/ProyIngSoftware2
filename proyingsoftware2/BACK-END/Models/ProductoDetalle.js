@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
+import moment from 'moment-timezone';
 
 
 const ProductoDetalle = sequelize.define('ProductoDetalle',{
