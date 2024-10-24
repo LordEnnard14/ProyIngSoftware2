@@ -1,7 +1,6 @@
 //aqui se realiza la paga
-import express from "express";
-import Orden from "../Models/Orden.js"; 
-import { Usuario,ProductoOrden ,Carrito, ProductoCarrito, Producto } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
+import express from "express"; 
+import { Orden, Usuario,ProductoOrden ,Carrito, ProductoCarrito, Producto } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
 
 const router = express.Router();
 const TASA_IMPUESTO = 0.18;  // Representa el 18% de impuestos
@@ -254,6 +253,18 @@ router.post('/llenarProductoOrden/:usuarioID/:ordenID', async (req, res) => {
   });
   
 
- 
+
+  /*ORDENES DE UN USUARIO*/
+
+  router.get("/", async (req, res) => {
+    try {
+        // Obtener todas las ordenes en la base de datos
+        const ordenes = await Orden.findAll();
+        res.json(ordenes);  // Aqui se envian a todas las ordenes como respuesta
+    } catch (error) { //Por si existe un error
+        console.error("Error al obtener ordenes:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
 
 export default router;
