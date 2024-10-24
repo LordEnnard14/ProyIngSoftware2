@@ -15,7 +15,7 @@ const Usuario = sequelize.define('Usuario', {
     },
     apellidoPaterno: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false,   
       },
     apellidoMaterno: {
         type: DataTypes.STRING,

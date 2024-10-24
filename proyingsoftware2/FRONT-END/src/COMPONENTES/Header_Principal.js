@@ -110,13 +110,6 @@ const Header1 = () => {
     };
   }, []);
 
-
-
-
-
-
-
-
   const handleLogout = () => {
     localStorage.removeItem('user');
     console.log("Usuario eliminado del localStorage");
@@ -124,23 +117,6 @@ const Header1 = () => {
     setUserName('');
     navigate('/InicioSesion');
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 
   const handleNavigate = (path, section) => {
     navigate(path);
@@ -203,6 +179,13 @@ const Header1 = () => {
                     <AccountCircleIcon />
                   </IconButton>
                 </Box>
+                <Button
+                  variant="outlined"
+                  sx={{ marginLeft: 2, color: '#567C8D', borderColor: '#567C8D' }}
+                  onClick={() => handleNavigate('/MisOrdenes')}
+                >
+                  Ver mis ordenes
+                </Button>
                 <Button
                   variant="contained"
                   sx={{ marginLeft: 2, backgroundColor: '#567C8D', color: '#ffffff' }}
