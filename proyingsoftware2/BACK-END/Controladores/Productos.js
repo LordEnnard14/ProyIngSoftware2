@@ -1,6 +1,6 @@
 // Archivo: Controladores/Productos.js
 import express from "express";
-import {Producto, Marca, Botica} from "../models/Relaciones.js";
+import {Producto, Marca, Botica, ProductoDetalle} from "../models/Relaciones.js";
 import { Op } from "sequelize";
 const router = express.Router();
 
@@ -36,25 +36,33 @@ router.post('/newProductos', async (req, res) => {
   }  
 })
 
-router.get('/ProductosAll', async (req,res)=>{
-  try{
-    return res.status(200).send({Productos: JSON.parse(JSON.stringify(await Producto.findAll()))});
+router.get('/ProductosAll', async (req, res) => {
+  try {
+    const productosDetalles = await ProductoDetalle.findAll({
+      include: [
+        {
+          model: Producto, 
+          attributes: ['id', 'nombre'], 
+          include: [
+            {
+              model: Marca, 
+              attributes: ['nombre'], 
+            }
+          ]
+        },
+        {
+          model: Botica, 
+          attributes: ['nombre', 'direccion'], 
+        }
+      ],
+      order: [['id', 'ASC']] 
+    });
 
-  }catch (error){
-    console.error("Error al encontrar productos", error);
-    res.status(404).send('Error al encontrar producto')
+    return res.status(200).send({ ProductosDetalles: JSON.parse(JSON.stringify(productosDetalles)) });
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
   }
-})
-
-router.post('/Producto/:id', async (req,res)=>{
-  try{
-    return res.status(200).send(Producto.findByPk(req.params))
-
-  }catch (error){
-    console.error("Error al encontrar producto", error);
-    res.status(404).send('Error al encontrar producto')
-  } 
-})
+});
 
 
 router.get('/stockProductosAll', async (req, res) => {
