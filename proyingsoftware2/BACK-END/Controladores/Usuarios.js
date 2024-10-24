@@ -1,5 +1,5 @@
 import express from "express";
-import {Usuario} from "../Models/Relaciones.js"; 
+import { Usuario, Orden, Producto } from "../Models/Relaciones.js"; 
 
 const router = express.Router();
 
@@ -130,5 +130,37 @@ router.put('/restablecerContrasena', async (req, res) => {
   }
 });
 
+// Endpoint para obtener las órdenes de un usuario específico
+router.get('/:id/ordenes', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const ordenes = await Orden.findAll({
+      where: { usuarioId: id }, // Asegúrate de que 'usuarioId' es la columna que relaciona la orden con el usuario
+      include: [
+        {
+          model: Producto,
+          attributes: ['nombre'],
+        }
+      ],
+    });
+
+    if (ordenes.length === 0) {
+      return res.status(404).json({ message: "No se encontraron órdenes para este usuario." });
+    }
+
+    const resultado = ordenes.map(orden => ({
+      id: orden.id,
+      nombreProducto: orden.Producto.nombre,
+      cantidadPedida: orden.cantidad, // Asegúrate de que 'cantidad' está definido en el modelo Orden
+      total: orden.total, // Asegúrate de que 'total' está definido en el modelo Orden
+      estadoEnvio: orden.estadoEnvio, // Asegúrate de que 'estadoEnvio' está definido en el modelo Orden
+    }));
+
+    res.json(resultado);
+  } catch (error) {
+    console.error("Error al obtener las órdenes:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
 
 export default router;
