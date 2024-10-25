@@ -112,7 +112,7 @@ const DetalleProducto = () => {
   }
 
   // Construimos la URL de la imagen usando el ID del producto
-  const imagenUrl = `http://localhost:4000/api/productos/${stockProducto.imageUrl}`;
+  const imagenUrl = `http://localhost:4000/api/productoDetalle/${stockProducto.imageUrl}`;
 
   return (
     <>
