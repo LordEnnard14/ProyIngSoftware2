@@ -1,5 +1,5 @@
 import express from 'express';
-import { Usuario, Carrito, ProductoCarrito, Producto } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
+import {Carrito, ProductoCarrito,ProductoDetalle, Producto } from '../Models/Relaciones.js';  // Asegúrate de importar ProductoDetalle
 
 const router = express.Router();
 
@@ -33,13 +33,13 @@ router.post('/crearCarritoSiNoExiste/:usuarioID', async (req, res) => {
     }
 });
 
-//usado
+//llenar la tabla producto carrito
 router.post('/agregarProductoCarrito', async (req, res) => {
     try {
-        const { productoID, carritoID, cantidad } = req.body;
+        const { productoDetalleID, carritoID, cantidad } = req.body;
 
         // Verificar que todos los campos están presentes
-        if (!productoID || !carritoID || !cantidad) {
+        if (!productoDetalleID || !carritoID || !cantidad) {
             return res.status(400).json({ mensaje: 'Todos los campos son obligatorios.' });
         }
 
@@ -49,30 +49,25 @@ router.post('/agregarProductoCarrito', async (req, res) => {
             return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
         }
 
-        // Verificar que el producto existe en StockProducto y obtener el precio
-        const stockProducto = await StockProducto.findOne({ where: { productoID } });
-        if (!stockProducto) {
-            return res.status(404).json({ mensaje: 'Producto no encontrado en el stock.' });
+        // Verificar que el producto existe en ProductoDetalle y obtener el precio
+        const productoDetalle = await ProductoDetalle.findByPk(productoDetalleID);
+        if (!productoDetalle) {
+            return res.status(404).json({ mensaje: 'Producto no encontrado.' });
         }
 
-        const precio = stockProducto.precio;  // Obtener el precio desde StockProducto
-
-        // Verificar que el precio no sea nulo
-        if (!precio) {
-            return res.status(400).json({ mensaje: 'El producto no tiene un precio válido.' });
-        }
+        const precio = productoDetalle.precio;  // Obtener el precio desde ProductoDetalle
 
         // Verificar si el producto ya existe en el carrito
         const existingProduct = await ProductoCarrito.findOne({
             where: {
-                productoID,
+                productoDetalleID,
                 carritoID
             }
         });
 
         if (existingProduct) {
             // Si el producto ya existe, actualizar la cantidad
-            existingProduct.cantidad += cantidad; // Incrementar la cantidad
+            existingProduct.cantidad += cantidad;
             await existingProduct.save();
             return res.status(200).json({
                 mensaje: 'Cantidad actualizada en el carrito.',
@@ -81,10 +76,10 @@ router.post('/agregarProductoCarrito', async (req, res) => {
         } else {
             // Si no existe, agregarlo
             const productoCarrito = await ProductoCarrito.create({
-                productoID,
+                productoDetalleID,
                 carritoID,
                 cantidad,
-                precio  // Pasar el precio obtenido del stock del producto
+                precio  // Precio obtenido desde ProductoDetalle
             });
 
             return res.status(201).json({
@@ -102,62 +97,69 @@ router.post('/agregarProductoCarrito', async (req, res) => {
     }
 });
 
+
+
 //usado
 router.get('/productos/:usuarioID', async (req, res) => {
-    const { usuarioID } = req.params; // Obtenemos el usuarioID desde los parámetros
-    const baseUrl = `http://localhost:4000/api/productos/`; // La URL base para las imágenes
+    const { usuarioID } = req.params;  // Obtener el usuarioID desde los parámetros de la URL
+    const baseUrl = `http://localhost:4000/api/productos/`;  // La URL base para las imágenes
 
     try {
-        // Primero, buscamos el carrito asociado al usuarioID
+        // Buscar el carrito asociado al usuarioID
         const carrito = await Carrito.findOne({ where: { usuarioID } });
 
         if (!carrito) {
             return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
         }
 
-        // Buscamos los productos en ProductoCarrito que correspondan al carrito encontrado
+        // Buscar los productos en ProductoCarrito que correspondan al carrito encontrado
         const productosCarrito = await ProductoCarrito.findAll({
-            where: { carritoID: carrito.id }, // Usamos el ID del carrito encontrado
+            where: { carritoID: carrito.id },
             include: [
                 {
-                    model: Producto,
+                    model: ProductoDetalle,
                     include: [
                         {
-                            model: StockProducto,
-                            attributes: ['precio'], // Incluir el precio
+                            model: Producto,  // Relación con Producto para obtener el nombre
+                            attributes: ['nombre']
                         }
                     ],
-                    attributes: ['imageUrl', 'nombre'], // Obtener la imagen y el nombre del producto
+                    attributes: ['precio', 'imageUrl'],  // Obtener precio e imagen desde ProductoDetalle
                 }
-            ],
+            ]
         });
 
         // Si no hay productos en el carrito
-        if (productosCarrito.length === 0) {
+        if (!productosCarrito || productosCarrito.length === 0) {
             return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
         }
 
         // Mapeamos los datos a la estructura deseada
         const respuesta = productosCarrito.map(item => ({
-            productoID: item.productoID, // Incluimos la ID del producto
-            imagen: item.Producto.imageUrl ? `${baseUrl}${item.Producto.imageUrl}` : null, // Construir la URL completa usando baseUrl
-            nombre: item.Producto.nombre,
-            precio: item.Producto.StockProducto.precio,
-            cantidad: item.cantidad,
-            subtotal: (item.Producto.StockProducto.precio * item.cantidad).toFixed(2), // Calcular subtotal
+            productoID: item.productoDetalleID,  // Incluimos la ID del productoDetalle
+            nombre: item.ProductoDetalle.Producto.nombre,  // Obtener el nombre desde Producto
+            imagen: item.ProductoDetalle.imageUrl ? `${baseUrl}${item.ProductoDetalle.imageUrl}` : null,  // Construir la URL completa usando baseUrl
+            precio: item.ProductoDetalle.precio,  // Obtener el precio desde ProductoDetalle
+            cantidad: item.cantidad,  // Cantidad desde ProductoCarrito
+            subtotal: (item.ProductoDetalle.precio * item.cantidad).toFixed(2)  // Calcular subtotal
         }));
 
+        // Enviar la respuesta en formato JSON
         res.status(200).json(respuesta);
     } catch (error) {
-        console.error('Error al obtener los productos del carrito:', error);
-        res.status(500).json({ mensaje: 'Error interno del servidor' });
+        console.error('Error al obtener los productos del carrito:', error.message);
+        res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
     }
 });
+
+
+
+
 
 // En tu archivo de rutas de carrito.js Usandose
 //usado
 router.delete('/eliminarProducto/:usuarioID/:productoID', async (req, res) => {
-    const { usuarioID, productoID } = req.params;
+    const { usuarioID, productoID } = req.params;  // Usar productoID en lugar de productoDetalleID
 
     try {
         // Encuentra el carrito del usuario
@@ -170,30 +172,35 @@ router.delete('/eliminarProducto/:usuarioID/:productoID', async (req, res) => {
         }
 
         // Busca el producto en el carrito
-        const producto = await ProductoCarrito.findOne({
+        const productoEnCarrito = await ProductoCarrito.findOne({
             where: {
-                carritoID: carrito.id, // Usar el ID del carrito encontrado
-                productoID // Busca por ID del producto
+                carritoID: carrito.id,  // Usar el ID del carrito encontrado
+                productoDetalleID: productoID  // Usar productoID para encontrar el producto correcto
             }
         });
 
-        if (!producto) {
+        if (!productoEnCarrito) {
             return res.status(404).json({ mensaje: 'Producto no encontrado en el carrito.' });
         }
 
-        // Elimina el producto
+        // Elimina el producto del carrito
         await ProductoCarrito.destroy({
             where: {
-                id: producto.id, // Asegúrate de eliminar por ID
+                carritoID: carrito.id,  // Eliminar en base al carritoID
+                productoDetalleID: productoID  // Y productoID (productoDetalleID)
             }
         });
 
         res.status(200).json({ mensaje: 'Producto eliminado correctamente.' });
     } catch (error) {
         console.error('Error al eliminar el producto:', error);
-        res.status(500).json({ mensaje: 'Error interno del servidor' });
+        res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
     }
 });
+
+
+
+
 
 //usado para la imagen de carrito de compras
 router.get('/cantidadProductos/:usuarioID', async (req, res) => {
@@ -219,24 +226,28 @@ router.get('/cantidadProductos/:usuarioID', async (req, res) => {
         res.status(500).json({ mensaje: 'Error interno del servidor.' });
     }
 });
+
+
+
+
 //usado
 router.put('/actualizarCantidad/:usuarioID/:productoID', async (req, res) => {
-    const { usuarioID, productoID } = req.params; // Obtiene los IDs de los parámetros
-    const { accion } = req.body; // Obtiene la acción desde el cuerpo de la solicitud (incrementar o decrementar)
+    const { usuarioID, productoID } = req.params;  // Obtener los IDs de los parámetros
+    const { accion } = req.body;  // Obtener la acción (incrementar o decrementar) desde el cuerpo de la solicitud
 
     try {
-        // Busca el carrito del usuario
+        // Buscar el carrito del usuario
         const carrito = await Carrito.findOne({ where: { usuarioID } });
 
         if (!carrito) {
             return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
         }
 
-        // Busca el producto en el carrito
+        // Buscar el producto en el carrito
         const productoEnCarrito = await ProductoCarrito.findOne({
             where: {
-                carritoID: carrito.id, // Usa el ID del carrito encontrado
-                productoID
+                carritoID: carrito.id,  // Usar el ID del carrito encontrado
+                productoDetalleID: productoID  // Asegúrate de usar la columna correcta, asumo que es productoDetalleID
             }
         });
 
@@ -244,7 +255,7 @@ router.put('/actualizarCantidad/:usuarioID/:productoID', async (req, res) => {
             return res.status(404).json({ mensaje: 'Producto no encontrado en el carrito.' });
         }
 
-        // Incrementa o decrementar la cantidad
+        // Incrementar o decrementar la cantidad según la acción
         if (accion === 'incrementar') {
             productoEnCarrito.cantidad += 1;
         } else if (accion === 'decrementar') {
@@ -258,15 +269,16 @@ router.put('/actualizarCantidad/:usuarioID/:productoID', async (req, res) => {
             return res.status(400).json({ mensaje: 'Acción no válida. Debe ser "incrementar" o "decrementar".' });
         }
 
+        // Guardar los cambios
         await productoEnCarrito.save();
 
+        // Responder con la nueva cantidad
         res.status(200).json({ mensaje: 'Cantidad actualizada correctamente.', nuevaCantidad: productoEnCarrito.cantidad });
     } catch (error) {
         console.error('Error al actualizar la cantidad:', error);
-        res.status(500).json({ mensaje: 'Error interno del servidor.' });
+        res.status(500).json({ mensaje: 'Error interno del servidor.', detalles: error.message });
     }
 });
-
 
 
 

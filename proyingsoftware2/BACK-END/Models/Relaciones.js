@@ -19,6 +19,7 @@ Orden.belongsTo(Usuario, {foreignKey: 'usuarioID'});
 Orden.hasMany(ProductoOrden, {foreignKey: 'ordenID'});
 Producto.belongsTo(Marca, {foreignKey: 'marcaID', onDelete: 'CASCADE'});
 Producto.hasMany(ProductoDetalle,{foreignKey: 'productoID'});
+Producto.hasOne(ProductoDetalle, { foreignKey: 'productoID' });  
 ProductoDetalle.hasMany(ProductoCarrito,{foreignKey: 'productoDetalleID'});
 ProductoDetalle.hasMany(ProductoOrden,{foreignKey: 'productoDetalleID'});
 ProductoCarrito.belongsTo(ProductoDetalle, {foreignKey: 'productoDetalleID'});

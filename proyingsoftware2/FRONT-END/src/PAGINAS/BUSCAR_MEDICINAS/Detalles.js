@@ -60,7 +60,7 @@ const DetalleProducto = () => {
 
             // Verificar los datos antes de enviarlos al backend
             console.log('Enviando datos al carrito:', {
-                productoID: stockProducto.Producto.id,
+                productoDetalleID: stockProducto.Producto.id,
                 usuarioID: usuarioID,
                 carritoID: carritoID,
                 cantidad: cantidad,
@@ -73,7 +73,7 @@ const DetalleProducto = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    productoID: stockProducto.Producto.id,
+                    productoDetalleID: stockProducto.Producto.id,
                     carritoID: carritoID,
                     cantidad: cantidad,
                 }),
@@ -126,7 +126,7 @@ const DetalleProducto = () => {
           </Typography>
           {/* Aquí se muestra la tienda */}
           <Typography variant="body1" color="textSecondary">
-            Vendido por: {stockProducto.Producto.Botica.nombre}
+            Vendido por: {stockProducto.Botica.nombre}
           </Typography>
         </Box>
         <Grid container spacing={4}>
