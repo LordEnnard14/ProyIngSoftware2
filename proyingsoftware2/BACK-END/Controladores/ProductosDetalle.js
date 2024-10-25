@@ -84,44 +84,47 @@ router.post('/newDetalle', upload.single('imagen'), async (req, res) => {
     }
   });
 
-  router.get('/searchProductosAll', async (req, res) => {
+router.get('/searchProductos', async (req, res) => {
     try {
-      const { nombreProducto } = req.query; 
-  
-      const productosDetalles = await ProductoDetalle.findAll({
-        include: [
-          {
-            model: Producto,
-            attributes: ['id', 'nombre'],
+        const { nombreProducto } = req.query; 
+        const trimmedNombreProducto = nombreProducto ? nombreProducto.trim() : ''; 
+
+        
+        const whereCondition = trimmedNombreProducto ? {
+            nombre: {
+                [Op.iLike]: `%${trimmedNombreProducto}%`
+            }
+        } : {};
+
+        const productosDetalles = await ProductoDetalle.findAll({
             include: [
-              {
-                model: Marca,
-                attributes: ['nombre'],
-              }
+                {
+                    model: Producto,
+                    attributes: ['id', 'nombre'],
+                    where: whereCondition, 
+                    include: [
+                        {
+                            model: Marca,
+                            attributes: ['nombre'],
+                        }
+                    ]
+                },
+                {
+                    model: Botica,
+                    attributes: ['nombre', 'direccion'],
+                }
             ],
-            where: nombreProducto ? { 
-              nombre: { 
-                [Op.iLike]: `%${nombreProducto}%` 
-              } 
-            } : {} 
-          },
-          {
-            model: Botica,
-            attributes: ['nombre', 'direccion'],
-          }
-        ],
-        order: [['id', 'ASC']]
-      });
-  
-      // Validación: si no se encontraron productos
-      if (productosDetalles.length === 0) {
-        return res.status(404).send({ message: `No se encontró el producto con el término "${nombreProducto}"` });
-      }
-  
-      return res.status(200).send({ ProductosDetalles: JSON.parse(JSON.stringify(productosDetalles)) });
+            order: [['id', 'ASC']]
+        });
+
+        if (productosDetalles.length === 0) {
+            return res.status(404).send({ message: `No se encontró ningún producto con el término "${trimmedNombreProducto}"` });
+        }
+
+        return res.status(200).send({ ProductosDetalles: JSON.parse(JSON.stringify(productosDetalles)) });
     } catch (error) {
-      return res.status(500).send({ error: error.message });
+        return res.status(500).send({ error: error.message });
     }
-  });
+});
 
 export default router;

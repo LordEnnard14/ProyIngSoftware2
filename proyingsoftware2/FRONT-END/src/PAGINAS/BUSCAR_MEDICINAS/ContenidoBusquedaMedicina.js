@@ -100,9 +100,9 @@ const ContenidoPaginaBusqueda = (props) => {
             sx={{
               borderRadius: '20px',
               backgroundColor: '#4a6a7d',
-              width: '80%', // Reducir el ancho del botón
-              padding: '8px 16px', // Ajustar el padding para hacerlo más pequeño
-              margin: '0 auto', // Centrar el botón horizontalmente
+              width: '80%', 
+              padding: '8px 16px', 
+              margin: '0 auto', 
             }}
           >
             VER MÁS

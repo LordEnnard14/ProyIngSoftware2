@@ -3,8 +3,9 @@ import usuarioRoutes from "./Controladores/Usuarios.js";
 import ordenRoutes from "./Controladores/Ordenes.js";
 import adminRoutes from "./Controladores/Admin.js";
 import productoDetalleRoutes from "./Controladores/ProductosDetalle.js"; 
-import carritoRoutes from "./Controladores/Carrito.js"
-import ordenesRoutes from "./Controladores/Carrito.js"
+import carritoRoutes from "./Controladores/Carrito.js";
+import ordenesRoutes from "./Controladores/Carrito.js";
+
 
 
 

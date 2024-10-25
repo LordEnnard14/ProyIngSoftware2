@@ -8,57 +8,49 @@ import ContenidoPaginaBusqueda from './ContenidoBusquedaMedicina.js';
 
 const ResultadoBusqueda = () => {
   const location = useLocation();
-  const { query } = location.state || { query: '' }; // Obtenemos el término de búsqueda
-  const [filteredStocks, setFilteredStocks] = useState([]); // Stocks filtrados
-  const [currentPage, setCurrentPage] = useState(1); // Página actual
-  const productsPerPage = 8; // Número de productos por página
-  const [isSearchEmpty, setIsSearchEmpty] = useState(false); // Para manejar si la búsqueda está vacía
-  const [totalPages, setTotalPages] = useState(1); // Total de páginas
-  const [searchError, setSearchError] = useState(''); // Para manejar errores de búsqueda
+  const { query } = location.state || { query: '' }; 
+  const [filteredStocks, setFilteredStocks] = useState([]); 
+  const [currentPage, setCurrentPage] = useState(1); 
+  const productsPerPage = 8; 
+  const [totalPages, setTotalPages] = useState(1); 
+  const [searchError, setSearchError] = useState(''); 
 
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const endpoint = query
-          ? `http://localhost:4000/api/productos/searchStockProductos?query=${query}`
-          : `http://localhost:4000/api/productos/stockProductosAll`; // Todos los productos si no hay búsqueda
+        const respuesta = await fetch(`http://localhost:4000/api/productoDetalle/searchProductos?nombreProducto=${query}`);
+                
+        const data = await respuesta.json();
 
-        const response = await fetch(endpoint);
-
-        if (!response.ok) {
-          const errorResponse = await response.json(); // Obtener mensaje de error del backend
-          throw new Error(errorResponse.message || 'Error al obtener los datos del servidor'); // Lanzar el error con mensaje
+        if (!respuesta.ok) {
+          
+          setSearchError(data.message || 'Error al buscar productos.'); 
+          setFilteredStocks([]); 
+          return; 
         }
+         
 
-        const data = await response.json();
-        console.log("Datos obtenidos:", data); // Para depurar
+        const baseUrl = `http://localhost:4000/api/productoDetalle/`; 
 
-        const stockConDatos = data.map(stock => ({
-          id: stock?.id || 'Sin ID',
-          name: stock.Producto?.nombre || 'Sin nombre',
-          marca: stock.Producto?.Marca?.nombre || 'Sin marca',
-          botica: stock.Producto?.Botica?.nombre || 'Sin botica',
-          direccion: stock.Botica?.direccion || 'Sin dirección',
-          cantidad: stock.cantidad || 0,
-          image: `http://localhost:4000/api/productos/${stock.Producto?.imageUrl}`,
-          precio: stock.precio || 0,
+        const producto_busqueda = data.ProductosDetalles.map(dato => ({
+          id: dato.id || 'Sin ID',
+          name: dato.Producto?.nombre || 'Sin nombre',
+          marca: dato.Producto?.Marca?.nombre || 'Sin marca',
+          botica: dato.Producto?.Botica?.nombre || 'Sin botica',
+          direccion: dato.Botica?.direccion || 'Sin dirección',
+          cantidad: dato.cantidad || 0,
+          image: `${baseUrl}${dato.imageUrl || ''}`,
+          precio: dato.precio || 0,
         }));
 
-        setFilteredStocks(stockConDatos);
-        setTotalPages(Math.ceil(stockConDatos.length / productsPerPage));
-
-        // Actualizar isSearchEmpty según el resultado
-        if (query && stockConDatos.length === 0) {
-          setIsSearchEmpty(true);
-          setSearchError(`No se encontraron productos con '${query}'.`);
-        } else {
-          setIsSearchEmpty(false);
-          setSearchError(''); // Resetear el error si hay resultados
-        }
+        setFilteredStocks(producto_busqueda);
+        setTotalPages(Math.ceil(producto_busqueda.length / productsPerPage));
+        setSearchError(''); 
+      
       } catch (error) {
-        console.error('Error fetching data:', error);
-        setSearchError(error.message); // Usar el mensaje de error real
-        setFilteredStocks([]);
+        console.error('Error de conexión:', error);
+        setSearchError('Servidor caído. Intenta más tarde.'); 
+        setFilteredStocks([]); 
       }
     };
 
@@ -71,36 +63,32 @@ const ResultadoBusqueda = () => {
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage((prevPage) => prevPage + 1);
+      setCurrentPage(prevPage => prevPage + 1);
     }
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage((prevPage) => prevPage - 1);
+      setCurrentPage(prevPage => prevPage - 1);
     }
   };
 
-  const handlePageClick = (pageNumber) => {
+  const handlePageClick = pageNumber => {
     setCurrentPage(pageNumber);
   };
 
   const renderPaginationButtons = () => {
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(
-        <Button
-          key={i}
-          variant="contained"
-          onClick={() => handlePageClick(i)}
-          style={{ margin: '0 5px', backgroundColor: '#567C8D' }}
-          disabled={currentPage === i}
-        >
-          {i}
-        </Button>
-      );
-    }
-    return pageNumbers;
+    return Array.from({ length: totalPages }, (_, i) => (
+      <Button
+        key={i + 1}
+        variant="contained"
+        onClick={() => handlePageClick(i + 1)}
+        style={{ margin: '0 5px', backgroundColor: '#567C8D' }}
+        disabled={currentPage === i + 1}
+      >
+        {i + 1}
+      </Button>
+    ));
   };
 
   return (
@@ -110,15 +98,9 @@ const ResultadoBusqueda = () => {
       <Box sx={{ flexGrow: 1, padding: 4 }}>
         {searchError ? (
           <Box textAlign="center" padding={4}>
-            {searchError} {/* Mensaje de error del servidor */}
+            {searchError}
           </Box>
-        ) : isSearchEmpty ? (
-          <Box textAlign="center" padding={4}>
-            {query
-              ? `No se encontraron productos con '${query}'.` // Mensaje específico
-              : "No se encontraron productos disponibles."}
-          </Box>
-        ) : (
+        )  : (
           <>
             <Grid
               container
@@ -128,7 +110,7 @@ const ResultadoBusqueda = () => {
               paddingRight={'10%'}
               paddingLeft={'10%'}
             >
-              {currentProducts.map((stock) => (
+              {currentProducts.map(stock => (
                 <ContenidoPaginaBusqueda
                   key={stock.id}
                   caractProducto={stock}
