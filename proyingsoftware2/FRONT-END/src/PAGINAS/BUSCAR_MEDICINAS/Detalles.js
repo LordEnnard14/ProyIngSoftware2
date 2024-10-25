@@ -112,7 +112,7 @@ const DetalleProducto = () => {
   }
 
   // Construimos la URL de la imagen usando el ID del producto
-  const imagenUrl = `http://localhost:4000/api/productos/${stockProducto.Producto.imageUrl}`;
+  const imagenUrl = `http://localhost:4000/api/productos/${stockProducto.imageUrl}`;
 
   return (
     <>
@@ -196,7 +196,7 @@ const DetalleProducto = () => {
 
         <Box mt={4} mb={4} bgcolor="grey.300" p={2} borderRadius={3}>
           <Typography variant="h6">Características del Producto:</Typography>
-          {stockProducto?.Producto?.caracteristicas?.length > 0 ? (
+          {stockProducto?.caracteristicas?.length > 0 ? (
             <ul>
               {stockProducto.caracteristicas.map((caracteristica, index) => (
                 <li key={index}>
