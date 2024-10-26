@@ -192,6 +192,7 @@ const CarritoCompras = () => {
                     </TableRow>
                   ))}
                 </TableBody>
+                
               </Table>
             </TableContainer>
           </Grid>

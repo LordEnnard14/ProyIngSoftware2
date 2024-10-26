@@ -6,59 +6,57 @@ const router = express.Router();
 const TASA_IMPUESTO = 0.18;  // Representa el 18% de impuestos
 
 router.get('/:usuarioID', async (req, res) => {
-    const { usuarioID } = req.params; // Obtener el usuarioID desde los parámetros
-  
+    const { usuarioID } = req.params;
+    const baseUrl = `http://localhost:4000/images/`;  // Cambia esto si tienes otra ruta de acceso a las imágenes
+
     try {
-      // Primero, buscamos el carrito asociado al usuarioID
-      const carrito = await Carrito.findOne({ where: { usuarioID } });
-  
-      // Si no se encuentra el carrito, devolvemos un error
-      if (!carrito) {
-        return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
-      }
-  
-      const carritoID = carrito.id; // Obtener el carritoID del carrito encontrado
-  
-      // Buscar los productos en ProductoCarrito que correspondan al carrito
-      const productosCarrito = await ProductoCarrito.findAll({
-        where: { carritoID }, // Usamos el carritoID
-        attributes: ['cantidad'], // Obtenemos la cantidad de cada producto en el carrito
-        include: [
-          {
-            model: Producto,
-            attributes: ['nombre'], // Obtenemos el nombre del producto
+        // Buscar el carrito asociado al usuarioID
+        const carrito = await Carrito.findOne({ where: { usuarioID } });
+
+        if (!carrito) {
+            return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
+        }
+
+        const carritoID = carrito.id;
+
+        // Buscar los productos en ProductoCarrito que correspondan al carrito
+        const productosCarrito = await ProductoCarrito.findAll({
+            where: { carritoID },
+            attributes: ['cantidad'],
             include: [
-              {
-                model: StockProducto,
-                attributes: ['precio'], // Obtenemos el precio del producto
-              }
+                {
+                    model: ProductoDetalle,
+                    attributes: ['precio', 'imageUrl'], // Obtener el precio e imagen desde ProductoDetalle
+                    include: {
+                        model: Producto,
+                        attributes: ['nombre']  // Obtener el nombre del producto
+                    }
+                }
             ]
-          }
-        ]
-      });
-  
-      // Verificar si hay productos en el carrito
-      if (productosCarrito.length === 0) {
-        return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
-      }
-  
-      // Mapeamos los datos deseados (nombre, precio y cantidad)
-      const productos = productosCarrito.map(item => ({
-        nombre: item.Producto.nombre,
-        precio: item.Producto.StockProducto.precio,
-        cantidad: item.cantidad // Cantidad del producto en el carrito
-      }));
-  
-      // Devolver los productos con nombre, precio y cantidad
-      res.status(200).json(productos);
+        });
+
+        if (productosCarrito.length === 0) {
+            return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
+        }
+
+        // Mapeamos los datos (nombre, precio, cantidad y imagen)
+        const productos = productosCarrito.map(item => ({
+            nombre: item.ProductoDetalle.Producto.nombre,
+            precio: item.ProductoDetalle.precio,
+            cantidad: item.cantidad,
+        }));
+
+        // Devolver los productos con nombre, precio, cantidad e imagen
+        res.status(200).json(productos);
     } catch (error) {
-      console.error('Error al obtener los productos del carrito:', error);
-      res.status(500).json({ mensaje: 'Error interno del servidor' });
+        console.error('Error al obtener los productos del carrito:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
     }
-  });
+});
+
   
 
-  router.post('/crearOrden/:usuarioID', async (req, res) => {
+router.post('/crearOrden/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params;
     const { direccionEnvio, metodoEntrega, botica } = req.body;
 
@@ -80,10 +78,10 @@ router.get('/:usuarioID', async (req, res) => {
             where: { carritoID: carrito.id },
             include: [
                 {
-                    model: ProductoDetalle,  // Obtener el precio desde ProductoDetalle
+                    model: ProductoDetalle,
                     attributes: ['precio'],
                     include: {
-                        model: Producto,  // Obtener el nombre del producto
+                        model: Producto,
                         attributes: ['nombre']
                     }
                 }
@@ -96,32 +94,31 @@ router.get('/:usuarioID', async (req, res) => {
         }, 0);
 
         // Determinar el costo de envío
-        const costoEnvio = metodoEntrega === 'entrega' ? 10 : 0;  // Si es entrega a domicilio, se cobra
+        const costoEnvio = metodoEntrega === 'entrega' ? 10 : 0;
 
         // Calcular el impuesto (18%)
-        const impuesto = (subtotal + costoEnvio) * 0.18;  // TASA_IMPUESTO = 0.18
+        const impuesto = (subtotal + costoEnvio) * TASA_IMPUESTO;
         const impuestoFinal = isNaN(impuesto) ? 0 : impuesto.toFixed(2);
 
         // Calcular el total
         const total = subtotal + costoEnvio + parseFloat(impuestoFinal);
 
-        // Si el método de entrega es "recojo", usamos la botica seleccionada como dirección
+        // Determinar la dirección final según el método de entrega
         const direccionFinal = metodoEntrega === 'recojo' ? `Recojo en ${botica}` : direccionEnvio;
 
-        // Validar que haya una dirección válida para la entrega a domicilio
+        // Validación de campos requeridos
         if (metodoEntrega === 'entrega' && !direccionEnvio) {
             return res.status(400).json({ mensaje: 'Debe proporcionar una dirección para la entrega a domicilio.' });
         }
 
-        // Validar que haya una botica seleccionada si es recojo en tienda
         if (metodoEntrega === 'recojo' && !botica) {
             return res.status(400).json({ mensaje: 'Debe seleccionar una botica para el recojo en tienda.' });
         }
 
-        // Crear la nueva orden en la base de datos
+        // Crear la nueva orden en la base de datos, sin llenar ProductoOrden
         const nuevaOrden = await Orden.create({
             estado: 'pendiente',
-            direccionEnvio: direccionFinal,  // Usar "Recojo en [botica]" o la dirección para entrega
+            direccionEnvio: direccionFinal,
             subtotal: subtotal.toFixed(2),
             costoEnvio: costoEnvio.toFixed(2),
             impuestos: impuestoFinal,
@@ -129,20 +126,8 @@ router.get('/:usuarioID', async (req, res) => {
             usuarioID: usuarioID,
         });
 
-        // Transferir productos del carrito a ProductoOrden
-        for (const producto of productosCarrito) {
-            await ProductoOrden.create({
-                ordenID: nuevaOrden.id,
-                productoDetalleID: producto.ProductoDetalle.id,
-                cantidad: producto.cantidad,
-                precio: producto.ProductoDetalle.precio
-            });
-        }
-
-        // No eliminar el carrito ni los productos (lo harás después según indicaste)
-
         res.status(201).json({
-            mensaje: 'Orden creada exitosamente.',
+            mensaje: 'Orden creada exitosamente. Use /llenarProductoOrden para añadir productos.',
             orden: nuevaOrden,
         });
     } catch (error) {
@@ -151,55 +136,58 @@ router.get('/:usuarioID', async (req, res) => {
     }
 });
 
+
+
 router.post('/llenarProductoOrden/:usuarioID/:ordenID', async (req, res) => {
-  const { usuarioID, ordenID } = req.params;
+    const { usuarioID, ordenID } = req.params;
 
-  try {
-      // Buscar el carrito del usuario
-      const carrito = await Carrito.findOne({ where: { usuarioID } });
-      if (!carrito) {
-          return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
-      }
+    try {
+        // Buscar el carrito del usuario
+        const carrito = await Carrito.findOne({ where: { usuarioID } });
+        if (!carrito) {
+            return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
+        }
 
-      // Obtener los productos del carrito del usuario
-      const productosCarrito = await ProductoCarrito.findAll({
-          where: { carritoID: carrito.id },
-          include: [
-              {
-                  model: ProductoDetalle,  // Usamos ProductoDetalle en lugar de Producto
-                  attributes: ['precio'],  // Obtener el precio desde ProductoDetalle
-                  include: {
-                      model: Producto,  // Incluir Producto para obtener el nombre u otros detalles
-                      attributes: ['nombre']  // Ejemplo: obtener el nombre del producto
-                  }
-              }
-          ]
-      });
+        // Obtener los productos del carrito del usuario
+        const productosCarrito = await ProductoCarrito.findAll({
+            where: { carritoID: carrito.id },
+            include: [
+                {
+                    model: ProductoDetalle,
+                    attributes: ['precio'],
+                    include: {
+                        model: Producto,
+                        attributes: ['nombre']
+                    }
+                }
+            ]
+        });
 
-      if (productosCarrito.length === 0) {
-          return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
-      }
+        if (productosCarrito.length === 0) {
+            return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
+        }
 
-      // Iteramos sobre los productos del carrito y llenamos la tabla ProductoOrden
-      for (const item of productosCarrito) {
-          const precioTotal = item.ProductoDetalle.precio * item.cantidad;  // Precio total = precio unitario * cantidad
+        // Iterar sobre los productos del carrito y llenar la tabla ProductoOrden
+        for (const item of productosCarrito) {
+            const precioTotal = item.ProductoDetalle.precio * item.cantidad;
 
-          await ProductoOrden.create({
-              ordenID: ordenID,                           // ID de la orden
-              productoDetalleID: item.productoDetalleID,   // ID del producto en ProductoDetalle
-              cantidad: item.cantidad,                    // Cantidad del producto en el carrito
-              precio: item.ProductoDetalle.precio.toFixed(2), // Precio unitario
-              precioTotal: precioTotal.toFixed(2)         // Precio total por la cantidad de productos
-          });
-      }
+            await ProductoOrden.create({
+                ordenID: ordenID,
+                productoDetalleID: item.productoDetalleID,
+                cantidad: item.cantidad,
+                precio: item.ProductoDetalle.precio.toFixed(2),
+                precioTotal: precioTotal.toFixed(2)
+            });
+        }
 
-
-      res.status(201).json({ mensaje: 'ProductoOrden llenado con éxito.' });
-  } catch (error) {
-      console.error('Error al llenar ProductoOrden:', error);
-      res.status(500).json({ mensaje: 'Error interno del servidor al llenar ProductoOrden.', detalles: error.message });
-  }
+        res.status(201).json({ mensaje: 'ProductoOrden llenado con éxito.' });
+    } catch (error) {
+        console.error('Error al llenar ProductoOrden:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor al llenar ProductoOrden.', detalles: error.message });
+    }
 });
+
+
 
 router.put('/actualizarStockProductos/:usuarioID', async (req, res) => {
   const { usuarioID } = req.params;
@@ -268,10 +256,6 @@ router.put('/actualizarStockProductos/:usuarioID', async (req, res) => {
 });
 
 
-
-
-
-
 router.delete('/eliminarCarrito/:usuarioID', async (req, res) => {
   const { usuarioID } = req.params;
 
@@ -293,17 +277,59 @@ router.delete('/eliminarCarrito/:usuarioID', async (req, res) => {
   }
 });
 
-  /*ORDENES DE UN USUARIO*/
+// Endpoint para obtener todas las órdenes de un usuario específico
+router.get('/ordenesUsuario/:usuarioID', async (req, res) => {
+    const { usuarioID } = req.params;
 
-  router.get("/", async (req, res) => {
     try {
-        // Obtener todas las ordenes en la base de datos
-        const ordenes = await Orden.findAll();
-        res.json(ordenes);  // Aqui se envian a todas las ordenes como respuesta
-    } catch (error) { //Por si existe un error
-        console.error("Error al obtener ordenes:", error);
-        res.status(500).json({ error: "Error interno del servidor" });
+        // Buscar todas las órdenes asociadas al usuarioID
+        const ordenes = await Orden.findAll({
+            where: { usuarioID },
+            include: [
+                {
+                    model: ProductoOrden,
+                    attributes: ['cantidad', 'precio'],
+                    include: [
+                        {
+                            model: ProductoDetalle,
+                            attributes: ['precio'],
+                            include: {
+                                model: Producto,
+                                attributes: ['nombre']
+                            }
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if (ordenes.length === 0) {
+            return res.status(404).json({ mensaje: 'No se encontraron órdenes para este usuario.' });
+        }
+
+        // Estructurar la respuesta para cada orden
+        const detallesOrdenes = ordenes.map(orden => ({
+            id: orden.id,
+            direccionEnvio: orden.direccionEnvio,
+            estado: orden.estado,
+            subtotal: orden.subtotal,
+            costoEnvio: orden.costoEnvio,
+            impuestos: orden.impuestos,
+            total: orden.total,
+            productos: orden.ProductoOrdens.map(item => ({
+                nombre: item.ProductoDetalle.Producto.nombre,
+                cantidad: item.cantidad,
+                precioUnitario: item.precio,
+                precioTotal: (item.cantidad * item.precio).toFixed(2)
+            }))
+        }));
+
+        res.status(200).json(detallesOrdenes);
+    } catch (error) {
+        console.error('Error al obtener las órdenes del usuario:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
     }
 });
+
 
 export default router;
