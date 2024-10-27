@@ -102,7 +102,7 @@ router.post('/agregarProductoCarrito', async (req, res) => {
 //usado
 router.get('/productos/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params;  // Obtener el usuarioID desde los parámetros de la URL
-    const baseUrl = `http://localhost:4000/api/productos/`;  // La URL base para las imágenes
+    const baseUrl = `http://localhost:4000/api/productoDetalle/`;  // La URL base para las imágenes
 
     try {
         // Buscar el carrito asociado al usuarioID
