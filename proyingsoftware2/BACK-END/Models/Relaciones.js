@@ -13,6 +13,8 @@ Admin.belongsTo(Botica,{ foreignKey: 'boticaID' });
 Botica.hasMany(ProductoDetalle, {foreignKey: 'boticaID'});
 Botica.hasOne(Admin,{ foreignKey: 'boticaID' });
 Carrito.belongsTo(Usuario, {foreignKey: 'usuarioID'});
+Orden.belongsTo(Botica, { foreignKey: 'boticaID' });
+Botica.hasMany(Orden, { foreignKey: 'boticaID' });
 Carrito.hasMany(ProductoCarrito, {foreignKey: 'carritoID'});
 Marca.hasMany(Producto, {foreignKey: 'marcaID'});
 Orden.belongsTo(Usuario, {foreignKey: 'usuarioID'});
