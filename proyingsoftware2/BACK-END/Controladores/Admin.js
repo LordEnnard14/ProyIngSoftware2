@@ -1,5 +1,5 @@
 import express from "express";
-import { Admin, Producto , Marca} from "../Models/Relaciones.js";
+import { Admin, Producto , Marca, ProductoDetalle} from "../Models/Relaciones.js";
 
 
 const router = express.Router();
@@ -40,17 +40,19 @@ router.post('/iniciarSesion', async (req, res) => {
   router.get('/boticaProductos/:boticaID', async (req, res) => {
     const { boticaID } = req.params;
     try {
-        const productos = await Producto.findAll({
+        const productos = await ProductoDetalle.findAll({
             where: { boticaID },
             include: [
                 {
-                    model: Marca,
-                    attributes: ['id', 'nombre'],
+                    model: Producto,
+                    attributes: ['id','nombre', 'presentacion', 'categoria', 'nRegistroSanitario'],
+                    include:[
+                      {
+                        model: Marca,
+                        attributes: ['id', 'nombre'],
+                      },
+                    ]
                 },
-                {
-                    model: StockProducto,
-                    attributes: ['cantidad', 'precio'],
-                }
             ]
         });
         res.json(productos);

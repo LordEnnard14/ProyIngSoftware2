@@ -21,10 +21,11 @@ const ListaProductosBotica = () => {
 
           const productosBotica = resultado.map(producto => ({
             id: producto?.id || 'Sin ID',
-            nombre: producto?.nombre || 'Sin nombre',
-            precio: producto?.StockProducto?.precio || 'Sin precio',
+            marca: producto?.Producto?.Marca?.nombre || 'Sin marca',
+            nombre: producto?.Producto?.nombre || 'Sin nombre',
+            precio: producto?.precio || 'Sin precio',
             fechaRegistro: producto?.fechaRegistro || 'Fecha no disponible', // Ajuste del campo si está disponible
-            stock: producto?.StockProducto?.cantidad || 'Sin stock',
+            stock: producto?.cantidad || 'Sin stock',
             estado: producto?.estado ? 'Disponible' : 'No disponible', // Mostrar 'Disponible' si es true, 'No disponible' si es false
           }));
 
@@ -69,6 +70,7 @@ const ListaProductosBotica = () => {
             <TableHead>
               <TableRow>
                 <TableCell sx={{ textAlign: 'center' }}>ID</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Marca</TableCell>
                 <TableCell sx={{ textAlign: 'center' }}>Nombre</TableCell>
                 <TableCell sx={{ textAlign: 'center' }}>Precio</TableCell>
                 <TableCell sx={{ textAlign: 'center' }}>Fecha Registro</TableCell>
