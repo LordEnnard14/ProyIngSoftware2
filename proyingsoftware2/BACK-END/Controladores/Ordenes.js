@@ -1,6 +1,6 @@
 //aqui se realiza la paga
 import express from "express"; 
-import { Orden, Usuario,ProductoOrden ,Carrito, ProductoCarrito, Producto,ProductoDetalle } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
+import { Orden, Usuario,ProductoOrden ,Carrito, ProductoCarrito, Producto,ProductoDetalle,Botica } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
 
 const router = express.Router();
 const TASA_IMPUESTO = 0.18;  // Representa el 18% de impuestos
@@ -54,8 +54,6 @@ router.get('/:usuarioID', async (req, res) => {
     }
 });
 
-  
-
 router.post('/crearOrden/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params;
     const { direccionEnvio, metodoEntrega, botica } = req.body;
@@ -73,13 +71,13 @@ router.post('/crearOrden/:usuarioID', async (req, res) => {
             return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
         }
 
-        // Obtener los productos del carrito
+        // Obtener los productos del carrito con la botica asociada
         const productosCarrito = await ProductoCarrito.findAll({
             where: { carritoID: carrito.id },
             include: [
                 {
                     model: ProductoDetalle,
-                    attributes: ['precio'],
+                    attributes: ['precio', 'boticaID'],
                     include: {
                         model: Producto,
                         attributes: ['nombre']
@@ -88,51 +86,68 @@ router.post('/crearOrden/:usuarioID', async (req, res) => {
             ]
         });
 
-        // Calcular el subtotal
-        const subtotal = productosCarrito.reduce((total, item) => {
-            return total + item.ProductoDetalle.precio * item.cantidad;
-        }, 0);
-
-        // Determinar el costo de envío
-        const costoEnvio = metodoEntrega === 'entrega' ? 10 : 0;
-
-        // Calcular el impuesto (18%)
-        const impuesto = (subtotal + costoEnvio) * TASA_IMPUESTO;
-        const impuestoFinal = isNaN(impuesto) ? 0 : impuesto.toFixed(2);
-
-        // Calcular el total
-        const total = subtotal + costoEnvio + parseFloat(impuestoFinal);
-
-        // Determinar la dirección final según el método de entrega
-        const direccionFinal = metodoEntrega === 'recojo' ? `Recojo en ${botica}` : direccionEnvio;
+        // Agrupar productos por botica
+        const productosPorBotica = {};
+        productosCarrito.forEach(item => {
+            const boticaID = item.ProductoDetalle.boticaID;
+            if (!productosPorBotica[boticaID]) {
+                productosPorBotica[boticaID] = [];
+            }
+            productosPorBotica[boticaID].push(item);
+        });
 
         // Validación de campos requeridos
         if (metodoEntrega === 'entrega' && !direccionEnvio) {
             return res.status(400).json({ mensaje: 'Debe proporcionar una dirección para la entrega a domicilio.' });
         }
-
         if (metodoEntrega === 'recojo' && !botica) {
             return res.status(400).json({ mensaje: 'Debe seleccionar una botica para el recojo en tienda.' });
         }
 
-        // Crear la nueva orden en la base de datos, sin llenar ProductoOrden
-        const nuevaOrden = await Orden.create({
-            estado: 'pendiente',
-            direccionEnvio: direccionFinal,
-            subtotal: subtotal.toFixed(2),
-            costoEnvio: costoEnvio.toFixed(2),
-            impuestos: impuestoFinal,
-            total: total.toFixed(2),
-            usuarioID: usuarioID,
-        });
+        // Crear una orden por cada botica
+        const ordenesCreadas = [];
+        for (const [boticaID, productos] of Object.entries(productosPorBotica)) {
+            // Calcular el subtotal para esta botica
+            const subtotal = productos.reduce((total, item) => {
+                return total + item.ProductoDetalle.precio * item.cantidad;
+            }, 0);
+
+            // Determinar el costo de envío
+            const costoEnvio = metodoEntrega === 'entrega' ? 10 : 0;
+
+            // Calcular el impuesto (18%)
+            const impuesto = (subtotal + costoEnvio) * TASA_IMPUESTO;
+            const impuestoFinal = isNaN(impuesto) ? 0 : impuesto.toFixed(2);
+
+            // Calcular el total
+            const total = subtotal + costoEnvio + parseFloat(impuestoFinal);
+
+            // Determinar la dirección final según el método de entrega
+            const direccionFinal = metodoEntrega === 'recojo' ? `Recojo en ${botica}` : direccionEnvio;
+
+            // Crear la nueva orden para esta botica
+            const nuevaOrden = await Orden.create({
+                estado: 'pendiente',
+                direccionEnvio: direccionFinal,
+                subtotal: subtotal.toFixed(2),
+                costoEnvio: costoEnvio.toFixed(2),
+                impuestos: impuestoFinal,
+                total: total.toFixed(2),
+                usuarioID: usuarioID,
+                boticaID: parseInt(boticaID), // Asociar la orden a la botica
+                fechaRegistro: new Date() // Fecha actual de creación
+            });
+
+            ordenesCreadas.push(nuevaOrden);
+        }
 
         res.status(201).json({
-            mensaje: 'Orden creada exitosamente. Use /llenarProductoOrden para añadir productos.',
-            orden: nuevaOrden,
+            mensaje: 'Órdenes creadas exitosamente para cada botica.',
+            ordenes: ordenesCreadas,
         });
     } catch (error) {
-        console.error('Error al crear la orden:', error);
-        res.status(500).json({ mensaje: 'Error al crear la orden.', detalles: error.message });
+        console.error('Error al crear las órdenes:', error);
+        res.status(500).json({ mensaje: 'Error al crear las órdenes.', detalles: error.message });
     }
 });
 
@@ -330,6 +345,77 @@ router.get('/ordenesUsuario/:usuarioID', async (req, res) => {
         res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
     }
 });
+
+
+
+
+
+
+
+
+
+/////////---------------------------------------------------------------
+router.get('/carrito/ingresoTotalPorBotica/:usuarioID', async (req, res) => {
+    const { usuarioID } = req.params;
+
+    try {
+        // Buscar el carrito asociado al usuarioID
+        const carrito = await Carrito.findOne({ where: { usuarioID } });
+        if (!carrito) {
+            return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
+        }
+
+        // Obtener los productos en el carrito con su cantidad, precio y el boticaID
+        const productosCarrito = await ProductoCarrito.findAll({
+            where: { carritoID: carrito.id },
+            attributes: ['productoDetalleID', 'cantidad', 'precio'],
+            include: [
+                {
+                    model: ProductoDetalle,
+                    attributes: ['boticaID'],
+                    include: [
+                        {
+                            model: Botica, // Incluir la tabla Botica para obtener el nombre
+                            attributes: ['nombre']
+                        }
+                    ]
+                }
+            ]
+        });
+
+        // Verificar si hay productos en el carrito
+        if (productosCarrito.length === 0) {
+            return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
+        }
+
+        // Calcular el ingreso total por botica
+        const ingresosPorBotica = {};
+
+        productosCarrito.forEach(item => {
+            const nombreBotica = item.ProductoDetalle.Botica ? item.ProductoDetalle.Botica.nombre : 'Nombre no disponible';
+            const ingresoProducto = item.precio * item.cantidad;
+
+            if (!ingresosPorBotica[nombreBotica]) {
+                ingresosPorBotica[nombreBotica] = 0;
+            }
+
+            ingresosPorBotica[nombreBotica] += ingresoProducto;
+        });
+
+        // Convertir el resultado a un array de objetos para la respuesta
+        const resultado = Object.keys(ingresosPorBotica).map(nombreBotica => ({
+            nombreBotica,
+            ingresoTotal: ingresosPorBotica[nombreBotica].toFixed(2) // Formatear a 2 decimales
+        }));
+
+        res.status(200).json({ ingresosPorBotica: resultado });
+    } catch (error) {
+        console.error('Error al calcular el ingreso total por botica:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
+    }
+});
+
+
 
 
 export default router;

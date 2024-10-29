@@ -115,104 +115,91 @@ const PaginaPago = () => {
 
 
 
-
   const handleFinalizarCompra = async () => {
     if (!metodoEntrega) {
-      alert('Selecciona un método de entrega.');
-      return;
+        alert('Selecciona un método de entrega.');
+        return;
     }
-  
+
     if (metodoEntrega === 'recojo' && !botica) {
-      alert('Selecciona una botica para el recojo.');
-      return;
+        alert('Selecciona una botica para el recojo.');
+        return;
     }
-  
+
     if (metodoEntrega === 'entrega' && !direccion) {
-      alert('Ingrese una dirección de entrega válida.');
-      return;
+        alert('Ingrese una dirección de entrega válida.');
+        return;
     }
-  
+
     if (!numeroTarjeta || errorTarjeta) {
-      alert('Ingrese un número de tarjeta válido.');
-      return;
+        alert('Ingrese un número de tarjeta válido.');
+        return;
     }
-  
+
     if (!cvv || errorCvv) {
-      alert('Ingrese un CVV válido.');
-      return;
+        alert('Ingrese un CVV válido.');
+        return;
     }
-  
+
     const usuario = JSON.parse(localStorage.getItem('user'));
     const usuarioID = usuario?.id;
-  
+
     try {
-      // Llamada a la API para crear la orden
-      const response = await fetch(`http://localhost:4000/api/ordenes/crearOrden/${usuarioID}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          direccionEnvio: metodoEntrega === 'entrega' ? direccion : '',  // Enviar dirección si es "entrega"
-          metodoEntrega: metodoEntrega,
-          botica: metodoEntrega === 'recojo' ? botica : '',  // Enviar botica si es "recojo"
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok && data.orden?.id) {
-        const ordenID = data.orden.id; // Almacenar el ID de la orden
-  
-        // Almacenar el ID de la orden en el localStorage (opcional)
-        localStorage.setItem('orden', JSON.stringify({
-          id: ordenID,
-          estado: 'pendiente',
-          total: data.orden.total,
-        }));
-  
-        // Verificar si hay productos y actualizar el stock
-        const actualizarStockResponse = await fetch(`http://localhost:4000/api/ordenes/actualizarStockProductos/${usuarioID}`, {
-          method: 'PUT',
+        // Llamada a la API para crear la orden
+        const response = await fetch(`http://localhost:4000/api/ordenes/crearOrden/${usuarioID}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                direccionEnvio: metodoEntrega === 'entrega' ? direccion : '',
+                metodoEntrega: metodoEntrega,
+                botica: metodoEntrega === 'recojo' ? botica : '',
+            }),
         });
-  
-        const actualizarStockData = await actualizarStockResponse.json();
-  
-        if (!actualizarStockResponse.ok) {
-          // Si no hay productos o no se pudo actualizar el stock, se detiene el proceso
-          alert('Lo sentimos: ' + (actualizarStockData.mensaje || 'Error desconocido.'));
-          return; // Detener el proceso aquí
-        }
-  
-        // Ahora que tenemos el ordenID, realizamos la segunda llamada para llenar la tabla ProductoOrden
-        const llenarProductoOrdenResponse = await fetch(`http://localhost:4000/api/ordenes/llenarProductoOrden/${usuarioID}/${ordenID}`, {
-          method: 'POST',
-        });
-  
-        const productoOrdenData = await llenarProductoOrdenResponse.json();
-  
-        await fetch(`http://localhost:4000/api/ordenes/eliminarCarrito/${usuarioID}`, {
-          method: 'DELETE',
-        });
-  
-        if (llenarProductoOrdenResponse.ok) {
-          // Éxito en el llenado de ProductoOrden
-          alert('Compra realizada con éxito y productos añadidos a la orden.');
-          navigate('/')
+
+        const data = await response.json();
+
+        if (response.ok && data.ordenes?.length > 0) {
+            const ordenesCreadas = data.ordenes; // Array de órdenes creadas
+
+            // Almacenar detalles de la orden en localStorage si es necesario
+            localStorage.setItem('orden', JSON.stringify({
+                estado: 'pendiente',
+                total: data.totalGeneral, // Puedes sumar el total de todas las órdenes creadas
+            }));
+
+            // Ejecutar la lógica adicional (como actualizar stock o llenar la tabla de productos)
+            for (const orden of ordenesCreadas) {
+                const llenarProductoOrdenResponse = await fetch(`http://localhost:4000/api/ordenes/llenarProductoOrden/${usuarioID}/${orden.id}`, {
+                    method: 'POST',
+                });
+
+                const productoOrdenData = await llenarProductoOrdenResponse.json();
+
+                if (!llenarProductoOrdenResponse.ok) {
+                    console.error('Error al llenar ProductoOrden para la orden:', orden.id);
+                    alert(`Error al añadir productos a la orden ID ${orden.id}.`);
+                    return;
+                }
+            }
+
+            // Eliminar el carrito solo si todas las operaciones fueron exitosas
+            await fetch(`http://localhost:4000/api/ordenes/eliminarCarrito/${usuarioID}`, {
+                method: 'DELETE',
+            });
+
+            alert('Compra realizada con éxito. Se crearon las órdenes para cada botica.');
+            navigate('/');
         } else {
-          console.log('Error al llenar ProductoOrden:', productoOrdenData);
-          alert('Error al añadir productos a la orden.');
+            console.error('Error en la respuesta del servidor:', data);
+            alert('Error al realizar la compra: ' + (data.mensaje || 'Error desconocido.'));
         }
-      } else {
-        console.log('Error en la respuesta del servidor:', data);
-        alert('Error al realizar la compra: ' + (data.mensaje || 'Error desconocido.'));
-      }
     } catch (error) {
-      console.error('Error al realizar la compra:', error);
-      alert('Ocurrió un error al procesar tu compra.');
+        console.error('Error al realizar la compra:', error);
+        alert('Ocurrió un error al procesar tu compra. Inténtelo nuevamente.');
     }
-  };
-  
+};
 
 
 
