@@ -1,5 +1,5 @@
 import express from "express";
-import { Admin, Producto , Marca, ProductoDetalle} from "../Models/Relaciones.js";
+import { Admin, Producto , Marca, ProductoDetalle,Botica} from "../Models/Relaciones.js";
 
 
 const router = express.Router();
@@ -62,7 +62,39 @@ router.post('/iniciarSesion', async (req, res) => {
     }
 });
 
-  
+router.get('/administradores', async (req, res) => {
+  const { boticaID } = req.query; 
+
+  try {
+      const whereClause = boticaID ? { boticaID: boticaID } : {}; // 
+
+      const administradores = await Admin.findAll({
+          where: whereClause,
+          include: {
+              model: Botica,
+              attributes: ['nombre'],
+              required: false
+          }
+      });
+
+      if (administradores.length === 0) {
+          return res.status(404).json({ mensaje: 'No se encontraron administradores' });
+      }
+
+      const resultado = administradores.map(admin => ({
+          nombre: admin.nombre,
+          apellidoPaterno: admin.apellidoPaterno,
+          apellidoMaterno: admin.apellidoMaterno,
+          botica: admin.Botica ? admin.Botica.nombre : 'Sin botica'
+      }));
+
+      res.status(200).json(resultado);
+  } catch (error) {
+      console.error('Error al obtener administradores:', error);
+      res.status(500).json({ mensaje: 'Error al obtener administradores', error: error.message });
+  }
+});
+
   
 
 
