@@ -45,5 +45,44 @@ router.get('/ingresosBotica/:boticaID/:fecha', async (req, res) => {
 });
 
 
+router.post('/registrarBotica', async (req, res) => {
+    const { 
+        ruc, 
+        nombre, 
+        horarioAbre, 
+        horarioCierre, 
+        direccion, 
+        direccion_latitude = null, // Valores por defecto nulos
+        direccion_longitude = null 
+    } = req.body;
+
+    // Validación de campos obligatorios
+    if (!ruc || !nombre || !horarioAbre || !horarioCierre || !direccion) {
+        return res.status(400).json({ mensaje: 'Todos los campos obligatorios deben ser completados.' });
+    }
+
+    try {
+        // Crear una nueva instancia de Botica en la base de datos
+        const nuevaBotica = await Botica.create({
+            ruc,
+            nombre,
+            horarioAbre,
+            horarioCierre,
+            direccion,
+            direccion_latitude,
+            direccion_longitude
+        });
+
+        // Enviar la respuesta con los datos de la nueva botica creada
+        res.status(201).json({
+            mensaje: 'Botica registrada exitosamente.',
+            botica: nuevaBotica
+        });
+    } catch (error) {
+        console.error('Error al registrar la botica:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
+    }
+});
+
 
 export default router;

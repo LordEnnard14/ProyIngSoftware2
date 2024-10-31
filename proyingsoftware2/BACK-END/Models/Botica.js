@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
 
-
 const Botica = sequelize.define('Botica', {
     id: {
         type: DataTypes.INTEGER,
@@ -30,15 +29,15 @@ const Botica = sequelize.define('Botica', {
     },
     direccion_latitude: {
         type: DataTypes.DOUBLE,
-        allowNull: false,
+        allowNull: true, // Permitir valores nulos
     },
     direccion_longitude: {
         type: DataTypes.DOUBLE,
-        allowNull: false,
+        allowNull: true, // Permitir valores nulos
     }
 }, {
     freezeTableName: true,
     timestamps: false
-});;
+});
 
 export default Botica;

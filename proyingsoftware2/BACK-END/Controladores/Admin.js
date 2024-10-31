@@ -95,7 +95,34 @@ router.get('/administradores', async (req, res) => {
   }
 });
 
-  
+
+
+
+router.post('/registrar', async (req, res) => {
+  const { nombre, apellidoPaterno, apellidoMaterno, correo, password, dni, boticaID } = req.body;
+
+  if (!boticaID) {
+      return res.status(400).json({ message: "El ID de la botica es obligatorio" });
+  }
+
+  try {
+      const nuevoAdmin = await Admin.create({
+          nombre,
+          apellidoPaterno,
+          apellidoMaterno,
+          correo,
+          password,
+          dni,
+          boticaID,
+      });
+
+      res.status(201).json({ message: "Administrador registrado exitosamente", admin: nuevoAdmin });
+  } catch (error) {
+      console.error("Error al registrar el administrador:", error);
+      res.status(500).json({ message: "Error al registrar el administrador", error: error.message });
+  }
+});
+
 
 
 export default router;

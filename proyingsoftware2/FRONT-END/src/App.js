@@ -26,6 +26,9 @@ import ListaProductosBotica from './PAGINAS/USUARIO_BOTICA/ListaProductoBotica';
 import OrdenesBotica from './PAGINAS/USUARIO_BOTICA/OrdenesBotica';
 import InicioSesionBotica from './PAGINAS/USUARIO_BOTICA/Inicio Sesion/InicioSesionBotica.js';
 
+import RegisBotica from './PAGINAS/USUARIO_BOTICA/Registro_Botica.js'
+import RegisAdmin from './PAGINAS/ADMINISTRADOR/RegisAdmin.js'
+
 function App() {
   return (
     <Router>
@@ -60,6 +63,8 @@ function App() {
             <Route path='/ListaProductosBotica' element={<ListaProductosBotica/>}/>
             <Route path='/OrdenesBotica' element={<OrdenesBotica/>}/>
             <Route path='/InicioSesionBotica' element={<InicioSesionBotica/>}/>
+            <Route path='/RegisBotica' element={<RegisBotica/>}/>
+            <Route path='/RegisAdmin' element={<RegisAdmin/>}/>
           </Routes>
         </Box>
        

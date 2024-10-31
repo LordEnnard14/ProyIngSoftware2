@@ -140,6 +140,7 @@ const InicioSesion = () => {
               <a onClick={() => navigate('/Registro')}>
                 <b>Regístrate aquí</b>
               </a>
+                
                 <div className="divolvide">
                   <a className="olvide" onClick={() => navigate('/InicioSesionBotica')}>
                     Iniciar Sesión Botica

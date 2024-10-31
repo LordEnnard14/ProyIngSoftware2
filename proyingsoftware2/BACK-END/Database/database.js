@@ -8,7 +8,7 @@ class Database {
                 dialect: "postgres",
                 database: "dosisxtra",
                 username: "postgres",
-                password: "pass",
+                password: "TEROS",
                 host: "localhost",
                 port: 5432,
                 ssl: false,

@@ -40,6 +40,7 @@ const InicioSesionBotica = () => {
     }
   };
 
+  
   return (
     <>
       <section id="BodyOne">
@@ -128,7 +129,7 @@ const InicioSesionBotica = () => {
             </Grid>
             <Box mt={2} className="RA">
               <p>¿Deseas que tu botica se una a nuestra página?</p>
-              <a onClick={() => navigate('/RegistroBotica')}>
+              <a onClick={() => navigate('/RegisBotica')}>
                 <b>Registra a tu botica aquí</b>
               </a>
               <div className="divolvide">
