@@ -7,9 +7,6 @@ import carritoRoutes from "./Controladores/Carrito.js";
 import ordenesRoutes from "./Controladores/Carrito.js";
 import boticaRoutes from "./Controladores/Botica.js";
 
-
-
-
 export default function(app){
     app.use("/api/productos", productoRoutes);
     app.use("/api/usuarios", usuarioRoutes);
