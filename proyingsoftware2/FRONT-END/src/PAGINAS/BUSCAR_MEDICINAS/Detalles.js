@@ -28,7 +28,60 @@ const DetalleProducto = () => {
   }, [id]);
 
   const handleAddToCart = async () => {
-    // Lógica para agregar al carrito
+    if (stockProducto) {
+        try {
+            // Obtener el ID del usuario desde el LocalStorage
+            const usuario = JSON.parse(localStorage.getItem('user'));
+            const usuarioID = usuario?.id;
+            if (!usuarioID) {
+                alert('No se encontró información del usuario. Por favor, inicia sesión.');
+                return; // Si no hay un usuarioID, detiene la ejecución
+            }
+            // Intentar crear un carrito si no existe
+            const responseCarrito = await fetch(`http://localhost:4000/api/carrito/crearCarritoSiNoExiste/${usuarioID}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const dataCarrito = await responseCarrito.json();
+            if (!responseCarrito.ok) {
+                alert('Error al verificar o crear el carrito.');
+                return; // Detener si no se pudo crear o verificar el carrito
+            }
+            const carritoID = dataCarrito.carrito.id; // Obtener el ID del carrito desde la respuesta
+            // Verificar los datos antes de enviarlos al backend
+            console.log('Enviando datos al carrito:', {
+                productoDetalleID: stockProducto.Producto.id,
+                usuarioID: usuarioID,
+                carritoID: carritoID,
+                cantidad: cantidad,
+            });
+            // Llamamos al endpoint para agregar el producto al carrito
+            const response = await fetch('http://localhost:4000/api/carrito/agregarProductoCarrito', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productoDetalleID: stockProducto.Producto.id,
+                    carritoID: carritoID,
+                    cantidad: cantidad,
+                }),
+            });
+            if (response.ok) {
+                // alert('Producto agregado al carrito correctamente');
+                const event = new Event('cartUpdated');
+                window.dispatchEvent(event);
+            } else {
+                const errorData = await response.json();
+                alert('Error al agregar el producto al carrito: ' + errorData.mensaje);
+            }
+        } catch (error) {
+            console.error('Error al agregar el producto al carrito:', error);
+            alert('Error al agregar el producto al carrito. Intente nuevamente.');
+        }
+    }
   };
 
   const aumentarCantidad = () => {
