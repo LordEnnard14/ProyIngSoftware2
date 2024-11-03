@@ -3,7 +3,25 @@ import PropTypes from 'prop-types';
 import { Button, TableCell, TableRow } from '@mui/material';
 
 function AgregarFilaProductoBotica(props) {
-  const { producto } = props;
+  const { producto,  onEstadoChange} = props;
+  const handleEstadoChange = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/admin/cambiarEstado/${producto.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        onEstadoChange(producto.id); // Notifica al componente padre para que actualice el estado local
+      } else {
+        console.error('Error al cambiar el estado del producto');
+      }
+    } catch (error) {
+      console.error('Error al conectar con el servidor:', error);
+    }
+  };
 
   return (
     <TableRow key={producto.id}>
@@ -16,14 +34,14 @@ function AgregarFilaProductoBotica(props) {
       <TableCell sx={{ textAlign: 'center' }}>{producto.estado}</TableCell>
       <TableCell sx={{ textAlign: 'center' }}>
         <Button size="small" sx={{ mr: 1 }} color="primary">
-          <strong>Ver</strong>
+          <strong>Actualizar Stock</strong>
           </Button>
         {producto.estado === 'Disponible' ? (
-          <Button size="small" color="secondary">
+          <Button size="small" color="secondary" onClick={handleEstadoChange} >
             <strong>Desactivar</strong>
             </Button>
         ) : (
-          <Button size="small" color="primary">
+          <Button size="small" color="secondary" onClick={handleEstadoChange}>
             <strong>Activar</strong>
             </Button>
         )}
@@ -42,6 +60,7 @@ AgregarFilaProductoBotica.propTypes = {
     stock: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     estado: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired, // Permitir string o boolean
   }).isRequired,
+  onEstadoChange: PropTypes.func.isRequired, // Nueva prop para notificar el cambio
 };
 
 export default AgregarFilaProductoBotica;

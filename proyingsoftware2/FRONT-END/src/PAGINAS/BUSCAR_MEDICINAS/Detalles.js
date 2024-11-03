@@ -3,98 +3,34 @@ import { Container, Grid, Box, Typography, Button, Link } from '@mui/material';
 import Header1 from '../../COMPONENTES/Header_Principal';
 import CantidadProducto from '../BUSCAR_MEDICINAS/DETALLES/Cantidad.js';
 import { useNavigate, useParams } from 'react-router-dom';
+import Header_Botica from '../../COMPONENTES/Header_Botica.js';
 
 const DetalleProducto = () => {
-  const { id } = useParams(); // Obtenemos el ID del producto desde la URL
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [stockProducto, setStockProducto] = useState(null); 
-  const [cantidad, setCantidad] = useState(1); 
-  const carritoID = 1;  // ID del carrito, asumiendo que ya existe uno (puedes cambiarlo dinámicamente)
+  const [stockProducto, setStockProducto] = useState(null);
+  const [cantidad, setCantidad] = useState(1);
 
-  // Usamos useEffect para obtener los datos del producto
   useEffect(() => {
     async function fetchStockProducto() {
       try {
-        const response = await fetch(`http://localhost:4000/api/productos/stockProductos/${id}`); 
+        const response = await fetch(`http://localhost:4000/api/productos/stockProductos/${id}`);
         if (!response.ok) {
           throw new Error('Error al obtener los datos del stockProducto');
         }
         const producto = await response.json();
-        setStockProducto(producto);  // Actualizamos el estado con los datos del producto
+        setStockProducto(producto);
       } catch (error) {
         console.error('Error:', error);
       }
     }
-    fetchStockProducto();  
+    fetchStockProducto();
   }, [id]);
 
-  // Función para agregar el producto al carrito
   const handleAddToCart = async () => {
-    if (stockProducto) {
-        try {
-            // Obtener el ID del usuario desde el LocalStorage
-            const usuario = JSON.parse(localStorage.getItem('user'));
-            const usuarioID = usuario?.id;
+    // Lógica para agregar al carrito
+  };
 
-            if (!usuarioID) {
-                alert('No se encontró información del usuario. Por favor, inicia sesión.');
-                return; // Si no hay un usuarioID, detiene la ejecución
-            }
-
-            // Intentar crear un carrito si no existe
-            const responseCarrito = await fetch(`http://localhost:4000/api/carrito/crearCarritoSiNoExiste/${usuarioID}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            const dataCarrito = await responseCarrito.json();
-
-            if (!responseCarrito.ok) {
-                alert('Error al verificar o crear el carrito.');
-                return; // Detener si no se pudo crear o verificar el carrito
-            }
-
-            const carritoID = dataCarrito.carrito.id; // Obtener el ID del carrito desde la respuesta
-
-            // Verificar los datos antes de enviarlos al backend
-            console.log('Enviando datos al carrito:', {
-                productoDetalleID: stockProducto.Producto.id,
-                usuarioID: usuarioID,
-                carritoID: carritoID,
-                cantidad: cantidad,
-            });
-
-            // Llamamos al endpoint para agregar el producto al carrito
-            const response = await fetch('http://localhost:4000/api/carrito/agregarProductoCarrito', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    productoDetalleID: stockProducto.Producto.id,
-                    carritoID: carritoID,
-                    cantidad: cantidad,
-                }),
-            });
-
-            if (response.ok) {
-                // alert('Producto agregado al carrito correctamente');
-                const event = new Event('cartUpdated');
-                window.dispatchEvent(event);
-            } else {
-                const errorData = await response.json();
-                alert('Error al agregar el producto al carrito: ' + errorData.mensaje);
-            }
-        } catch (error) {
-            console.error('Error al agregar el producto al carrito:', error);
-            alert('Error al agregar el producto al carrito. Intente nuevamente.');
-        }
-    }
-};
-
- 
   const aumentarCantidad = () => {
     if (cantidad < stockProducto.cantidad) {
       setCantidad(cantidad + 1);
@@ -108,23 +44,36 @@ const DetalleProducto = () => {
   };
 
   if (!stockProducto) {
-    return <div>No se encontró el Producto que está buscando.</div>; // Mostramos mensaje si no hay producto
+    return <div>No se encontró el Producto que está buscando.</div>;
   }
 
-  // Construimos la URL de la imagen usando el ID del producto
+  // Si el estado del producto es false, mostramos el mensaje de "Producto desactivado"
+  if (stockProducto.estado === false) {
+    return (
+      <Container maxWidth="md">
+        <Box my={4} textAlign="center">
+          <Typography variant="h4">Producto desactivado</Typography>
+          <Typography variant="body1" color="textSecondary">
+            Este producto no está disponible actualmente.
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
+
   const imagenUrl = `http://localhost:4000/api/productoDetalle/${stockProducto.imageUrl}`;
+  
+  const admin = JSON.parse(localStorage.getItem('admin'));
 
   return (
     <>
-      <Header1 />
+      {admin ? <Header_Botica /> : <Header1 />}
       <Container maxWidth="md">
         <Box my={4}>
           <Typography variant="h4">{stockProducto.Producto.nombre}</Typography>
-          {/* Aquí se muestra la marca */}
           <Typography variant="body1" color="textSecondary">
             Marca: {stockProducto.Producto.Marca.nombre}
           </Typography>
-          {/* Aquí se muestra la tienda */}
           <Typography variant="body1" color="textSecondary">
             Vendido por: {stockProducto.Botica.nombre}
           </Typography>
@@ -144,7 +93,7 @@ const DetalleProducto = () => {
               }}
             >
               <img
-                src={imagenUrl} // Usamos la URL construida
+                src={imagenUrl}
                 alt={stockProducto.Producto.nombre}
                 style={{
                   maxWidth: '100%',
@@ -172,6 +121,7 @@ const DetalleProducto = () => {
                   variant="contained"
                   style={{ marginTop: 8, backgroundColor: '#4a6a7d', color: '#ffffff' }}
                   onClick={handleAddToCart}
+                  disabled={admin !== null} // Deshabilitar si admin no es null
                 >
                   AÑADIR AL CARRITO
                 </Button>

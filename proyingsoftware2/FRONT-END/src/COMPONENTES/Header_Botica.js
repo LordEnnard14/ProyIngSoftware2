@@ -31,7 +31,7 @@ const Header_Botica = () => {
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem('admin'));
     if (user) {
       setLoggedIn(true);
       // Asegúrate de ajustar aquí las propiedades de tu modelo de usuario
@@ -43,7 +43,7 @@ const Header_Botica = () => {
 
     // Escuchar cambios en el localStorage
     const storageChangeHandler = () => {
-      const updatedUser = JSON.parse(localStorage.getItem('user'));
+      const updatedUser = JSON.parse(localStorage.getItem('admin'));
       if (updatedUser) {
         setLoggedIn(true);
         setUserName(`${updatedUser.nombre} ${updatedUser.apellidoPaterno}`);
@@ -61,7 +61,7 @@ const Header_Botica = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('admin');
     setLoggedIn(false);
     setUserName('');
     navigate('/InicioSesionBotica'); // Ajusta la ruta para cerrar sesión si es necesario

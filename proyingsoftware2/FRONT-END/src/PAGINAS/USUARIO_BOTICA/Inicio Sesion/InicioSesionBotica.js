@@ -25,10 +25,10 @@ const InicioSesionBotica = () => {
       if (response.ok) {
         alert('Inicio de sesión exitoso');
         // Guardar el id, nombre y apellido en localStorage
-        localStorage.setItem('user', JSON.stringify({
-          id: data.user.id,               // Se guarda el id del usuario
-          nombre: data.user.nombre,        // Se guarda el nombre
-          apellidoPaterno: data.user.apellidoPaterno,  // Se guarda el apellido paterno
+        localStorage.setItem('admin', JSON.stringify({
+          id: data.admin.id,               // Se guarda el id del usuario
+          nombre: data.admin.nombre,        // Se guarda el nombre
+          apellidoPaterno: data.admin.apellidoPaterno,  // Se guarda el apellido paterno
         }));
         navigate('/DashboardBotica'); // Redirige a DashboardBotica
       } else {

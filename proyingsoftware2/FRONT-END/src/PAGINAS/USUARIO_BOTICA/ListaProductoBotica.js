@@ -3,16 +3,27 @@ import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, Ta
 import Header_Botica from '../../COMPONENTES/Header_Botica';
 import BarraHorizontalBotica from '../../COMPONENTES/BarraHorizontalBotica';
 import { useNavigate } from 'react-router-dom';
-import ContenidoTablaProductoBotica from '../USUARIO_BOTICA/Contenido Tablas/ContenidoTablaProductoBotica';
+import ContenidoTablaProductoBotica from '../USUARIO_BOTICA/Contenido Tablas/ContenidoTablaProductoBotica.js';
 
 const ListaProductosBotica = () => {
   const [productos, setProductos] = useState([]);
   const navigate = useNavigate();
 
+  // Función para actualizar el estado de un producto en el estado local
+  const actualizarEstadoProducto = (idProducto) => {
+    setProductos(prevProductos =>
+      prevProductos.map(producto =>
+        producto.id === idProducto 
+          ? { ...producto, estado: producto.estado === 'Disponible' ? 'No Disponible' : 'Disponible' } 
+          : producto
+      )
+    );
+  };
+
   useEffect(() => {
     const fetchProductos = async () => {
-      const user = JSON.parse(localStorage.getItem('user')); // Obtener el ID de la botica
-      const boticaID = user?.id; // Asignar el id de la botica
+      const admin = JSON.parse(localStorage.getItem('admin')); // Obtener el ID de la botica
+      const boticaID = admin?.id;
 
       if (boticaID) {
         try {
@@ -24,9 +35,9 @@ const ListaProductosBotica = () => {
             marca: producto?.Producto?.Marca?.nombre || 'Sin marca',
             nombre: producto?.Producto?.nombre || 'Sin nombre',
             precio: producto?.precio || 'Sin precio',
-            fechaRegistro: producto?.fechaRegistro || 'Fecha no disponible', // Ajuste del campo si está disponible
+            fechaRegistro: producto?.fechaRegistro || 'Fecha no disponible',
             stock: producto?.cantidad || 'Sin stock',
-            estado: producto?.estado ? 'Disponible' : 'No disponible', // Mostrar 'Disponible' si es true, 'No disponible' si es false
+            estado: producto?.estado == true ? 'Disponible' : 'No Disponible',
           }));
 
           setProductos(productosBotica);
@@ -46,15 +57,13 @@ const ListaProductosBotica = () => {
       <Header_Botica />
       <BarraHorizontalBotica />
 
-      {/* Contenido principal con flexGrow para ocupar el resto del espacio disponible */}
       <Box sx={{ flexGrow: 1, mx: 4, mt: 4 }}>
-        {/* Caja de "Productos" similar a la de "Usuarios Registrados" */}
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            backgroundColor: '#D6E9FE', // Azul claro
+            backgroundColor: '#D6E9FE',
             padding: '10px 20px',
             borderRadius: '8px',
             mb: 4,
@@ -64,7 +73,6 @@ const ListaProductosBotica = () => {
           <Button onClick={() => navigate('/AgregarProducto')}> Agregar Producto </Button>
         </Box>
 
-        {/* Tabla de productos */}
         <TableContainer component={Paper} sx={{ height: '100%' }}>
           <Table>
             <TableHead>
@@ -81,7 +89,11 @@ const ListaProductosBotica = () => {
             </TableHead>
             <TableBody>
               {productos.map((producto) => (
-                <ContenidoTablaProductoBotica key={producto.id} producto={producto} />
+                <ContenidoTablaProductoBotica 
+                  key={producto.id} 
+                  producto={producto} 
+                  onEstadoChange={actualizarEstadoProducto} 
+                />
               ))}
             </TableBody>
           </Table>

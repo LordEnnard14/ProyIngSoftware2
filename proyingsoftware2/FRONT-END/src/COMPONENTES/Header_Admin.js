@@ -29,7 +29,7 @@ const Header_Admin = () => {
   const [userName, setUserName] = useState('');
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('admin');
     console.log("Usuario eliminado del localStorage");
     setLoggedIn(false);
     setUserName('');

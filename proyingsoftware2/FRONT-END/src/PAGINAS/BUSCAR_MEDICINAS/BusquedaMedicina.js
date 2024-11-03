@@ -5,10 +5,10 @@ import Header1 from '../../COMPONENTES/Header_Principal';
 import NavegacionMedicinas from '../../COMPONENTES/NavegacionMedicinas';
 import Footer from '../../COMPONENTES/Footer_Principal';
 import ContenidoPaginaBusqueda from './ContenidoBusquedaMedicina.js'; 
+import Header_Botica from '../../COMPONENTES/Header_Botica.js';
 
 const BusquedaMedicina = () => {
   const [catalogo, setCatalogo] = useState([]);
-
   const [searchParams] = useSearchParams();
   const categoria = useMemo(() => searchParams.get('categoria'), [searchParams]);
 
@@ -26,7 +26,8 @@ const BusquedaMedicina = () => {
         marca: dato.Producto?.Marca?.nombre || 'Sin marca',
         botica: dato.Botica?.nombre || 'Sin botica',
         direccion: dato.Botica?.direccion || 'Sin dirección',
-        cantidad: dato.cantidad || 0,        
+        cantidad: dato.cantidad || 0,
+        estado: dato.estado || false, 
         image: `${baseUrl}${dato.imageUrl || ''}`,
         precio: dato.precio || 0
       }));
@@ -37,14 +38,15 @@ const BusquedaMedicina = () => {
     }
   };
 
-  
   useEffect(() => {
     fetchData();
-  }, [categoria]); 
+  }, [categoria]);
+
+  const admin = JSON.parse(localStorage.getItem('admin'));
 
   return (
     <div>
-      <Header1 />
+      {admin ? <Header_Botica /> : <Header1 />}
       <NavegacionMedicinas />
       <Box sx={{ flexGrow: 1, padding: 4 }}>
         {catalogo.length === 0 ? (
@@ -60,12 +62,14 @@ const BusquedaMedicina = () => {
             paddingRight={'10%'}
             paddingLeft={'10%'}
           >
-            {catalogo.map((catalogo, index) => (
-              <ContenidoPaginaBusqueda
-                key={index}  
-                caractProducto={catalogo}
-              />
-            ))}
+            {catalogo
+              .filter((item) => item.estado) // Filtra productos que su estado sea true
+              .map((catalogo, index) => (
+                <ContenidoPaginaBusqueda
+                  key={index}  
+                  caractProducto={catalogo}
+                />
+              ))}
           </Grid>
         )}
       </Box>

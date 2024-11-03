@@ -25,8 +25,8 @@ router.post('/iniciarSesion', async (req, res) => {
       
       return res.json({
         message: 'Inicio de sesión exitoso',
-        user: {
-          id: admin.id,
+        admin: {
+          id: admin.boticaID,
           nombre: admin.nombre,
           apellidoPaterno: admin.apellidoPaterno,
         },
@@ -123,6 +123,25 @@ router.post('/registrar', async (req, res) => {
   }
 });
 
+router.put('/cambiarEstado/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const producto = await ProductoDetalle.findByPk(id);
+
+    if (!producto) {
+      return res.status(404).json({ message: 'ProductoDetalle no encontrado' });
+    }
+
+    // Cambiar el estado del producto de true a false o viceversa
+    await producto.update({ estado: !producto.estado });
+
+    return res.json({ message: 'Estado del producto actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error al actualizar el estado del producto:', error);
+    return res.status(500).json({ message: 'Error en el servidor. Inténtalo nuevamente más tarde.' });
+  }
+});
 
 
 export default router;
