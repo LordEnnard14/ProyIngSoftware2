@@ -1,5 +1,5 @@
 import express from 'express';
-import {Carrito, ProductoCarrito,ProductoDetalle, Producto } from '../Models/Relaciones.js';  // Asegúrate de importar ProductoDetalle
+import {Carrito, ProductoCarrito,ProductoDetalle, Producto,Botica } from '../Models/Relaciones.js';  // Asegúrate de importar ProductoDetalle
 
 const router = express.Router();
 
@@ -98,7 +98,7 @@ router.post('/agregarProductoCarrito', async (req, res) => {
 });
 
 
-
+//usado
 //usado
 router.get('/productos/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params;  // Obtener el usuarioID desde los parámetros de la URL
@@ -124,7 +124,7 @@ router.get('/productos/:usuarioID', async (req, res) => {
                             attributes: ['nombre']
                         }
                     ],
-                    attributes: ['precio', 'imageUrl'],  // Obtener precio e imagen desde ProductoDetalle
+                    attributes: ['precio', 'imageUrl', 'boticaID'],  // Obtener precio, imagen y boticaID desde ProductoDetalle
                 }
             ]
         });
@@ -134,6 +134,21 @@ router.get('/productos/:usuarioID', async (req, res) => {
             return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
         }
 
+        // Obtener los IDs únicos de las boticas para optimizar la consulta a la tabla Botica
+        const boticaIDs = [...new Set(productosCarrito.map(item => item.ProductoDetalle.boticaID))];
+        
+        // Obtener los nombres de las boticas usando los IDs obtenidos
+        const boticas = await Botica.findAll({
+            where: { id: boticaIDs },
+            attributes: ['id', 'nombre']
+        });
+
+        // Crear un diccionario para mapear cada boticaID a su nombre
+        const boticaMap = boticas.reduce((acc, botica) => {
+            acc[botica.id] = botica.nombre;
+            return acc;
+        }, {});
+
         // Mapeamos los datos a la estructura deseada
         const respuesta = productosCarrito.map(item => ({
             productoID: item.productoDetalleID,  // Incluimos la ID del productoDetalle
@@ -141,7 +156,8 @@ router.get('/productos/:usuarioID', async (req, res) => {
             imagen: item.ProductoDetalle.imageUrl ? `${baseUrl}${item.ProductoDetalle.imageUrl}` : null,  // Construir la URL completa usando baseUrl
             precio: item.ProductoDetalle.precio,  // Obtener el precio desde ProductoDetalle
             cantidad: item.cantidad,  // Cantidad desde ProductoCarrito
-            subtotal: (item.ProductoDetalle.precio * item.cantidad).toFixed(2)  // Calcular subtotal
+            subtotal: (item.ProductoDetalle.precio * item.cantidad).toFixed(2),  // Calcular subtotal
+            botica: boticaMap[item.ProductoDetalle.boticaID] || 'Botica no encontrada'  // Obtener el nombre de la botica usando el diccionario
         }));
 
         // Enviar la respuesta en formato JSON
@@ -151,6 +167,7 @@ router.get('/productos/:usuarioID', async (req, res) => {
         res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
     }
 });
+
 
 
 

@@ -118,6 +118,37 @@ const CarritoCompras = () => {
     }, 0).toFixed(2);
   };
 
+
+  const verificarYProcederAlPago = () => {
+    // Log detallado de cada producto y su botica
+    productos.forEach((producto, index) => {
+        console.log(`Producto ${index + 1}:`, producto);
+        console.log(`Botica del producto ${index + 1}:`, producto.botica);
+    });
+
+    // Obtener todos los nombres de botica de los productos en el carrito
+    const boticaNombres = productos.map((producto) => producto.botica);
+    console.log("Nombres de Boticas en el carrito:", boticaNombres);
+
+    // Verificar que cada producto tenga un nombre de botica asignado
+    const allHaveBoticaName = boticaNombres.every((nombre) => nombre !== undefined && nombre !== null);
+
+    // Comprobar si todos los productos pertenecen a la misma botica comparando nombres
+    const allSameBotica = boticaNombres.every((nombre) => nombre === boticaNombres[0]);
+
+    if (allHaveBoticaName && allSameBotica) {
+        // Si todos los productos tienen nombre de botica y pertenecen a la misma botica, proceder al pago
+        console.log("Todos los productos pertenecen a la misma botica. Navegando a la página de pago.");
+        navigate('/PaginaPago');
+    } else {
+        console.log("Los productos no pertenecen a la misma botica o faltan nombres de botica.");
+        alert("Todos los productos en el carrito deben pertenecer a la misma botica para proceder al pago.");
+    }
+};
+
+  
+  
+
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <HeaderAdmin />
@@ -140,60 +171,78 @@ const CarritoCompras = () => {
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
             <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Imagen</TableCell>
-                    <TableCell>Nombre del Producto</TableCell>
-                    <TableCell>Precio</TableCell>
-                    <TableCell>Cantidad</TableCell>
-                    <TableCell>Subtotal</TableCell>
-                    <TableCell>Eliminar</TableCell>
-                  </TableRow>
-                </TableHead>
 
-                <TableBody>
-                  {productos.map((producto) => (
-                    <TableRow key={producto.id}>
-                      <TableCell>
-                        <img
-                          src={producto.imagen || 'https://via.placeholder.com/100'}
-                          alt={producto.nombre || 'Nombre no disponible'}
-                          style={{ width: '100px', height: '100px' }}
-                        />
-                      </TableCell>
-                      <TableCell>{producto.nombre || 'Nombre no disponible'}</TableCell>
-                      <TableCell>S/ {(producto.precio || 0).toFixed(2)}</TableCell>
 
-                      <TableCell>
-                        <IconButton onClick={() => handleCantidadChange(producto.productoID, 'decrementar')}>
-                          <RemoveIcon />
-                        </IconButton>
-                        <TextField
-                          type="number"
-                          value={producto.cantidad || 1}
-                          inputProps={{ min: 1 }}
-                          sx={{ width: '60px', textAlign: 'center' }}
-                          readOnly
-                        />
-                        <IconButton onClick={() => handleCantidadChange(producto.productoID, 'incrementar')}>
-                          <AddIcon />
-                        </IconButton>
-                      </TableCell>
+            <Table>
+  <TableHead>
+    <TableRow>
+      <TableCell>Imagen</TableCell>
+      <TableCell>Nombre del Producto</TableCell>
+      <TableCell>Precio</TableCell>
+      <TableCell>Cantidad</TableCell>
+      <TableCell>Subtotal</TableCell>
+      <TableCell>Botica</TableCell> {/* Nueva columna para mostrar la botica */}
+      <TableCell>Eliminar</TableCell>
+    </TableRow>
+  </TableHead>
 
-                      <TableCell>
-                        S/ {((producto.precio || 0) * (producto.cantidad || 1)).toFixed(2)}
-                      </TableCell>
-                      <TableCell>
-                        <IconButton onClick={() => handleEliminarProducto(producto.productoID)}>
-                          <DeleteIcon color="error" />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-                
-              </Table>
+  <TableBody>
+    {productos.map((producto) => (
+      <TableRow key={producto.id}>
+        <TableCell>
+          <img
+            src={producto.imagen || 'https://via.placeholder.com/100'}
+            alt={producto.nombre || 'Nombre no disponible'}
+            style={{ width: '100px', height: '100px' }}
+          />
+        </TableCell>
+        <TableCell>{producto.nombre || 'Nombre no disponible'}</TableCell>
+        <TableCell>S/ {(producto.precio || 0).toFixed(2)}</TableCell>
+
+        <TableCell>
+          <IconButton onClick={() => handleCantidadChange(producto.productoID, 'decrementar')}>
+            <RemoveIcon />
+          </IconButton>
+          <TextField
+            type="number"
+            value={producto.cantidad || 1}
+            inputProps={{ min: 1, style: { textAlign: 'center' }, step: 'any' }}
+            sx={{ 
+              width: '60px', 
+              textAlign: 'center',
+              '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                display: 'none',
+              },
+              '& input[type=number]': {
+                MozAppearance: 'textfield',
+              }
+            }}
+            readOnly
+          />
+          <IconButton onClick={() => handleCantidadChange(producto.productoID, 'incrementar')}>
+            <AddIcon />
+          </IconButton>
+        </TableCell>
+
+        <TableCell>
+          S/ {((producto.precio || 0) * (producto.cantidad || 1)).toFixed(2)}
+        </TableCell>
+
+        <TableCell>
+          {producto.botica || 'No especificada'} {/* Mostrar el nombre de la botica */}
+        </TableCell>
+
+        <TableCell>
+          <IconButton onClick={() => handleEliminarProducto(producto.productoID)}>
+            <DeleteIcon color="error" />
+          </IconButton>
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+
+
             </TableContainer>
           </Grid>
 
@@ -210,11 +259,15 @@ const CarritoCompras = () => {
                 <Typography variant="h6">Total:</Typography>
                 <Typography variant="h6">S/ {calcularSubtotal()}</Typography>
               </Box>
-
-              <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={() => navigate('/PaginaPago')}>
+              <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2 }}
+              onClick={verificarYProcederAlPago} // Llamada a la función de verificación
+              >
                 Proceder al Pago
-              </Button>
-              
+                </Button>
               <Button variant="outlined" color="secondary" fullWidth sx={{ mt: 2 }} onClick={() => navigate('/')}>
                 Seguir Comprando
               </Button>
