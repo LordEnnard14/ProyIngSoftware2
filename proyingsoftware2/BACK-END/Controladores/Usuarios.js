@@ -36,9 +36,18 @@ router.get("/:id", async (req, res) => {
 //Esto se lleva cabo al registrarse a la página web
 router.post("/registrar", async (req, res) => {
   try {
-      const {nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni} = req.body;
+      const { nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni } = req.body;
+
+      // Validaciones de los campos
+      if (!nombre) return res.status(400).json({ message: "El campo 'nombre' es requerido" });
+      if (!correo) return res.status(400).json({ message: "El campo 'correo' es requerido" });
+      if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) return res.status(400).json({ message: "Formato de correo inválido" });
+      if (!telefono || telefono.length !== 9) return res.status(400).json({ message: "El campo 'telefono' debe tener 9 dígitos" });
+      if (!dni || dni.length !== 8) return res.status(400).json({ message: "El campo 'dni' debe tener 8 dígitos" });
+
       const nuevoUsuario = await Usuario.create({
-          nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni});
+          nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni
+      });
 
       res.status(201).json({
           mensaje: "Usuario registrado exitosamente",
@@ -49,10 +58,11 @@ router.post("/registrar", async (req, res) => {
       console.error("Error al registrar usuario:", error);
       res.status(500).json({
           error: "Error al registrar usuario. Por favor, intenta nuevamente.",
-          detalles: error.message  // Añade el mensaje de error aquí
+          detalles: error.message
       });
   }
 });
+
 
 
 router.post('/iniciarSesion', async (req, res) => {
