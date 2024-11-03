@@ -106,7 +106,7 @@ const InicioSesionBotica = () => {
               </Grid>
               <Grid item xs={12}>
                 <div className="divolvide">
-                  <a className="olvide" onClick={() => navigate('/RecuperarContraseña')}>
+                  <a className="olvide" onClick={() => navigate('/RecuperarContraseñaBotica')}>
                     Olvidé mi contraseña
                   </a>
                 </div>
@@ -130,7 +130,7 @@ const InicioSesionBotica = () => {
             <Box mt={2} className="RA">
               <p>¿Deseas que tu botica se una a nuestra página?</p>
               <a onClick={() => navigate('/RegisBotica')}>
-                <b>Registra a tu botica aquí</b>
+                <b>Registra a tu Botica aquí</b>
               </a>
               <div className="divolvide">
                 <a className="olvide" onClick={() => navigate('/InicioSesion')}>

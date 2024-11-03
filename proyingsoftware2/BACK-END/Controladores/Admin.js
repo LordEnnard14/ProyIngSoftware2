@@ -144,4 +144,41 @@ router.put('/cambiarEstado/:id', async (req, res) => {
 });
 
 
+router.get('/verificarCorreoAdmin/:correo', async (req, res) => {
+  const { correo } = req.params; 
+
+  try {
+    const admin = await Admin.findOne({ where: { correo } }); 
+
+    if (admin) {
+      return res.status(200).json({ message: 'El correo existe' }); 
+    } else {
+      return res.status(404).json({ message: 'El correo no existe' }); 
+    }
+  } catch (error) {
+    console.error('Error al verificar el correo:', error);
+    return res.status(500).json({ message: 'Ocurrió un error al verificar el correo.' });
+  }
+});
+
+
+router.put('/restablecerContrasenaAdmin', async (req, res) => {
+  const { correo, password } = req.body;
+  try {
+    const admin = await Admin.findOne({ where: { correo } });
+    if (admin) {
+      
+      admin.password = password; 
+      await admin.save(); 
+      
+      return res.status(200).json({ message: 'Contraseña actualizada con éxito' });
+    } else {
+      return res.status(404).json({ message: 'Correo no encontrado' });
+    }
+  } catch (error) {
+    console.error('Error al restablecer la contraseña:', error); // Log de error
+    return res.status(500).json({ message: 'Error en el servidor' });
+  }
+});
+
 export default router;

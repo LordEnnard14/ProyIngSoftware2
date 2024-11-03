@@ -37,7 +37,7 @@ const ListaProductosBotica = () => {
             precio: producto?.precio || 'Sin precio',
             fechaRegistro: producto?.fechaRegistro || 'Fecha no disponible',
             stock: producto?.cantidad || 'Sin stock',
-            estado: producto?.estado == true ? 'Disponible' : 'No Disponible',
+            estado: producto?.estado === true ? 'Disponible' : 'No Disponible',
           }));
 
           setProductos(productosBotica);
@@ -46,11 +46,12 @@ const ListaProductosBotica = () => {
         }
       } else {
         console.error("No se encontró el ID de la botica en el localStorage");
+        navigate('/InicioSesionBotica');
       }
     };
 
     fetchProductos();
-  }, []);
+  }, [navigate]);
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
