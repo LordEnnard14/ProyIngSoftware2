@@ -10,7 +10,7 @@ const DashboardBotica = () => {
 
   useEffect(() => {
     const fetchIngresos = async () => {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem('admin'));
       const boticaID = user?.id;
   
       if (boticaID && fecha) {
