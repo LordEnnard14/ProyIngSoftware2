@@ -20,7 +20,6 @@ const style = {
 
 export default function crear (props) {
     const {pops, handleClose, children} = props;
-    console.log('children passed', children)
 
   return (
     <div>

@@ -35,7 +35,11 @@ const Usuario = sequelize.define('Usuario', {
     },
     telefono: {
       type: DataTypes.STRING, 
-      allowNull: false 
+      allowNull: false,
+      validate: {
+          len: [9,9],
+          isNumeric: true,
+      }
     },
     estado: {
         type: DataTypes.BOOLEAN,

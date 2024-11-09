@@ -2,17 +2,16 @@ import React, { useState } from 'react';
 import { TextField, Grid, Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Header2 from '../../COMPONENTES/Header_2';
-import './Rcss.css';
+import '../REGISTROS/Rcss.css';
 import Footer from '../../COMPONENTES/Footer_Principal';
 
-const Registro = () => {
+const RegistroAdmin = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nombre: '',
     apellidoPaterno: '',
     apellidoMaterno: '',
     email: '',
-    telefono: '',
     dni: '',
     password: '',
     confirmarPassword: ''
@@ -30,16 +29,43 @@ const Registro = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
-    // Verifica si las contraseñas coinciden
+
+    // Validación de campos vacíos
+    for (let key in formData) {
+      if (!formData[key]) {
+        setErrorMessage('Por favor, completa todos los campos.');
+        return;
+      }
+    }
+
+    // Verifica que las contraseñas coincidan
     if (formData.password !== formData.confirmarPassword) {
       setErrorMessage('Las contraseñas no coinciden');
       return;
     }
-  
+
+    // Validación para que el correo termine en @botica.com
+    if (!formData.email.endsWith('@botica.com')) {
+      setErrorMessage('El correo electrónico debe terminar en @botica.com');
+      return;
+    }
+
+    // Validación de longitud de DNI
+    if (formData.dni.length !== 8) {
+      setErrorMessage('El DNI debe tener exactamente 8 dígitos.');
+      return;
+    }
+
+    // Obtén el boticaID desde el localStorage
+    const boticaID = localStorage.getItem('boticaID');
+    if (!boticaID) {
+      setErrorMessage('No se encontró el ID de la botica. Registra la botica primero.');
+      return;
+    }
+
     // Realiza la solicitud POST al backend
     try {
-      const response = await fetch('http://localhost:4000/api/usuarios/registrar', {
+      const response = await fetch('http://localhost:4000/api/Admin/registrar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,31 +76,27 @@ const Registro = () => {
           apellidoMaterno: formData.apellidoMaterno,
           password: formData.password,
           correo: formData.email,
-          telefono: formData.telefono,
           dni: formData.dni,
+          boticaID: boticaID 
         }), 
       });
-  
+
       if (response.ok) {
         const data = await response.json();
-        // Guarda el nombre y apellido en localStorage
-        localStorage.setItem('usuarioNombre', `${data.nombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`);
-        console.log('Usuario registrado con éxito');
-        navigate('/InicioSesion');; // Redirige a donde necesites
+        localStorage.setItem('adminNombre', `${data.nombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`);
+        console.log('Administrador registrado con éxito');
+        navigate('/InicioSesionBotica'); 
       } else {
         const errorData = await response.json();
-        console.error('Detalles del error:', errorData); // Imprimir el error completo
-        setErrorMessage(errorData.message || 'Error al registrar el usuario');
+        console.error('Detalles del error:', errorData);
+        setErrorMessage(errorData.message || 'Error al registrar el administrador');
       }
     } catch (error) {
       setErrorMessage('Hubo un problema con la solicitud, intente nuevamente más tarde');
       console.error('Error en la solicitud:', error);
     }
   };
-  
 
-
-  
   return (
     <>
       <Header2 />
@@ -94,7 +116,7 @@ const Registro = () => {
         >
           <form onSubmit={handleSubmit}>
             <Typography variant="h5" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 2, marginBottom: '50px', marginTop:'20px', fontSize: '32px', color: 'rgb(1, 33, 61)'}}>
-              Ingrese sus datos
+              Registro de Administrador (1era etapa)
             </Typography>
             <Grid container spacing={2} justifyContent="center">
               <Grid item xs={12} sm={6} md={4}>
@@ -106,16 +128,7 @@ const Registro = () => {
                   name="nombre"
                   onChange={handleInputChange}
                   value={formData.nombre}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
-                  InputLabelProps={{
-                    sx: {
-                      '&.Mui-focused': {
-                        top: '-20px',
-                        fontSize: '1.4rem',
-                        color: 'gray'
-                      }
-                    }
-                  }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor:'white' } }}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -127,16 +140,7 @@ const Registro = () => {
                   name="apellidoPaterno"
                   onChange={handleInputChange}
                   value={formData.apellidoPaterno}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
-                  InputLabelProps={{
-                    sx: {
-                      '&.Mui-focused': {
-                        top: '-20px',
-                        fontSize: '1.4rem',
-                        color: 'gray'
-                      }
-                    }
-                  }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor:'white' } }}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -148,16 +152,7 @@ const Registro = () => {
                   name="apellidoMaterno"
                   onChange={handleInputChange}
                   value={formData.apellidoMaterno}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
-                  InputLabelProps={{
-                    sx: {
-                      '&.Mui-focused': {
-                        top: '-20px',
-                        fontSize: '1.4rem',
-                        color: 'gray'
-                      }
-                    }
-                  }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor:'white' } }}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -166,41 +161,12 @@ const Registro = () => {
                   label="Correo Electrónico"
                   variant="outlined"
                   required
+                  placeholder="example@botica.com"
                   name="email"
                   type="email"
                   onChange={handleInputChange}
                   value={formData.email}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
-                  InputLabelProps={{
-                    sx: {
-                      '&.Mui-focused': {
-                        top: '-20px',
-                        fontSize: '1.4rem',
-                        color: 'gray'
-                      }
-                    }
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <TextField
-                  fullWidth
-                  label="Teléfono"
-                  variant="outlined"
-                  required
-                  name="telefono"
-                  onChange={handleInputChange}
-                  value={formData.telefono}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'20px', backgroundColor: 'white' } }}
-                  InputLabelProps={{
-                    sx: {
-                      '&.Mui-focused': {
-                        top: '-20px',
-                        fontSize: '1.4rem',
-                        color: 'gray'
-                      }
-                    }
-                  }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor:'white' } }}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -212,16 +178,7 @@ const Registro = () => {
                   name="dni"
                   onChange={handleInputChange}
                   value={formData.dni}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
-                  InputLabelProps={{
-                    sx: {
-                      '&.Mui-focused': {
-                        top: '-20px',
-                        fontSize: '1.4rem',
-                        color: 'gray'
-                      }
-                    }
-                  }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor:'white' } }}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -234,16 +191,7 @@ const Registro = () => {
                   name="password"
                   onChange={handleInputChange}
                   value={formData.password}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
-                  InputLabelProps={{
-                    sx: {
-                      '&.Mui-focused': {
-                        top: '-20px',
-                        fontSize: '1.4rem',
-                        color: 'gray'
-                      }
-                    }
-                  }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor:'white' } }}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
@@ -256,16 +204,7 @@ const Registro = () => {
                   name="confirmarPassword"
                   onChange={handleInputChange}
                   value={formData.confirmarPassword}
-                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor: 'white' } }}
-                  InputLabelProps={{
-                    sx: {
-                      '&.Mui-focused': {
-                        top: '-20px',
-                        fontSize: '1.4rem',
-                        color: 'gray'
-                      }
-                    }
-                  }}
+                  InputProps={{ style: { borderRadius: 50, marginBottom:'30px', backgroundColor:'white' } }}
                 />
               </Grid>
             </Grid>
@@ -288,4 +227,4 @@ const Registro = () => {
   );
 };
 
-export default Registro;
+export default RegistroAdmin;

@@ -29,7 +29,20 @@ async function verificacionConexion() {
 
 FacadeRutas(app);
 
+/*
 app.listen(port, function () {
     console.log("Servidor escuchando en el puerto " + port);
     verificacionConexion(); 
-});
+    });
+*/
+
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(port, function () {
+        console.log("Servidor escuchando en el puerto " + port);
+        verificacionConexion(); 
+    });
+}
+
+
+export { app, port };
+

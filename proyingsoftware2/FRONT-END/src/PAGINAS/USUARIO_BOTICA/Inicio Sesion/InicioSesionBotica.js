@@ -25,10 +25,10 @@ const InicioSesionBotica = () => {
       if (response.ok) {
         alert('Inicio de sesión exitoso');
         // Guardar el id, nombre y apellido en localStorage
-        localStorage.setItem('user', JSON.stringify({
-          id: data.user.id,               // Se guarda el id del usuario
-          nombre: data.user.nombre,        // Se guarda el nombre
-          apellidoPaterno: data.user.apellidoPaterno,  // Se guarda el apellido paterno
+        localStorage.setItem('admin', JSON.stringify({
+          id: data.admin.id,               // Se guarda el id del usuario
+          nombre: data.admin.nombre,        // Se guarda el nombre
+          apellidoPaterno: data.admin.apellidoPaterno,  // Se guarda el apellido paterno
         }));
         navigate('/DashboardBotica'); // Redirige a DashboardBotica
       } else {
@@ -40,6 +40,7 @@ const InicioSesionBotica = () => {
     }
   };
 
+  
   return (
     <>
       <section id="BodyOne">
@@ -105,7 +106,7 @@ const InicioSesionBotica = () => {
               </Grid>
               <Grid item xs={12}>
                 <div className="divolvide">
-                  <a className="olvide" onClick={() => navigate('/RecuperarContraseña')}>
+                  <a className="olvide" onClick={() => navigate('/RecuperarContraseñaBotica')}>
                     Olvidé mi contraseña
                   </a>
                 </div>
@@ -128,8 +129,8 @@ const InicioSesionBotica = () => {
             </Grid>
             <Box mt={2} className="RA">
               <p>¿Deseas que tu botica se una a nuestra página?</p>
-              <a onClick={() => navigate('/RegistroBotica')}>
-                <b>Registra a tu botica aquí</b>
+              <a onClick={() => navigate('/RegisBotica')}>
+                <b>Registra a tu Botica aquí</b>
               </a>
               <div className="divolvide">
                 <a className="olvide" onClick={() => navigate('/InicioSesion')}>

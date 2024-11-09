@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Slide from '@mui/material/Slide';
 import Grow from '@mui/material/Grow';
@@ -23,22 +22,9 @@ const Titulo_Boton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const Header_Admin = () => {
+const Header_2 = () => {
   const navigate = useNavigate();
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [userName, setUserName] = useState('');
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin');
-    console.log("Usuario eliminado del localStorage");
-    setLoggedIn(false);
-    setUserName('');
-    navigate('/InicioSesion');
-  };
-
-
-  // Recupera el nombre del usuario de localStorage
-  const usuarioNombre = localStorage.getItem('usuarioNombre');
 
   return (
     <Box>
@@ -46,24 +32,23 @@ const Header_Admin = () => {
         <AppBar position="static" sx={{ backgroundColor: '#FFFFFF' }} elevation={4}>
           <Toolbar sx={{ justifyContent: 'space-between' }}>
             <Box>
-              <Titulo_Boton onClick={() => navigate('/BusquedaMedicina')}>
-                DosisXtra
-              </Titulo_Boton>
+              <Button
+                variant="contained"
+                sx={{ backgroundColor: '#567C8D', color: '#ffffff' }}
+                onClick={() => navigate('/InicioSesionBotica')}
+              >
+                Volver
+              </Button>
             </Box>
 
             <Grow in={true} timeout={1000}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                {usuarioNombre ? `Bienvenido, ${usuarioNombre}` : 'Modo administrador'}
-              </Typography>
+              <Titulo_Boton>
+                DosisXtra
+              </Titulo_Boton>
             </Grow>
 
-            <Button
-              variant="contained"
-              sx={{ backgroundColor: '#567C8D', color: '#ffffff' }}
-              onClick={handleLogout}
-            >
-              Cerrar Sesión
-            </Button>
+           
+            <Box sx={{ width: 100 }} />
           </Toolbar>
         </AppBar>
       </Slide>
@@ -71,4 +56,4 @@ const Header_Admin = () => {
   );
 };
 
-export default Header_Admin;
+export default Header_2;

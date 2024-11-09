@@ -1,5 +1,5 @@
 import express from "express";
-import { Usuario, Orden, Producto } from "../Models/Relaciones.js"; 
+import { Orden, ProductoOrden, Producto, Usuario } from "../Models/Relaciones.js"; 
 
 const router = express.Router();
 
@@ -36,9 +36,18 @@ router.get("/:id", async (req, res) => {
 //Esto se lleva cabo al registrarse a la página web
 router.post("/registrar", async (req, res) => {
   try {
-      const {nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni} = req.body;
+      const { nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni } = req.body;
+
+      // Validaciones de los campos
+      if (!nombre) return res.status(400).json({ message: "El campo 'nombre' es requerido" });
+      if (!correo) return res.status(400).json({ message: "El campo 'correo' es requerido" });
+      if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) return res.status(400).json({ message: "Formato de correo inválido" });
+      if (!telefono || telefono.length !== 9) return res.status(400).json({ message: "El campo 'telefono' debe tener 9 dígitos" });
+      if (!dni || dni.length !== 8) return res.status(400).json({ message: "El campo 'dni' debe tener 8 dígitos" });
+
       const nuevoUsuario = await Usuario.create({
-          nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni});
+          nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni
+      });
 
       res.status(201).json({
           mensaje: "Usuario registrado exitosamente",
@@ -49,10 +58,11 @@ router.post("/registrar", async (req, res) => {
       console.error("Error al registrar usuario:", error);
       res.status(500).json({
           error: "Error al registrar usuario. Por favor, intenta nuevamente.",
-          detalles: error.message  // Añade el mensaje de error aquí
+          detalles: error.message
       });
   }
 });
+
 
 
 router.post('/iniciarSesion', async (req, res) => {
@@ -110,7 +120,6 @@ router.get('/verificarCorreo/:correo', async (req, res) => {
 
 
 //Endpoint que nos va a permitir reestablecer una contraseña para un correo existente
-
 router.put('/restablecerContrasena', async (req, res) => {
   const { correo, password } = req.body;
   try {
@@ -130,37 +139,58 @@ router.put('/restablecerContrasena', async (req, res) => {
   }
 });
 
-// Endpoint para obtener las órdenes de un usuario específico
-router.get('/:id/ordenes', async (req, res) => {
+/*
+router.get('/:usuarioId/ordenes', async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
-    const ordenes = await Orden.findAll({
-      where: { usuarioId: id }, // Asegúrate de que 'usuarioId' es la columna que relaciona la orden con el usuario
-      include: [
-        {
-          model: Producto,
-          attributes: ['nombre'],
-        }
-      ],
-    });
+    const { usuarioId } = req.params;
 
-    if (ordenes.length === 0) {
-      return res.status(404).json({ message: "No se encontraron órdenes para este usuario." });
+    // Verificamos si el usuario existe
+    const usuario = await Usuario.findByPk(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
-    const resultado = ordenes.map(orden => ({
-      id: orden.id,
-      nombreProducto: orden.Producto.nombre,
-      cantidadPedida: orden.cantidad, // Asegúrate de que 'cantidad' está definido en el modelo Orden
-      total: orden.total, // Asegúrate de que 'total' está definido en el modelo Orden
-      estadoEnvio: orden.estadoEnvio, // Asegúrate de que 'estadoEnvio' está definido en el modelo Orden
+    // Buscamos todas las órdenes del usuario
+    const ordenes = await Orden.findAll({
+      where: {
+        usuarioID: usuarioId // Aseguramos que las órdenes pertenezcan al usuario
+      },
+      include: {
+        model: ProductoOrden,
+        include: {
+          model: Producto,
+          attributes: ['nombre'] // Incluimos solo el nombre del producto
+        }
+      }
+    });
+
+    // Verificamos si el usuario tiene órdenes
+    if (ordenes.length === 0) {
+      return res.status(404).json({ message: 'Este usuario no tiene órdenes.' });
+    }
+
+    // Mapeamos las órdenes y productos
+    const resultado = ordenes.map((orden) => ({
+      ordenId: orden.id,
+      productos: orden.ProductoOrdens.map((productoOrden) => ({
+        nombreProducto: productoOrden.Producto.nombre,
+        cantidad: productoOrden.cantidad,
+        precio: productoOrden.precio,
+      }))
     }));
 
-    res.json(resultado);
+    // Enviamos la respuesta con todas las órdenes y productos
+    res.json({
+      usuarioId,
+      ordenes: resultado
+    });
+
   } catch (error) {
-    console.error("Error al obtener las órdenes:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    console.error('Error al obtener las órdenes del usuario:', error);
+    res.status(500).json({ message: 'Error interno del servidor.' });
   }
 });
+*/
+
 
 export default router;

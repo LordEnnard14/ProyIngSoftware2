@@ -152,7 +152,7 @@ router.get('/stockProductosAll', async (req, res) => {
   router.get('/stockProductos/:id', async (req, res) => {
     const { id } = req.params; // Obtenemos el id de los parámetros de la URL
     try {
-      const stockProducto = await StockProducto.findByPk(id, { // Usamos findByPk para buscar por la clave primaria
+      const stockProducto = await ProductoDetalle.findByPk(id, { // Usamos findByPk para buscar por la clave primaria
         include: [
           {
             model: Producto,
@@ -161,12 +161,13 @@ router.get('/stockProductosAll', async (req, res) => {
                 model: Marca,
                 attributes: ['id', 'nombre']
               },
-              {
-                model: Botica,
-                attributes: ['id', 'nombre', 'direccion']
-              }
+              
             ],
-            attributes: ['id', 'nombre', 'presentacion', 'imageUrl', 'categoria', 'descripcion', 'caracteristicas']
+            attributes: ['id', 'nombre', 'presentacion', 'categoria', 'nRegistroSanitario','fechaRegistro']
+          },
+          {
+            model: Botica,
+            attributes: ['id', 'nombre', 'direccion']
           }
         ]
       });

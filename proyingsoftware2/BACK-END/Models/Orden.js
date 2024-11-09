@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js"; 
+import moment from 'moment-timezone';
 
 
 const Orden = sequelize.define('Orden',{
@@ -31,10 +32,15 @@ const Orden = sequelize.define('Orden',{
     total: {
         type: DataTypes.DOUBLE,
         allowNull: false,
-    }
+    },
+    fechaRegistro: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: () => moment.tz('America/Lima').toDate 
+    },
 }, {
     freezeTableName: true,
-    timestamps: false
+    timestamps: false,
 });;
-//AQUI SE PUEDEN AGRREGAR COLUMNAS O ELIMINARLAS
+
 export default Orden;

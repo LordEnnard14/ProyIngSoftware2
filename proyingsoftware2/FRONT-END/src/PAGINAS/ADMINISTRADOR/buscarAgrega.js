@@ -5,7 +5,8 @@ const Buscar = ({nombre, marca, handleProductoChange}) => {
 
     //Pasarle un json con el producto elegido del array de productos mostrados
     const child =  async (producto) => {
-        handleProductoChange("id", producto.id)
+        console.log(producto)
+        handleProductoChange("id", 22)
         handleProductoChange("nombre",producto.nombre)
         handleProductoChange("marca",producto.Marca.nombre)
         

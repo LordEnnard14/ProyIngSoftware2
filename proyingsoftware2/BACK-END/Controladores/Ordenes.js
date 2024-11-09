@@ -1,259 +1,421 @@
 //aqui se realiza la paga
-import express from "express";
-import Orden from "../Models/Orden.js"; 
-import { Usuario,ProductoOrden ,Carrito, ProductoCarrito, Producto } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
+import express from "express"; 
+import { Orden, Usuario,ProductoOrden ,Carrito, ProductoCarrito, Producto,ProductoDetalle,Botica } from '../Models/Relaciones.js';  // Asegúrate de importar StockProducto
 
 const router = express.Router();
 const TASA_IMPUESTO = 0.18;  // Representa el 18% de impuestos
 
 router.get('/:usuarioID', async (req, res) => {
-    const { usuarioID } = req.params; // Obtener el usuarioID desde los parámetros
-  
-    try {
-      // Primero, buscamos el carrito asociado al usuarioID
-      const carrito = await Carrito.findOne({ where: { usuarioID } });
-  
-      // Si no se encuentra el carrito, devolvemos un error
-      if (!carrito) {
-        return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
-      }
-  
-      const carritoID = carrito.id; // Obtener el carritoID del carrito encontrado
-  
-      // Buscar los productos en ProductoCarrito que correspondan al carrito
-      const productosCarrito = await ProductoCarrito.findAll({
-        where: { carritoID }, // Usamos el carritoID
-        attributes: ['cantidad'], // Obtenemos la cantidad de cada producto en el carrito
-        include: [
-          {
-            model: Producto,
-            attributes: ['nombre'], // Obtenemos el nombre del producto
-            include: [
-              {
-                model: StockProducto,
-                attributes: ['precio'], // Obtenemos el precio del producto
-              }
-            ]
-          }
-        ]
-      });
-  
-      // Verificar si hay productos en el carrito
-      if (productosCarrito.length === 0) {
-        return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
-      }
-  
-      // Mapeamos los datos deseados (nombre, precio y cantidad)
-      const productos = productosCarrito.map(item => ({
-        nombre: item.Producto.nombre,
-        precio: item.Producto.StockProducto.precio,
-        cantidad: item.cantidad // Cantidad del producto en el carrito
-      }));
-  
-      // Devolver los productos con nombre, precio y cantidad
-      res.status(200).json(productos);
-    } catch (error) {
-      console.error('Error al obtener los productos del carrito:', error);
-      res.status(500).json({ mensaje: 'Error interno del servidor' });
-    }
-  });
-  
-
-  router.post('/crearOrden/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params;
-    const { direccionEnvio, metodoEntrega, botica } = req.body; // Agregamos "botica" desde el frontend
-  
+    const baseUrl = `http://localhost:4000/images/`;  // Cambia esto si tienes otra ruta de acceso a las imágenes
+
     try {
-      // Verificar si el usuario existe
-      const usuario = await Usuario.findByPk(usuarioID);
-      if (!usuario) {
-        return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
-      }
-  
-      // Buscar el carrito del usuario
-      const carrito = await Carrito.findOne({ where: { usuarioID } });
-      if (!carrito) {
-        return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
-      }
-  
-      // Obtener los productos del carrito
-      const productosCarrito = await ProductoCarrito.findAll({
-        where: { carritoID: carrito.id },
-        include: ['Producto'],
-      });
-  
-      // Calcular el subtotal
-      const subtotal = productosCarrito.reduce((total, item) => {
-        return total + item.precio * item.cantidad;
-      }, 0);
-  
-      // Determinar el costo de envío
-      const costoEnvio = metodoEntrega === 'entrega' ? 10 : 0; // Si es entrega a domicilio, se cobra
-  
-      // Calcular el impuesto
-      const impuesto = (subtotal + costoEnvio) * TASA_IMPUESTO;
-      const impuestoFinal = isNaN(impuesto) ? 0 : impuesto.toFixed(2);
-  
-      // Calcular el total
-      const total = subtotal + costoEnvio + parseFloat(impuestoFinal);
-  
-      // Si el método de entrega es "recojo", usamos la botica seleccionada como dirección
-      const direccionFinal = metodoEntrega === 'recojo' ? `Recojo en ${botica}` : direccionEnvio;
-  
-      // Validar que haya una dirección válida para la entrega a domicilio
-      if (metodoEntrega === 'entrega' && !direccionEnvio) {
-        return res.status(400).json({ mensaje: 'Debe proporcionar una dirección para la entrega a domicilio.' });
-      }
-  
-      // Validar que haya una botica seleccionada si es recojo en tienda
-      if (metodoEntrega === 'recojo' && !botica) {
-        return res.status(400).json({ mensaje: 'Debe seleccionar una botica para el recojo en tienda.' });
-      }
-  
-      // Crear la nueva orden en la base de datos
-      const nuevaOrden = await Orden.create({
-        estado: 'pendiente',
-        direccionEnvio: direccionFinal,  // Usar "Recojo en [botica]" o la dirección para entrega
-        subtotal: subtotal.toFixed(2),
-        costoEnvio: costoEnvio.toFixed(2),
-        impuestos: impuestoFinal,
-        total: total.toFixed(2),
-        usuarioID: usuarioID,
-      });
-  
-      res.status(201).json({
-        mensaje: 'Orden creada exitossssamente.',
-        orden: nuevaOrden,
-      });
+        // Buscar el carrito asociado al usuarioID
+        const carrito = await Carrito.findOne({ where: { usuarioID } });
+
+        if (!carrito) {
+            return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
+        }
+
+        const carritoID = carrito.id;
+
+        // Buscar los productos en ProductoCarrito que correspondan al carrito
+        const productosCarrito = await ProductoCarrito.findAll({
+            where: { carritoID },
+            attributes: ['cantidad'],
+            include: [
+                {
+                    model: ProductoDetalle,
+                    attributes: ['precio', 'imageUrl'], // Obtener el precio e imagen desde ProductoDetalle
+                    include: {
+                        model: Producto,
+                        attributes: ['nombre']  // Obtener el nombre del producto
+                    }
+                }
+            ]
+        });
+
+        if (productosCarrito.length === 0) {
+            return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
+        }
+
+        // Mapeamos los datos (nombre, precio, cantidad y imagen)
+        const productos = productosCarrito.map(item => ({
+            nombre: item.ProductoDetalle.Producto.nombre,
+            precio: item.ProductoDetalle.precio,
+            cantidad: item.cantidad,
+        }));
+
+        // Devolver los productos con nombre, precio, cantidad e imagen
+        res.status(200).json(productos);
     } catch (error) {
-      console.error('Error al crear la ottttrden:', error);
-      res.status(500).json({ mensaje: 'Error al crear la orden.' });
+        console.error('Error al obtener los productos del carrito:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
     }
-  });
+});
+
+router.post('/crearOrden/:usuarioID', async (req, res) => {
+    const { usuarioID } = req.params;
+    const { direccionEnvio, metodoEntrega, botica } = req.body;
+
+    try {
+        // Verificar si el usuario existe
+        const usuario = await Usuario.findByPk(usuarioID);
+        if (!usuario) {
+            return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
+        }
+
+        // Buscar el carrito del usuario
+        const carrito = await Carrito.findOne({ where: { usuarioID } });
+        if (!carrito) {
+            return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
+        }
+
+        // Obtener los productos del carrito con la botica asociada
+        const productosCarrito = await ProductoCarrito.findAll({
+            where: { carritoID: carrito.id },
+            include: [
+                {
+                    model: ProductoDetalle,
+                    attributes: ['precio', 'boticaID'],
+                    include: {
+                        model: Producto,
+                        attributes: ['nombre']
+                    }
+                }
+            ]
+        });
+
+        // Agrupar productos por botica
+        const productosPorBotica = {};
+        productosCarrito.forEach(item => {
+            const boticaID = item.ProductoDetalle.boticaID;
+            if (!productosPorBotica[boticaID]) {
+                productosPorBotica[boticaID] = [];
+            }
+            productosPorBotica[boticaID].push(item);
+        });
+
+        // Validación de campos requeridos
+        if (metodoEntrega === 'entrega' && !direccionEnvio) {
+            return res.status(400).json({ mensaje: 'Debe proporcionar una dirección para la entrega a domicilio.' });
+        }
+        if (metodoEntrega === 'recojo' && !botica) {
+            return res.status(400).json({ mensaje: 'Debe seleccionar una botica para el recojo en tienda.' });
+        }
+
+        // Crear una orden por cada botica
+        const ordenesCreadas = [];
+        for (const [boticaID, productos] of Object.entries(productosPorBotica)) {
+            // Calcular el subtotal para esta botica
+            const subtotal = productos.reduce((total, item) => {
+                return total + item.ProductoDetalle.precio * item.cantidad;
+            }, 0);
+
+            // Determinar el costo de envío
+            const costoEnvio = metodoEntrega === 'entrega' ? 10 : 0;
+
+            // Calcular el impuesto (18%)
+            const impuesto = (subtotal + costoEnvio) * TASA_IMPUESTO;
+            const impuestoFinal = isNaN(impuesto) ? 0 : impuesto.toFixed(2);
+
+            // Calcular el total
+            const total = subtotal + costoEnvio + parseFloat(impuestoFinal);
+
+            // Determinar la dirección final según el método de entrega
+            const direccionFinal = metodoEntrega === 'recojo' ? `Recojo en ${botica}` : direccionEnvio;
+
+            // Crear la nueva orden para esta botica
+            const nuevaOrden = await Orden.create({
+                estado: 'pendiente',
+                direccionEnvio: direccionFinal,
+                subtotal: subtotal.toFixed(2),
+                costoEnvio: costoEnvio.toFixed(2),
+                impuestos: impuestoFinal,
+                total: total.toFixed(2),
+                usuarioID: usuarioID,
+                boticaID: parseInt(boticaID), // Asociar la orden a la botica
+                fechaRegistro: new Date() // Fecha actual de creación
+            });
+
+            ordenesCreadas.push(nuevaOrden);
+        }
+
+        res.status(201).json({
+            mensaje: 'Órdenes creadas exitosamente para cada botica.',
+            ordenes: ordenesCreadas,
+        });
+    } catch (error) {
+        console.error('Error al crear las órdenes:', error);
+        res.status(500).json({ mensaje: 'Error al crear las órdenes.', detalles: error.message });
+    }
+});
+
 
 
 router.post('/llenarProductoOrden/:usuarioID/:ordenID', async (req, res) => {
     const { usuarioID, ordenID } = req.params;
-  
+
     try {
-      // Buscar el carrito del usuario
-      const carrito = await Carrito.findOne({ where: { usuarioID } });
-      if (!carrito) {
-        return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
-      }
-  
-      // Obtener los productos del carrito del usuario
-      const productosCarrito = await ProductoCarrito.findAll({
-        where: { carritoID: carrito.id },
-        include: [{ model: Producto }] // Incluimos los detalles del producto si es necesario
-      });
-  
-      if (productosCarrito.length === 0) {
-        return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
-      }
-  
-      // Iteramos sobre los productos del carrito y llenamos la tabla ProductoOrden
-      for (const item of productosCarrito) {
-        const precioTotal = item.precio * item.cantidad; // Precio total = precio unitario * cantidad
-  
-        await ProductoOrden.create({
-          ordenID: ordenID,              // ID de la orden que recibimos en el parámetro
-          productoID: item.productoID,   // ID del producto
-          cantidad: item.cantidad,       // Cantidad del producto en el carrito
-          precio: precioTotal.toFixed(2) // Precio total por la cantidad de productos
+        // Buscar el carrito del usuario
+        const carrito = await Carrito.findOne({ where: { usuarioID } });
+        if (!carrito) {
+            return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
+        }
+
+        // Obtener los productos del carrito del usuario
+        const productosCarrito = await ProductoCarrito.findAll({
+            where: { carritoID: carrito.id },
+            include: [
+                {
+                    model: ProductoDetalle,
+                    attributes: ['precio'],
+                    include: {
+                        model: Producto,
+                        attributes: ['nombre']
+                    }
+                }
+            ]
         });
-      }
-  
-      // Opcionalmente, podríamos vaciar el carrito del usuario después de procesar la orden
-      // await ProductoCarrito.destroy({ where: { carritoID: carrito.id } });
-  
-      res.status(201).json({ mensaje: 'ProductoOrden llenado con éxito.' });
+
+        if (productosCarrito.length === 0) {
+            return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
+        }
+
+        // Iterar sobre los productos del carrito y llenar la tabla ProductoOrden
+        for (const item of productosCarrito) {
+            const precioTotal = item.ProductoDetalle.precio * item.cantidad;
+
+            await ProductoOrden.create({
+                ordenID: ordenID,
+                productoDetalleID: item.productoDetalleID,
+                cantidad: item.cantidad,
+                precio: item.ProductoDetalle.precio.toFixed(2),
+                precioTotal: precioTotal.toFixed(2)
+            });
+        }
+
+        res.status(201).json({ mensaje: 'ProductoOrden llenado con éxito.' });
     } catch (error) {
-      console.error('Error al llenar ProductoOrden:', error);
-      res.status(500).json({ mensaje: 'Error interno del servidor al llenar ProductoOrden.' });
+        console.error('Error al llenar ProductoOrden:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor al llenar ProductoOrden.', detalles: error.message });
     }
-  });
-  
-  router.put('/actualizarStockProductos/:usuarioID', async (req, res) => {
-    const { usuarioID } = req.params;
-  
-    try {
+});
+
+
+
+router.put('/actualizarStockProductos/:usuarioID', async (req, res) => {
+  const { usuarioID } = req.params;
+
+  try {
       // Buscar el carrito del usuario
       const carrito = await Carrito.findOne({ where: { usuarioID } });
-  
+      console.log('Carrito encontrado:', carrito);
+
       if (!carrito) {
-        return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
+          return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
       }
-  
+
       // Obtener los productos del carrito
       const productosCarrito = await ProductoCarrito.findAll({
-        where: { carritoID: carrito.id },
-        include: ['Producto'], // Incluir la información del producto
+          where: { carritoID: carrito.id },
+          include: [
+              {
+                  model: ProductoDetalle,  // Usar ProductoDetalle ya que contiene el stock
+                  attributes: ['id', 'cantidad'], // Obtenemos la cantidad disponible en stock y el id
+                  include: {
+                      model: Producto,  // Incluimos Producto si necesitamos el nombre
+                      attributes: ['nombre']
+                  }
+              }
+          ]
       });
-  
+      console.log('Productos en carrito:', productosCarrito);
+
       // Verificar si el carrito tiene productos
       if (productosCarrito.length === 0) {
-        return res.status(400).json({ mensaje: 'No hay productos en el carrito para actualizar el stock.' });
+          return res.status(400).json({ mensaje: 'No hay productos en el carrito para actualizar el stock.' });
       }
-  
+
       // Iterar sobre los productos del carrito y actualizar el stock
       for (let item of productosCarrito) {
-        const stockProducto = await StockProducto.findOne({ where: { productoID: item.productoID } });
-  
-        if (stockProducto) {
-          // Restar la cantidad del producto comprado del stock actual
-          const nuevaCantidad = stockProducto.cantidad - item.cantidad;
-  
-          // Verificar si hay stock suficiente
-          if (nuevaCantidad < 0) {
-            return res.status(400).json({
-              mensaje: `No hay suficiente stock para el producto ${item.Producto.nombre}. Stock disponible: ${stockProducto.cantidad}.`,
-            });
+          const stockProducto = item.ProductoDetalle;
+          console.log('Stock del producto:', stockProducto);
+
+          if (stockProducto) {
+              // Restar la cantidad del producto comprado del stock actual
+              const nuevaCantidad = stockProducto.cantidad - item.cantidad;
+              console.log('Nueva cantidad:', nuevaCantidad);
+
+              // Verificar si hay stock suficiente
+              if (nuevaCantidad < 0) {
+                  return res.status(400).json({
+                      mensaje: `No hay suficiente stock para el producto ${item.ProductoDetalle.Producto.nombre}. Stock disponible: ${stockProducto.cantidad}.`,
+                  });
+              }
+
+              // Asegurarse de que estamos usando el ID correcto para actualizar
+              await ProductoDetalle.update({ cantidad: nuevaCantidad }, { where: { id: stockProducto.id } });
+          } else {
+              return res.status(404).json({
+                  mensaje: `No se encontró el producto con ID: ${item.productoDetalleID} en el stock.`,
+              });
           }
-  
-          // Actualizar el stock en la base de datos
-          await stockProducto.update({ cantidad: nuevaCantidad });
-        } else {
-          return res.status(404).json({
-            mensaje: `No se encontró el producto con ID: ${item.productoID} en el stock.`,
-          });
-        }
       }
-  
+
       res.status(200).json({ mensaje: 'Stock actualizado correctamente.' });
-    } catch (error) {
-      console.error('Lo sentimos:', error);
-      res.status(500).json({ mensaje: 'Error interno del servidor.' });
-    }
-  });
-  
+  } catch (error) {
+      console.error('Error al actualizar el stock:', error);
+      res.status(500).json({ mensaje: 'Error interno del servidor.', detalles: error.message });
+  }
+});
 
 
-  router.delete('/eliminarCarrito/:usuarioID', async (req, res) => {
-    const { usuarioID } = req.params;
-  
-    try {
+router.delete('/eliminarCarrito/:usuarioID', async (req, res) => {
+  const { usuarioID } = req.params;
+
+  try {
       // Buscar el carrito del usuario
       const carrito = await Carrito.findOne({ where: { usuarioID } });
-  
+
       if (!carrito) {
-        return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
+          return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
       }
-  
+
       // Eliminar todos los productos del carrito en ProductoCarrito
       await ProductoCarrito.destroy({ where: { carritoID: carrito.id } });
-  
-      // Eliminar el carrito del usuario
-      await Carrito.destroy({ where: { id: carrito.id } });
-  
-      res.status(200).json({ mensaje: 'Carrito y productos eliminados correctamente.' });
-    } catch (error) {
-      console.error('Error al eliminar el carrito y productos:', error);
-      res.status(500).json({ mensaje: 'Error interno del servidor.' });
-    }
-  });
-  
 
- 
+      res.status(200).json({ mensaje: 'Productos del carrito eliminados correctamente.' });
+  } catch (error) {
+      console.error('Error al eliminar los productos del carrito:', error);
+      res.status(500).json({ mensaje: 'Error interno del servidor.', detalles: error.message });
+  }
+});
+
+// Endpoint para obtener todas las órdenes de un usuario específico
+router.get('/ordenesUsuario/:usuarioID', async (req, res) => {
+    const { usuarioID } = req.params;
+
+    try {
+        // Buscar todas las órdenes asociadas al usuarioID
+        const ordenes = await Orden.findAll({
+            where: { usuarioID },
+            include: [
+                {
+                    model: ProductoOrden,
+                    attributes: ['cantidad', 'precio'],
+                    include: [
+                        {
+                            model: ProductoDetalle,
+                            attributes: ['precio'],
+                            include: {
+                                model: Producto,
+                                attributes: ['nombre']
+                            }
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if (ordenes.length === 0) {
+            return res.status(404).json({ mensaje: 'No se encontraron órdenes para este usuario.' });
+        }
+
+        // Estructurar la respuesta para cada orden
+        const detallesOrdenes = ordenes.map(orden => ({
+            id: orden.id,
+            direccionEnvio: orden.direccionEnvio,
+            estado: orden.estado,
+            subtotal: orden.subtotal,
+            costoEnvio: orden.costoEnvio,
+            impuestos: orden.impuestos,
+            total: orden.total,
+            productos: orden.ProductoOrdens.map(item => ({
+                nombre: item.ProductoDetalle.Producto.nombre,
+                cantidad: item.cantidad,
+                precioUnitario: item.precio,
+                precioTotal: (item.cantidad * item.precio).toFixed(2)
+            }))
+        }));
+
+        res.status(200).json(detallesOrdenes);
+    } catch (error) {
+        console.error('Error al obtener las órdenes del usuario:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
+    }
+});
+
+
+
+
+
+
+
+
+
+/////////---------------------------------------------------------------
+router.get('/carrito/ingresoTotalPorBotica/:usuarioID', async (req, res) => {
+    const { usuarioID } = req.params;
+
+    try {
+        // Buscar el carrito asociado al usuarioID
+        const carrito = await Carrito.findOne({ where: { usuarioID } });
+        if (!carrito) {
+            return res.status(404).json({ mensaje: 'Carrito no encontrado para este usuario.' });
+        }
+
+        // Obtener los productos en el carrito con su cantidad, precio y el boticaID
+        const productosCarrito = await ProductoCarrito.findAll({
+            where: { carritoID: carrito.id },
+            attributes: ['productoDetalleID', 'cantidad', 'precio'],
+            include: [
+                {
+                    model: ProductoDetalle,
+                    attributes: ['boticaID'],
+                    include: [
+                        {
+                            model: Botica, // Incluir la tabla Botica para obtener el nombre
+                            attributes: ['nombre']
+                        }
+                    ]
+                }
+            ]
+        });
+
+        // Verificar si hay productos en el carrito
+        if (productosCarrito.length === 0) {
+            return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
+        }
+
+        // Calcular el ingreso total por botica
+        const ingresosPorBotica = {};
+
+        productosCarrito.forEach(item => {
+            const nombreBotica = item.ProductoDetalle.Botica ? item.ProductoDetalle.Botica.nombre : 'Nombre no disponible';
+            const ingresoProducto = item.precio * item.cantidad;
+
+            if (!ingresosPorBotica[nombreBotica]) {
+                ingresosPorBotica[nombreBotica] = 0;
+            }
+
+            ingresosPorBotica[nombreBotica] += ingresoProducto;
+        });
+
+        // Convertir el resultado a un array de objetos para la respuesta
+        const resultado = Object.keys(ingresosPorBotica).map(nombreBotica => ({
+            nombreBotica,
+            ingresoTotal: ingresosPorBotica[nombreBotica].toFixed(2) // Formatear a 2 decimales
+        }));
+
+        res.status(200).json({ ingresosPorBotica: resultado });
+    } catch (error) {
+        console.error('Error al calcular el ingreso total por botica:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
+    }
+});
+
+
+
 
 export default router;

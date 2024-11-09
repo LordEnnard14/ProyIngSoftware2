@@ -7,6 +7,7 @@ import HeaderPrincipal from '../../COMPONENTES/Header_Principal';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../COMPONENTES/Footer_Principal';
 import NavegacionMedicinas from '../../COMPONENTES/NavegacionMedicinas';
+import Header_Botica from '../../COMPONENTES/Header_Botica';
 
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -22,10 +23,12 @@ const Eleccion = () => {
       slidesToSlide: 1 
     }
   };
+  const admin = JSON.parse(localStorage.getItem('admin'));
+
 
   return (
     <>
-      <HeaderPrincipal/>
+      {admin ? <Header_Botica /> : <HeaderPrincipal />}
       <NavegacionMedicinas />
       <Carousel responsive={responsiveWall} infinite={true} autoPlay={true} autoPlaySpeed={3000} showDots={true} draggable={false}>
         <div className="Wall">

@@ -1,5 +1,5 @@
 import express from "express";
-import { Producto, ProductoDetalle, Botica } from "../Models/Relaciones.js";
+import { Producto, ProductoDetalle, Botica, Marca } from "../Models/Relaciones.js";
 import { Op } from "sequelize";
 import multer from 'multer';
 import path from 'path';
@@ -55,5 +55,76 @@ router.post('/newDetalle', upload.single('imagen'), async (req, res) => {
       res.status(500).send('Error al agregar detalle');
     }  
   })
+
+  router.get('/ProductosAll', async (req, res) => {
+    try {
+      const productosDetalles = await ProductoDetalle.findAll({
+        include: [
+          {
+            model: Producto, 
+            attributes: ['id', 'nombre'], 
+            include: [
+              {
+                model: Marca, 
+                attributes: ['nombre'], 
+              }
+            ]
+          },
+          {
+            model: Botica, 
+            attributes: ['nombre', 'direccion'], 
+          }
+        ],
+        order: [['id', 'ASC']] 
+      });
+  
+      return res.status(200).send({ ProductosDetalles: JSON.parse(JSON.stringify(productosDetalles)) });
+    } catch (error) {
+      return res.status(500).send({ error: error.message });
+    }
+  });
+
+router.get('/searchProductos', async (req, res) => {
+    try {
+        const { nombreProducto } = req.query; 
+        const trimmedNombreProducto = nombreProducto ? nombreProducto.trim() : ''; 
+
+        
+        const whereCondition = trimmedNombreProducto ? {
+            nombre: {
+                [Op.iLike]: `%${trimmedNombreProducto}%`
+            }
+        } : {};
+
+        const productosDetalles = await ProductoDetalle.findAll({
+            include: [
+                {
+                    model: Producto,
+                    attributes: ['id', 'nombre'],
+                    where: whereCondition, 
+                    include: [
+                        {
+                            model: Marca,
+                            attributes: ['nombre'],
+                        }
+                    ]
+                },
+                {
+                    model: Botica,
+                    attributes: ['nombre', 'direccion'],
+                }
+            ],
+            order: [['id', 'ASC']]
+        });
+
+        if (productosDetalles.length === 0) {
+            return res.status(404).send({ message: `No se encontró ningún producto con el término "${trimmedNombreProducto}"` });
+        }
+
+        return res.status(200).send({ ProductosDetalles: JSON.parse(JSON.stringify(productosDetalles)) });
+    } catch (error) {
+        return res.status(500).send({ error: error.message });
+    }
+});
 
 export default router;

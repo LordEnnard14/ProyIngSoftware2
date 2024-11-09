@@ -25,6 +25,11 @@ import DashboardBotica from './PAGINAS/USUARIO_BOTICA/DashboardBotica';
 import ListaProductosBotica from './PAGINAS/USUARIO_BOTICA/ListaProductoBotica';
 import OrdenesBotica from './PAGINAS/USUARIO_BOTICA/OrdenesBotica';
 import InicioSesionBotica from './PAGINAS/USUARIO_BOTICA/Inicio Sesion/InicioSesionBotica.js';
+import RecuperarContraseñaBotica from './PAGINAS/USUARIO_BOTICA/Recuperar Contraseña/RecuperarContraseñaBotica.js';
+import RestablecerContraseñaBotica from './PAGINAS/USUARIO_BOTICA/Recuperar Contraseña/RestablecerContraseñaBotica.js';
+
+import RegisBotica from './PAGINAS/USUARIO_BOTICA/Registro_Botica.js'
+import RegisAdmin from './PAGINAS/ADMINISTRADOR/RegisAdmin.js'
 
 function App() {
   return (
@@ -60,6 +65,10 @@ function App() {
             <Route path='/ListaProductosBotica' element={<ListaProductosBotica/>}/>
             <Route path='/OrdenesBotica' element={<OrdenesBotica/>}/>
             <Route path='/InicioSesionBotica' element={<InicioSesionBotica/>}/>
+            <Route path='/RegisBotica' element={<RegisBotica/>}/>
+            <Route path='/RegisAdmin' element={<RegisAdmin/>}/>
+            <Route path='/RecuperarContraseñaBotica' element={<RecuperarContraseñaBotica/>}/>
+            <Route path='/RestablecerContraseñaBotica' element={<RestablecerContraseñaBotica/>}/>
           </Routes>
         </Box>
        

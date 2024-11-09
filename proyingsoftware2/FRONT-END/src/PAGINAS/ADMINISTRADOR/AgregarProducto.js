@@ -67,15 +67,17 @@ const AgregarProducto = () => {
     const handleSubmit = async () => {
                 // Aquí iría la lógica para guardar el producto, como una llamada a la API.
                 console.log("esata funcionando")
-                const user = JSON.parse(localStorage.getItem('user'));
-                console.log(user.id);
+                const admin = JSON.parse(localStorage.getItem('admin'));
+                console.log(admin.id);
+                console.log("funciona hasta aca")
                 console.log(producto.rsLetras)
                 console.log(producto.rsNumeros)
+                
                 try {
 
                   const formData = new FormData();
                   formData.append('productoID', producto.id);
-                  formData.append('boticaID', user.id);
+                  formData.append('boticaID', admin.id);
                   formData.append('descripcion', producto.descripcion);
                   formData.append('precio', producto.precio);
                   formData.append('cantidad',producto.stock);
