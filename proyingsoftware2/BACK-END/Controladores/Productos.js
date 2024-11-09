@@ -35,10 +35,62 @@ router.post('/newProductos', async (req, res) => {
     res.status(500).send('Error al crear producto');
   }  
 })
+router.get('/ProductosTodos', async (req,res)=>{
+  const productos = await Producto.findAll()
+  res.send(productos)
+})
 
 router.get('/ProductosAll', async (req, res) => {
   try {
     const productosDetalles = await ProductoDetalle.findAll({
+      include: [
+        {
+          model: Producto, 
+          attributes: ['id', 'nombre'], 
+          include: [
+            {
+              model: Marca, 
+              attributes: ['nombre'], 
+            }
+          ]
+        },
+        {
+          model: Botica, 
+          attributes: ['nombre', 'direccion'], 
+        }
+      ],
+      order: [['id', 'ASC']] 
+    });
+
+    return res.status(200).send({ ProductosDetalles: JSON.parse(JSON.stringify(productosDetalles)) });
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+});
+
+router.get('/BusquedaAgrega', async(req,res)=>{
+  const nombre = req.query.nombre
+  const marca = req.query.marca
+  const producto = await Producto.findAll({
+    include:{
+      model: Marca,
+      where:{nombre :{[Op.iLike]: `%${marca}%`}},
+      attributes:['nombre']
+    },
+    where:{
+      nombre: {[Op.iLike]: `%${nombre}%`}
+    },
+  })
+  return res.send(JSON.parse(JSON.stringify(producto)))
+
+})
+
+router.get('/ProductosAllBotica/:id', async (req, res) => { //Todos los productos de una botica
+  try {
+    const productosDetalles = await ProductoDetalle.findAll({
+      where:{
+        boticaID : req.params.id
+      },
       include: [
         {
           model: Producto, 

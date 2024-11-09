@@ -5,6 +5,7 @@ import adminRoutes from "./Controladores/Admin.js";
 import productoDetalleRoutes from "./Controladores/ProductosDetalle.js"; 
 import carritoRoutes from "./Controladores/Carrito.js"
 import ordenesRoutes from "./Controladores/Carrito.js"
+import marcasRoutes from "./Controladores/Marcas.js"
 
 
 
@@ -15,6 +16,7 @@ export default function(app){
     app.use("/api/admin",adminRoutes);
     app.use("/api/productoDetalle",productoDetalleRoutes);
     app.use("/api/carrito", carritoRoutes);
-    app.use("/api/ordenes", ordenesRoutes);    
+    app.use("/api/ordenes", ordenesRoutes);
+    app.use("/api/marcas",marcasRoutes);   
     
 }

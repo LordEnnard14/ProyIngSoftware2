@@ -16,7 +16,7 @@ import PaginaPago from './PAGINAS/CARRITO_COMPRAS/PaginaPago';
 //Vistas de administrador
 import Dashboard from './PAGINAS/ADMINISTRADOR/Dashboard';
 import OrdenesUsuario from './PAGINAS/ADMINISTRADOR/OrdenesUsuario'
-import AgregarProducto from './PAGINAS/ADMINISTRADOR/AgregarProductos'
+import AgregarProducto from './PAGINAS/ADMINISTRADOR/AgregarProducto'
 import ListaUsuarios from './PAGINAS/ADMINISTRADOR/ListaUsuarios'
 import ListaProductos from './PAGINAS/ADMINISTRADOR/ListaProductos'
 //Vistas de Botica
