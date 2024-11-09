@@ -205,12 +205,12 @@ const  CrearProducto = () =>{
                     
                 </Grid>
                 {crearMarca&&<Grid sx={{ml:2, mt:3}}>
-                        <Button variant = "contained" color = "primary" onClick={handleMarcaSubmit}>
+                        <Button variant = "contained" sx={{color:"white", backgroundColor:"black"}} onClick={handleMarcaSubmit}>
                             <SaveIcon/>
                         </Button>
                 </Grid>}
                 <Grid sx={{ml:2, mt:3}}>            
-                        <Button variant="contained" color="primary" onClick={()=>{handleToggle(); setUpdate(!update)}}>
+                        <Button variant="contained" color="primary" sx={{color:"white", backgroundColor:"black"}} onClick={()=>{handleToggle(); setUpdate(!update)}}>
                             {crearMarca ? <CancelIcon/> : <AddCircleOutlineIcon/>}
                         </Button>
                         

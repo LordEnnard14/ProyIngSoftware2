@@ -5,6 +5,39 @@ import { Orden, Usuario,ProductoOrden ,Carrito, ProductoCarrito, Producto,Produc
 const router = express.Router();
 const TASA_IMPUESTO = 0.18;  // Representa el 18% de impuestos
 
+router.get('/OrdenesAll', async(req,res)=>{
+    try{
+        const boticaID = req.query.boticaID
+        const ordenes = await Orden.findAll({
+            where:{
+                boticaID: boticaID},
+            include:
+                {
+                    model:Usuario,
+                    attributes:['nombre','correo']
+                },
+
+                raw: true,
+                nest: true,
+        });
+    const ordenesConUsuario = ordenes.map(orden => {
+        const { Usuario, ...restOfOrden } = orden;  // Destructure to remove the nested Usuario object
+        return {
+            ...restOfOrden,  // Spread the other properties from the Orden model
+            nombre: Usuario.nombre,  // Add the 'nombre' from Usuario
+            correo: Usuario.correo,  // Add the 'correo' from Usuario
+        };
+    });
+
+        return res.status(200).json(ordenesConUsuario);
+    } catch (error){
+        console.error("Error al obtener ordenes",error)
+        return res.status(500).send("Error al obtener ordenes");
+    }
+
+})
+
+
 router.get('/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params;
     const baseUrl = `http://localhost:4000/images/`;  // Cambia esto si tienes otra ruta de acceso a las imágenes

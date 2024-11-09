@@ -1,9 +1,9 @@
 import Header_Botica from '../../COMPONENTES/Header_Botica';
 import BarraHorizontalBotica from '../../COMPONENTES/BarraHorizontalBotica';
 import ContenidoTablaOrdenesBotica from '../USUARIO_BOTICA/Contenido Tablas/ContenidoTablaOrdenesBotica';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, TextField, TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Button, Pagination } from '@mui/material';
-
+import { DataGrid, GridRowModes, renderActionsCell } from '@mui/x-data-grid';
 const OrdenesBotica = () => {
     // Estado para controlar la búsqueda y las órdenes
     const [busqueda, setBusqueda] = useState('');
@@ -14,9 +14,80 @@ const OrdenesBotica = () => {
         // Se pueden agregar más órdenes aquí...
     ]);
 
+    const admin = JSON.parse(localStorage.getItem('admin'));
+    
+
     const handleSearchChange = (e) => {
         setBusqueda(e.target.value);
     };
+    const boton = (params) => {
+        return (
+            <strong>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    //style={{ marginLeft: 16 }}
+                >
+                    Ver
+                </Button>
+            </strong>
+        )
+    }
+
+    const [row,setRow] = useState([]);
+    const [loading,setLoading] = useState(true);
+
+    useEffect( ()=>{
+        const fetchOrdenes = async ()=>{
+            setLoading(true)
+            try{
+              const data = await buscarOrdenes();
+              setRow(data);
+            }
+            catch(error){
+              console.error("Error en la busqueda", error);
+            } finally{
+              setLoading(false);
+            }
+
+        };
+        fetchOrdenes();
+    }, []);
+
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'nombre', headerName: 'Usuario', width: 150, 
+        },
+        { field: 'fechaRegistro', headerName: 'Fecha de Orden', width: 130, type: 'date', 
+            valueGetter: (value) => value && new Date(value),
+         },
+        { field: 'total', headerName: 'Total', width: 130 },
+        { field: 'correo', headerName: 'Correo', width: 130,
+         },
+        { field: 'estado', headerName: 'Estado', width: 130 },
+        { field: 'acciones', 
+            headerName: 'Acciones', 
+            width: 145,
+            renderCell: boton
+          },
+
+    ]
+
+    const paginationModel = { page: 0, pageSize: 5 };
+
+    const buscarOrdenes = async() =>{
+        const response = await fetch(`http://localhost:4000/api/ordenes/OrdenesAll?boticaID=${admin.id}`, {
+            method:'GET',
+        });
+        const data = await response.json();
+        return data; 
+    }
+
+    if(loading){
+        return <div>Loading...</div>;
+    }   
+
+
 
     return (
         <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -56,29 +127,17 @@ const OrdenesBotica = () => {
                 />
 
                 {/* Tabla de Órdenes */}
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell><strong>ID</strong></TableCell>
-                                <TableCell><strong>Usuario</strong></TableCell>
-                                <TableCell><strong>Fecha de Orden</strong></TableCell>
-                                <TableCell><strong>Total</strong></TableCell>
-                                <TableCell><strong>Correo</strong></TableCell>
-                                <TableCell><strong>Estado</strong></TableCell>
-                                <TableCell><strong>Acciones</strong></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {ordenesBotica.map((orden) => (
-                                <ContenidoTablaOrdenesBotica 
-                                    key={orden.id} 
-                                    orden={orden} // Pasamos los datos de cada orden
-                                />
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                <Paper sx={{heigh:'100%', width: '100%'}} >
+                <DataGrid
+                    rows={row}
+                    columns={columns}
+                    disableRowSelectionOnClick
+                    initialState={{ pagination: { paginationModel } }}
+                    pageSizeOptions={[5, 10]}
+                    sx={{ border: 0 }}        
+
+               />
+            </Paper>
 
                 {/* Paginación */}
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
