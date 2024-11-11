@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, TextField, Button, TableContainer, Paper } from '@mui/material';
 import { DataGrid, GridRowModes, renderActionsCell } from '@mui/x-data-grid';
-const Buscar = ({nombre, marca, handleProductoChange}) => {
+const Buscar = ({nombre, marca, handleProductoChange,update}) => {
 
     //Pasarle un json con el producto elegido del array de productos mostrados
     const child =  async (producto) => {
         console.log(producto)
-        handleProductoChange("id", 22)
+        handleProductoChange("id", producto.id)
+        console.log(producto.id)
         handleProductoChange("nombre",producto.nombre)
         handleProductoChange("marca",producto.Marca.nombre)
         
     }
+
 
         
     const boton = (params) => {
@@ -44,6 +46,7 @@ const Buscar = ({nombre, marca, handleProductoChange}) => {
       const [row,setRow] = useState([]);
       const [loading,setLoading] = useState(true);
       
+      
 
       useEffect( ()=>{
           const fetchProductos = async ()=>{
@@ -60,7 +63,7 @@ const Buscar = ({nombre, marca, handleProductoChange}) => {
 
           };
           fetchProductos();
-      }, []);      
+      }, [update]);      
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },

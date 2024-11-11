@@ -3,7 +3,7 @@ import BarraHorizontal from '../../COMPONENTES/BarraHorizontalBotica.js'; // Bar
 import React, { useState } from 'react';
 import { Box, Typography, Grid, Paper, TextField, Button, Input, InputLabel, Select, FormControl, MenuItem, Checkbox, ListItemText, useStepperContext } from '@mui/material';
 import { alignProperty } from '@mui/material/styles/cssUtils';
-
+//elimanar archivo
 const AgregarProducto = () => {
     // Manejo de estado para los campos del formulario
     const [producto, setProducto] = useState({

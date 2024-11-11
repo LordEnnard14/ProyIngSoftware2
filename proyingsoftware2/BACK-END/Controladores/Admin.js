@@ -2,6 +2,7 @@ import express from "express";
 import { Admin, Producto , Marca, ProductoDetalle,Botica} from "../Models/Relaciones.js";
 
 
+
 const router = express.Router();
 
 
@@ -142,6 +143,32 @@ router.put('/cambiarEstado/:id', async (req, res) => {
     return res.status(500).json({ message: 'Error en el servidor. Inténtalo nuevamente más tarde.' });
   }
 });
+
+router.put('/cambiarStock', async (req, res) => {
+  const { id, stock } = req.query;
+  
+
+  try {
+    console.log(id)
+    const producto = await ProductoDetalle.findByPk(id);
+    console.log(producto)
+
+    if (!producto) {
+      return res.status(404).json({ message: 'ProductoDetalle no encontrado' });
+    }
+
+    // Cambiar el estado del producto de true a false o viceversa
+    await producto.update({ cantidad: stock });
+    await producto.save()
+
+    return res.send(JSON.parse(JSON.stringify(producto)));
+  } catch (error) {
+    console.error('Error al actualizar el Stock del producto:', error);
+    return res.status(500).json({ message: 'Error en el servidor. Inténtalo nuevamente más tarde.' });
+  }
+});
+
+
 
 
 router.get('/verificarCorreoAdmin/:correo', async (req, res) => {

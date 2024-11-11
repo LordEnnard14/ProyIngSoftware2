@@ -10,7 +10,7 @@ const divStyle = {
     alignItems: 'center',
     height: '100%',
     width: 800,
-    border: '1px solid black', // Optional for visibility
+    border: '1px solid black', 
   };
 
 const  CrearProducto = () =>{

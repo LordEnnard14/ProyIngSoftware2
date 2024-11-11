@@ -7,6 +7,7 @@ import { Divider } from '@mui/material';
 import { maxWidth, sizing } from '@mui/system';
 import Crea from '../ADMINISTRADOR/Crea'
 import Popup from '../ADMINISTRADOR/popup2';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 const style = {
   position: 'absolute',
@@ -20,11 +21,11 @@ const style = {
 };
 
 export default function BasicModal(props) {
-    const {pop, handleClose, children} = props;
+    const {pop, handleClose, children, handleUpdate} = props;
     const [pops, setpops ] = useState(false);
     const handleOpenPop = () => setpops(true);
     const handleClosePop = () => setpops(false);
-
+    
   return (
     <div>
       <Modal
@@ -37,15 +38,28 @@ export default function BasicModal(props) {
             Busqueda de Producto
           </Typography>
           <Divider/>
-          <Button
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+          
+            <Button
+                      variant="contained"
+                      color="primary"
+                      //style={{ marginLeft: 16 }}
+                      sx= {{backgroundColor:'black', mt: 2, mb:2}}
+                      onClick={handleOpenPop}
+                  >
+                      Crear Producto
+                  </Button>
+                  <Button
                     variant="contained"
-                    color="primary"
-                    //style={{ marginLeft: 16 }}
-                    sx= {{backgroundColor:'black', mt: 2, mb:2}}
-                    onClick={handleOpenPop}
-                >
-                    Crear Producto
-                </Button>
+                      color="primary"
+                      //style={{ marginLeft: 16 }}
+                      sx= {{backgroundColor:'black', mt: 2, mb:2}}
+                      onClick={handleUpdate}
+                      
+                      >
+                        <RefreshIcon/>
+                  </Button>
+            </Box>
                 <Popup
                   pops = {pops}
                   handleClose = {handleClosePop}
@@ -55,12 +69,14 @@ export default function BasicModal(props) {
                 </Popup>
             {children}
             <strong>
+              
                 <Button
                     variant="contained"
                     color="primary"
                     //style={{ marginLeft: 16 }}
                     sx= {{backgroundColor:'black', mt: 2}}
                     onClick={handleClose}
+                    
                 >
                     Cancelar
                 </Button>

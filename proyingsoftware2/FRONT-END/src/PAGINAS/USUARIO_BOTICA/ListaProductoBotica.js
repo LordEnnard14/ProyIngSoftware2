@@ -8,6 +8,7 @@ import ContenidoTablaProductoBotica from '../USUARIO_BOTICA/Contenido Tablas/Con
 const ListaProductosBotica = () => {
   const [productos, setProductos] = useState([]);
   const navigate = useNavigate();
+  
 
   // Función para actualizar el estado de un producto en el estado local
   const actualizarEstadoProducto = (idProducto) => {
@@ -19,6 +20,8 @@ const ListaProductosBotica = () => {
       )
     );
   };
+  
+
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -93,7 +96,8 @@ const ListaProductosBotica = () => {
                 <ContenidoTablaProductoBotica 
                   key={producto.id} 
                   producto={producto} 
-                  onEstadoChange={actualizarEstadoProducto} 
+                  onEstadoChange={actualizarEstadoProducto}
+                  
                 />
               ))}
             </TableBody>

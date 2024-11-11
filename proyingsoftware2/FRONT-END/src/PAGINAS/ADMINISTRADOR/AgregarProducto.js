@@ -23,7 +23,10 @@ const AgregarProducto = () => {
     const [pop, setpop ] = useState(false);
     const handleOpen = () => setpop(true);
     const handleClose = () => setpop(false);
-
+    const [update, setUpdate] = useState(false);
+    const handleUpdate = () => {
+      setUpdate(!update)
+    }
 
     const handleProductoChange = (name,value) =>{
       setProducto( producto => ({
@@ -219,9 +222,10 @@ const AgregarProducto = () => {
                 <Popup
                   pop = {pop}
                   handleClose = {handleClose}
+                  handleUpdate = {handleUpdate}
                 >
                   
-                  <Buscar handleProductoChange = {handleProductoChange} nombre = {producto.nombre} marca = {producto.marca}/>
+                  <Buscar handleProductoChange = {handleProductoChange} nombre = {producto.nombre} marca = {producto.marca} update = {update} />
 
                 </Popup>
                 
