@@ -99,7 +99,6 @@ router.post('/agregarProductoCarrito', async (req, res) => {
 
 
 //usado
-//usado
 router.get('/productos/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params;  // Obtener el usuarioID desde los parámetros de la URL
     const baseUrl = `http://localhost:4000/api/productoDetalle/`;  // La URL base para las imágenes
@@ -124,7 +123,7 @@ router.get('/productos/:usuarioID', async (req, res) => {
                             attributes: ['nombre']
                         }
                     ],
-                    attributes: ['precio', 'imageUrl', 'boticaID'],  // Obtener precio, imagen y boticaID desde ProductoDetalle
+                    attributes: ['precio', 'imageUrl', 'boticaID', 'estado'],  // Incluir 'estado' en los atributos obtenidos desde ProductoDetalle
                 }
             ]
         });
@@ -157,7 +156,8 @@ router.get('/productos/:usuarioID', async (req, res) => {
             precio: item.ProductoDetalle.precio,  // Obtener el precio desde ProductoDetalle
             cantidad: item.cantidad,  // Cantidad desde ProductoCarrito
             subtotal: (item.ProductoDetalle.precio * item.cantidad).toFixed(2),  // Calcular subtotal
-            botica: boticaMap[item.ProductoDetalle.boticaID] || 'Botica no encontrada'  // Obtener el nombre de la botica usando el diccionario
+            botica: boticaMap[item.ProductoDetalle.boticaID] || 'Botica no encontrada',  // Obtener el nombre de la botica usando el diccionario
+            estado: item.ProductoDetalle.estado  // Incluir el estado del producto
         }));
 
         // Enviar la respuesta en formato JSON
@@ -167,7 +167,6 @@ router.get('/productos/:usuarioID', async (req, res) => {
         res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
     }
 });
-
 
 
 

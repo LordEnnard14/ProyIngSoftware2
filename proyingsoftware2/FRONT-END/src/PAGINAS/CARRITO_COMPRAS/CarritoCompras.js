@@ -118,12 +118,12 @@ const CarritoCompras = () => {
     }, 0).toFixed(2);
   };
 
-
   const verificarYProcederAlPago = () => {
-    // Log detallado de cada producto y su botica
+    // Log detallado de cada producto y su botica y estado
     productos.forEach((producto, index) => {
         console.log(`Producto ${index + 1}:`, producto);
         console.log(`Botica del producto ${index + 1}:`, producto.botica);
+        console.log(`Estado del producto ${index + 1}:`, producto.estado);
     });
 
     // Obtener todos los nombres de botica de los productos en el carrito
@@ -136,9 +136,15 @@ const CarritoCompras = () => {
     // Comprobar si todos los productos pertenecen a la misma botica comparando nombres
     const allSameBotica = boticaNombres.every((nombre) => nombre === boticaNombres[0]);
 
-    if (allHaveBoticaName && allSameBotica) {
-        // Si todos los productos tienen nombre de botica y pertenecen a la misma botica, proceder al pago
-        console.log("Todos los productos pertenecen a la misma botica. Navegando a la página de pago.");
+    // Verificación de estado activo para todos los productos
+    const productoInactivo = productos.find((producto) => producto.estado === false);
+    
+    if (productoInactivo) {
+        // Si algún producto está desactivado, mostrar alerta y detener el flujo
+        alert(`El producto "${productoInactivo.nombre}" está desactivado`);
+    } else if (allHaveBoticaName && allSameBotica) {
+        // Si todos los productos tienen nombre de botica, pertenecen a la misma y están activos, proceder al pago
+        console.log("Todos los productos pertenecen a la misma botica y están activos. Navegando a la página de pago.");
         navigate('/PaginaPago');
     } else {
         console.log("Los productos no pertenecen a la misma botica o faltan nombres de botica.");

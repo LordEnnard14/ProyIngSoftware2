@@ -40,7 +40,7 @@ router.get('/OrdenesAll', async(req,res)=>{
 
 router.get('/:usuarioID', async (req, res) => {
     const { usuarioID } = req.params;
-    const baseUrl = `http://localhost:4000/images/`;  // Cambia esto si tienes otra ruta de acceso a las imágenes
+    const baseUrl = `http://localhost:4000/images/`; // Cambia esto si tienes otra ruta de acceso a las imágenes
 
     try {
         // Buscar el carrito asociado al usuarioID
@@ -60,10 +60,16 @@ router.get('/:usuarioID', async (req, res) => {
                 {
                     model: ProductoDetalle,
                     attributes: ['precio', 'imageUrl'], // Obtener el precio e imagen desde ProductoDetalle
-                    include: {
-                        model: Producto,
-                        attributes: ['nombre']  // Obtener el nombre del producto
-                    }
+                    include: [
+                        {
+                            model: Producto,
+                            attributes: ['nombre'] // Obtener el nombre del producto
+                        },
+                        {
+                            model: Botica,
+                            attributes: ['nombre'], // Obtener el nombre de la botica
+                        }
+                    ]
                 }
             ]
         });
@@ -72,14 +78,16 @@ router.get('/:usuarioID', async (req, res) => {
             return res.status(404).json({ mensaje: 'No se encontraron productos en el carrito.' });
         }
 
-        // Mapeamos los datos (nombre, precio, cantidad y imagen)
+        // Mapeamos los datos (nombre, precio, cantidad, imagen y botica)
         const productos = productosCarrito.map(item => ({
             nombre: item.ProductoDetalle.Producto.nombre,
             precio: item.ProductoDetalle.precio,
             cantidad: item.cantidad,
+            imagen: item.ProductoDetalle.imageUrl ? `${baseUrl}${item.ProductoDetalle.imageUrl}` : null, // Agregar URL completa de imagen
+            botica: item.ProductoDetalle.Botica ? item.ProductoDetalle.Botica.nombre : 'No especificada' // Nombre de la botica
         }));
 
-        // Devolver los productos con nombre, precio, cantidad e imagen
+        // Devolver los productos con nombre, precio, cantidad, imagen y nombre de la botica
         res.status(200).json(productos);
     } catch (error) {
         console.error('Error al obtener los productos del carrito:', error);
@@ -238,71 +246,76 @@ router.post('/llenarProductoOrden/:usuarioID/:ordenID', async (req, res) => {
 
 
 router.put('/actualizarStockProductos/:usuarioID', async (req, res) => {
-  const { usuarioID } = req.params;
-
-  try {
-      // Buscar el carrito del usuario
-      const carrito = await Carrito.findOne({ where: { usuarioID } });
-      console.log('Carrito encontrado:', carrito);
-
-      if (!carrito) {
-          return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
-      }
-
-      // Obtener los productos del carrito
-      const productosCarrito = await ProductoCarrito.findAll({
-          where: { carritoID: carrito.id },
-          include: [
-              {
-                  model: ProductoDetalle,  // Usar ProductoDetalle ya que contiene el stock
-                  attributes: ['id', 'cantidad'], // Obtenemos la cantidad disponible en stock y el id
-                  include: {
-                      model: Producto,  // Incluimos Producto si necesitamos el nombre
-                      attributes: ['nombre']
-                  }
-              }
-          ]
-      });
-      console.log('Productos en carrito:', productosCarrito);
-
-      // Verificar si el carrito tiene productos
-      if (productosCarrito.length === 0) {
-          return res.status(400).json({ mensaje: 'No hay productos en el carrito para actualizar el stock.' });
-      }
-
-      // Iterar sobre los productos del carrito y actualizar el stock
-      for (let item of productosCarrito) {
-          const stockProducto = item.ProductoDetalle;
-          console.log('Stock del producto:', stockProducto);
-
-          if (stockProducto) {
-              // Restar la cantidad del producto comprado del stock actual
-              const nuevaCantidad = stockProducto.cantidad - item.cantidad;
-              console.log('Nueva cantidad:', nuevaCantidad);
-
-              // Verificar si hay stock suficiente
-              if (nuevaCantidad < 0) {
-                  return res.status(400).json({
-                      mensaje: `No hay suficiente stock para el producto ${item.ProductoDetalle.Producto.nombre}. Stock disponible: ${stockProducto.cantidad}.`,
-                  });
-              }
-
-              // Asegurarse de que estamos usando el ID correcto para actualizar
-              await ProductoDetalle.update({ cantidad: nuevaCantidad }, { where: { id: stockProducto.id } });
-          } else {
-              return res.status(404).json({
-                  mensaje: `No se encontró el producto con ID: ${item.productoDetalleID} en el stock.`,
-              });
-          }
-      }
-
-      res.status(200).json({ mensaje: 'Stock actualizado correctamente.' });
-  } catch (error) {
-      console.error('Error al actualizar el stock:', error);
-      res.status(500).json({ mensaje: 'Error interno del servidor.', detalles: error.message });
-  }
-});
-
+    const { usuarioID } = req.params;
+  
+    try {
+        // Buscar el carrito del usuario
+        const carrito = await Carrito.findOne({ where: { usuarioID } });
+        console.log('Carrito encontrado:', carrito);
+  
+        if (!carrito) {
+            return res.status(404).json({ mensaje: 'Carrito no encontrado.' });
+        }
+  
+        // Obtener los productos del carrito
+        const productosCarrito = await ProductoCarrito.findAll({
+            where: { carritoID: carrito.id },
+            include: [
+                {
+                    model: ProductoDetalle,  // Usar ProductoDetalle ya que contiene el stock
+                    attributes: ['id', 'cantidad'], // Obtenemos la cantidad disponible en stock y el id
+                    include: {
+                        model: Producto,  // Incluimos Producto si necesitamos el nombre
+                        attributes: ['nombre']
+                    }
+                }
+            ]
+        });
+        console.log('Productos en carrito:', productosCarrito);
+  
+        // Verificar si el carrito tiene productos
+        if (productosCarrito.length === 0) {
+            return res.status(400).json({ mensaje: 'No hay productos en el carrito para actualizar el stock.' });
+        }
+  
+        // Iterar sobre los productos del carrito y actualizar el stock
+        for (let item of productosCarrito) {
+            const stockProducto = item.ProductoDetalle;
+            console.log('Stock del producto antes de actualización:', stockProducto);
+  
+            if (stockProducto) {
+                // Restar la cantidad del producto comprado del stock actual
+                const nuevaCantidad = stockProducto.cantidad - item.cantidad;
+                console.log(`Producto: ${item.ProductoDetalle.Producto.nombre}, Stock actual: ${stockProducto.cantidad}, Cantidad a restar: ${item.cantidad}, Nueva cantidad: ${nuevaCantidad}`);
+  
+                // Verificar si hay stock suficiente
+                if (nuevaCantidad < 0) {
+                    return res.status(400).json({
+                        mensaje: `No hay suficiente stock para el producto ${item.ProductoDetalle.Producto.nombre}. Stock disponible: ${stockProducto.cantidad}.`,
+                    });
+                }
+  
+                // Realizar la actualización de la cantidad en la base de datos
+                const updateResult = await ProductoDetalle.update(
+                    { cantidad: nuevaCantidad }, 
+                    { where: { id: stockProducto.id } }
+                );
+  
+                console.log(`Resultado de la actualización del producto con ID ${stockProducto.id}:`, updateResult);
+            } else {
+                return res.status(404).json({
+                    mensaje: `No se encontró el producto con ID: ${item.productoDetalleID} en el stock.`,
+                });
+            }
+        }
+  
+        res.status(200).json({ mensaje: 'Stock actualizado correctamente.' });
+    } catch (error) {
+        console.error('Error al actualizar el stock:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor.', detalles: error.message });
+    }
+  });
+  
 
 router.delete('/eliminarCarrito/:usuarioID', async (req, res) => {
   const { usuarioID } = req.params;
@@ -378,12 +391,6 @@ router.get('/ordenesUsuario/:usuarioID', async (req, res) => {
         res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
     }
 });
-
-
-
-
-
-
 
 
 
