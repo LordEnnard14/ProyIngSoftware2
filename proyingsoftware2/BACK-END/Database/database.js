@@ -8,7 +8,7 @@ class Database {
                 dialect: "postgres",
                 database: "dosisxtra",
                 username: "postgres",
-                password: "pass",
+                password: "ALBEDO004",
                 host: "localhost",
                 port: 5432,
                 ssl: false,
@@ -38,4 +38,4 @@ class Database {
 const instance = new Database(); 
 Object.freeze(instance); 
 
-export default instance.getInstance(); // E
+export default instance.getInstance(); // 

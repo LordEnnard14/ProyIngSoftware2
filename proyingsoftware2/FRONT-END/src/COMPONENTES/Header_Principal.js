@@ -63,7 +63,7 @@ const Header1 = () => {
     const updateCartCount = async () => {
       if (!usuarioID) {
         console.error('Usuario no encontrado');
-        setCartItemCount(0); // O cualquier valor por defecto que desees
+        setCartItemCount(0);
         return;
       }
 
@@ -74,22 +74,18 @@ const Header1 = () => {
           throw new Error('Error al obtener la cantidad de productos');
         }
 
-        const data = await response.json(); // Obtener el cuerpo de la respuesta
-        console.log('Cantidad de productos:', data.totalProductos); // Verificar qué se devuelve
-
-        setCartItemCount(data.totalProductos); // Asegúrate de que este campo exista
+        const data = await response.json();
+        setCartItemCount(data.totalProductos);
       } catch (error) {
         console.error('Error al actualizar el conteo del carrito:', error);
-        setCartItemCount(0); // O cualquier valor por defecto que desees
+        setCartItemCount(0);
       }
     };
 
-    updateCartCount(); // Inicializa el conteo
+    updateCartCount();
 
-    // Escuchar el evento personalizado
     window.addEventListener('cartUpdated', updateCartCount);
 
-    // Verificar cambios en el localStorage (para pruebas)
     const storageChangeHandler = () => {
       const updatedUser = JSON.parse(localStorage.getItem('user'));
       if (updatedUser) {
@@ -112,7 +108,6 @@ const Header1 = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    console.log("Usuario eliminado del localStorage");
     setLoggedIn(false);
     setUserName('');
     navigate('/InicioSesion');
@@ -123,6 +118,11 @@ const Header1 = () => {
     if (section) {
       document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleProfileClick = () => {
+    // Redirige al perfil del usuario
+    navigate(`/perfil/${JSON.parse(localStorage.getItem('user')).id}`);
   };
 
   return (
@@ -172,10 +172,10 @@ const Header1 = () => {
             {loggedIn ? (
               <>
                 <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: 2 }}>
-                  <Typography sx={{ color: '#000000', marginRight: 1 }}>
+                  <Typography sx={{ color: '#000000', marginRight: 1, cursor: 'pointer' }} onClick={handleProfileClick}>
                     {userName}
                   </Typography>
-                  <IconButton onClick={() => console.log('Abrir perfil')} sx={{ color: '#000000' }}>
+                  <IconButton onClick={handleProfileClick} sx={{ color: '#000000' }}>
                     <AccountCircleIcon />
                   </IconButton>
                 </Box>

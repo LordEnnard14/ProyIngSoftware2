@@ -1,0 +1,126 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import './PerfilUserCss.css';
+import Header1 from '../../COMPONENTES/Header_Principal';
+
+const PerfilUsuario = () => {
+  const { id } = useParams();
+  const [usuario, setUsuario] = useState(null);
+  const [nuevaDireccion, setNuevaDireccion] = useState('');
+  const [error, setError] = useState('');
+  const [mensaje, setMensaje] = useState('');
+
+  // Cargar datos del usuario al montar el componente
+  useEffect(() => {
+    console.log("ID del usuario:", id); // Verifica si el id es correcto
+    const fetchUsuario = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/api/usuarios/${id}`);
+        if (!response.ok) throw new Error('Usuario no encontrado');
+        const data = await response.json();
+        setUsuario(data);
+      } catch (error) {
+        console.error(error);
+        setError('Error al cargar datos del usuario');
+      }
+    };
+  
+    fetchUsuario();
+  }, [id]);
+
+  // Función para manejar la adición de una nueva dirección
+  const agregarDireccion = async () => {
+    const direccion = nuevaDireccion.trim(); // Eliminar espacios en blanco al inicio y al final
+    if (!direccion) {
+      setError('Por favor ingresa una dirección');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:4000/api/usuarios/direcciones/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nuevaDireccion: direccion }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Error en la respuesta:', errorData);
+        setError('Error al agregar dirección');
+        return;
+      }
+
+      const data = await response.json();
+      if (data.error) {
+        setError(data.error || 'Error al agregar la dirección');
+        return;
+      }
+
+      // Actualizar el estado del usuario para mostrar la nueva dirección
+      setUsuario((prevUsuario) => ({
+        ...prevUsuario,
+        direcciones: [...(prevUsuario.direcciones || []), direccion],
+      }));
+
+      setMensaje('Dirección añadida correctamente');
+      setNuevaDireccion(''); // Limpiar el campo de entrada
+      setError(''); // Limpiar cualquier mensaje de error
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      setError('Error al agregar la dirección');
+    }
+    console.log(usuario.direcciones)
+  };
+
+  return (
+    <>
+    <Header1/>
+    <div className='ContenedorUser'>
+      {usuario ? (
+        <div>
+          <h1>
+            {usuario.nombre} {usuario.apellidoPaterno} {usuario.apellidoMaterno}
+          </h1>
+          <p>Correo: {usuario.correo}</p>
+          <p>Teléfono: {usuario.telefono}</p>
+          <p>DNI: {usuario.dni}</p>
+          <p>Te uniste el: {usuario.fechaRegistro}</p>
+
+          <h3>Direcciones</h3>
+          {usuario.direcciones && usuario.direcciones.length > 0 ? (
+            usuario.direcciones.map((direccion, index) => (
+              <div key={index} className="direccion-item">
+                <p>{direccion}</p>
+              </div>
+            ))
+          ) : (
+            <p>No hay direcciones registradas.</p>
+          )}
+
+          <div className="agregar-direccion">
+            <input
+              type="text"
+              value={nuevaDireccion}
+              onChange={(e) => setNuevaDireccion(e.target.value)}
+              placeholder="Ingresa una nueva dirección"
+            />
+            <button onClick={agregarDireccion}>Agregar Dirección</button>
+          </div>
+
+          {error && <p className="error">{error}</p>}
+          {mensaje && <p className="mensaje">{mensaje}</p>}
+        </div>
+      ) : (
+        <p>Cargando...</p>
+      )}
+
+      <br/>
+      <br/>
+      <a href='/'>Regresar al inicio</a>
+    </div>
+    </>
+  );
+};
+
+
+export default PerfilUsuario;

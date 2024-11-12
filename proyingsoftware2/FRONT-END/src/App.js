@@ -30,6 +30,7 @@ import RestablecerContraseñaBotica from './PAGINAS/USUARIO_BOTICA/Recuperar Con
 
 import RegisBotica from './PAGINAS/USUARIO_BOTICA/Registro_Botica.js'
 import RegisAdmin from './PAGINAS/ADMINISTRADOR/RegisAdmin.js'
+import PerfilUsuario from './PAGINAS/PerfilUsuario/PerfilUser.jsx';
 
 function App() {
   return (
@@ -69,6 +70,8 @@ function App() {
             <Route path='/RegisAdmin' element={<RegisAdmin/>}/>
             <Route path='/RecuperarContraseñaBotica' element={<RecuperarContraseñaBotica/>}/>
             <Route path='/RestablecerContraseñaBotica' element={<RestablecerContraseñaBotica/>}/>
+            <Route path="/perfil/:id" element={<PerfilUsuario />} />
+            
           </Routes>
         </Box>
        
