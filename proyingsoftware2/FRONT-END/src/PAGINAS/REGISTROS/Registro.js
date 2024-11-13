@@ -80,6 +80,9 @@ const Registro = () => {
       <Header2 />
       <section id="Cuerpo">
         <article id="WallpaperIzquierda">
+          <br/>
+          <br/>
+          <br/> 
           <h2>DosisXtra</h2>
           <p>“Tu salud, nuestra prioridad. Llevamos bienestar hasta tu puerta”</p>
         </article>

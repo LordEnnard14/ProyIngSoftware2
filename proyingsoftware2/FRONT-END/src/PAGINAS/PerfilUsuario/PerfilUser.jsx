@@ -30,47 +30,40 @@ const PerfilUsuario = () => {
 
   // Función para manejar la adición de una nueva dirección
   const agregarDireccion = async () => {
-    const direccion = nuevaDireccion.trim(); // Eliminar espacios en blanco al inicio y al final
+    const direccion = nuevaDireccion.trim();
     if (!direccion) {
-      setError('Por favor ingresa una dirección');
-      return;
+        setError('Por favor ingresa una dirección');
+        return;
     }
 
     try {
-      const response = await fetch(`http://localhost:4000/api/usuarios/direcciones/${id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nuevaDireccion: direccion }),
-      });
+        const response = await fetch(`http://localhost:4000/api/usuarios/${id}/direcciones`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nuevaDireccion: direccion }),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Error en la respuesta:', errorData);
-        setError('Error al agregar dirección');
-        return;
-      }
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error('Error en la respuesta:', errorData);
+            setError('Error al agregar dirección');
+            return;
+        }
 
-      const data = await response.json();
-      if (data.error) {
-        setError(data.error || 'Error al agregar la dirección');
-        return;
-      }
+        const data = await response.json();
+        setUsuario((prevUsuario) => ({
+            ...prevUsuario,
+            direcciones: data.direcciones,
+        }));
 
-      // Actualizar el estado del usuario para mostrar la nueva dirección
-      setUsuario((prevUsuario) => ({
-        ...prevUsuario,
-        direcciones: [...(prevUsuario.direcciones || []), direccion],
-      }));
-
-      setMensaje('Dirección añadida correctamente');
-      setNuevaDireccion(''); // Limpiar el campo de entrada
-      setError(''); // Limpiar cualquier mensaje de error
+        setMensaje('Dirección añadida correctamente');
+        setNuevaDireccion('');
+        setError('');
     } catch (error) {
-      console.error('Error en la solicitud:', error);
-      setError('Error al agregar la dirección');
+        console.error('Error en la solicitud:', error);
+        setError('Error al agregar la dirección');
     }
-    console.log(usuario.direcciones)
-  };
+};
 
   return (
     <>
@@ -113,10 +106,6 @@ const PerfilUsuario = () => {
       ) : (
         <p>Cargando...</p>
       )}
-
-      <br/>
-      <br/>
-      <a href='/'>Regresar al inicio</a>
     </div>
     </>
   );

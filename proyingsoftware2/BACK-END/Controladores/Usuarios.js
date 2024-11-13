@@ -140,39 +140,32 @@ router.put('/restablecerContrasena', async (req, res) => {
 });
 
 
-router.post("/direcciones/:id", async (req, res) => {
+router.post('/:id/direcciones', async (req, res) => {
   const { id } = req.params;
   const { nuevaDireccion } = req.body;
 
   try {
-    if (!nuevaDireccion || nuevaDireccion.trim().length === 0) {
-      return res.status(400).json({ error: "La dirección no puede estar vacía" });
-    }
+      if (!nuevaDireccion || nuevaDireccion.trim().length === 0) {
+          return res.status(400).json({ error: "La dirección no puede estar vacía" });
+      }
 
-    const usuario = await Usuario.findByPk(id);
+      const usuario = await Usuario.findByPk(id);
 
-if (!usuario) {
-  return res.status(404).json({ error: "Usuario no encontrado" });
-}
+      if (!usuario) {
+          return res.status(404).json({ error: "Usuario no encontrado" });
+      }
 
-const direcciones = usuario.direcciones || [];  // Asegúrate de que sea un array
-if (direcciones.length >= 3) {
-  return res.status(400).json({ error: "No puedes tener más de 3 direcciones" });
-}
+      // Agrega la nueva dirección al array de direcciones
+      usuario.direcciones = [...(usuario.direcciones || []), nuevaDireccion];
 
-// Agregar la nueva dirección al array
-direcciones.push(nuevaDireccion);
-
-usuario.direcciones = direcciones;  // Asigna el array actualizado
-
-await usuario.save();  // Guarda los cambios
-res.json({ direcciones: usuario.direcciones });  // Devuelve las direcciones actualizadas
-
+      await usuario.save();
+      res.json({ direcciones: usuario.direcciones });
   } catch (error) {
-    console.error("Error al agregar dirección:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+      console.error("Error al agregar dirección:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
 
 
 /*

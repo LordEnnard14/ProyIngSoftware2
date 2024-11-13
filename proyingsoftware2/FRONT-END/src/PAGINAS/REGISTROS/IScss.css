@@ -26,7 +26,7 @@
 
 .divolvide {
     display: flex;  /* Hacer que sea un contenedor flexible */
-    justify-content: center;  /* Centrar el contenido horizontalmente */
+    justify-content:end;  /* Centrar el contenido horizontalmente */
     margin-bottom: 35px;
 }
 
@@ -34,6 +34,7 @@
     color: aliceblue;
     cursor: pointer;
     text-align: center;
+    
 }
 
 .RA {
