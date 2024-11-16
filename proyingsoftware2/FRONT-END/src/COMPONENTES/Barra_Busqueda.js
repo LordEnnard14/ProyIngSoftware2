@@ -18,7 +18,7 @@ const BarradeBusqueda = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, maxWidth: '370px' }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, maxWidth: '370px', backgroundColor:'white', borderRadius: '20px' }}>
       <TextField
         variant="outlined"
         placeholder="Busca productos por nombre..."
@@ -32,9 +32,9 @@ const BarradeBusqueda = () => {
               onClick={handleSearch}
               sx={{ 
                 borderRadius: '50%',
-                backgroundColor: '#567C8D', 
+                backgroundColor: '#d7e8ff', 
                 '&:hover': {
-                  backgroundColor: '#4a6a7d', 
+                  backgroundColor: '#5f9fbf', 
                 },
                 width: '40px', 
                 height: '30px', 
@@ -43,7 +43,7 @@ const BarradeBusqueda = () => {
                 border: 'none',         
               }}
             >
-              <SearchIcon sx={{ color: '#ffffff' }} />
+              <SearchIcon sx={{ color: '#1f364c' }} />
             </IconButton>
           ),
         }}

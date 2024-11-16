@@ -7,11 +7,11 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 
-
 const Conteiner = styled(Box)(({ theme }) => ({
-  backgroundColor: '#C8D9E6', 
+  background: 'linear-gradient(to right, #bcd1f1, #C8D9E6)', 
   padding: theme.spacing(4),
   display: 'flex',
+  height: '150px',
   justifyContent: 'space-between',
   [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
@@ -24,30 +24,41 @@ const Columnas = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   margin: theme.spacing(2),
+  color: '#ffffff',
 }));
 
 const Titulo_Columnas = styled(Typography)(({ theme }) => ({
-  fontFamily: 'Arial, sans-serif', 
-  color: '#000000', 
+  fontFamily: 'Arial, sans-serif',
+  color: '#333333', // Color del título
+  fontWeight: 'bold',
+  marginBottom: theme.spacing(1),
 }));
 
 const Texto_Columnas = styled(Typography)(({ theme }) => ({
-  fontFamily: 'Arial, sans-serif', 
-  color: '#000000', 
+  fontFamily: 'Arial, sans-serif',
+  color: '#666666', // Color del texto
 }));
 
 const Subrayado = styled(Link)(({ theme }) => ({
-  fontFamily: 'Arial, sans-serif', 
-  color: '#000000', 
+  fontFamily: 'Arial, sans-serif',
+  color: '#555555',
   cursor: 'pointer',
-  underline: 'hover',
+  textDecoration: 'none',
+  margin: theme.spacing(0.5, 0),
   '&:hover': {
-    color: '#000000', 
+    color: '#000000', // Color en hover
+    textDecoration: 'underline',
+  },
+}));
+
+const FooterIconButton = styled(IconButton)(({ theme }) => ({
+  color: '#555555',
+  '&:hover': {
+    color: '#1976d2', // Color en hover para los íconos
   },
 }));
 
 const Footer = () => {
-
   const navigate = useNavigate();
 
   const handleNavigate = (path, section) => {
@@ -68,67 +79,47 @@ const Footer = () => {
         <Texto_Columnas variant="body2" gutterBottom>
           © 2010 – 2020
         </Texto_Columnas>
-        <Subrayado href="#" underline="hover">
-          Privacy - Terms
-        </Subrayado> 
+        <Subrayado href="#">Privacy - Terms</Subrayado>
       </Columnas>
       <Columnas>
         <Titulo_Columnas variant="h6" gutterBottom>
           Cuenta
         </Titulo_Columnas>
-        <Subrayado href="/iniciarsesion" underline="hover">
-          Login
-        </Subrayado>
-        <Subrayado href="/registrar" underline="hover">
-          Registro
-        </Subrayado>
-        <Subrayado href="/carritocompra" underline="hover">
-          Carrito
-        </Subrayado>
+        <Subrayado href="/iniciarsesion">Login</Subrayado>
+        <Subrayado href="/registrar">Registro</Subrayado>
+        <Subrayado href="/carritocompra">Carrito</Subrayado>
       </Columnas>
       <Columnas>
         <Titulo_Columnas variant="h6" gutterBottom>
           Productos
         </Titulo_Columnas>
-        <Subrayado  underline="hover" onClick={() => handleNavigate('/', 'vendidos')}>
-          Más Vendidos
-        </Subrayado>
-        <Subrayado  underline="hover" onClick={() => handleNavigate('/', 'nuevos')}>
-          Nuevos
-        </Subrayado>
-        <Subrayado  underline="hover" onClick={() => handleNavigate('/', 'ofertas')}>
-          Ofertas
-        </Subrayado>
+        <Subrayado onClick={() => handleNavigate('/', 'vendidos')}>Más Vendidos</Subrayado>
+        <Subrayado onClick={() => handleNavigate('/', 'nuevos')}>Nuevos</Subrayado>
+        <Subrayado onClick={() => handleNavigate('/', 'ofertas')}>Ofertas</Subrayado>
       </Columnas>
       <Columnas>
         <Titulo_Columnas variant="h6" gutterBottom>
           Ayuda
         </Titulo_Columnas>
-        <Subrayado href="/acercadenosotros" underline="hover">
-          Acerca de Nosotros
-        </Subrayado>
-        <Subrayado href="/politicaenvio" underline="hover">
-          Política de Envío
-        </Subrayado>
-        <Subrayado href="/faq" underline="hover">
-          FAQ
-        </Subrayado>
+        <Subrayado href="/acercadenosotros">Acerca de Nosotros</Subrayado>
+        <Subrayado href="/politicaenvio">Política de Envío</Subrayado>
+        <Subrayado href="/faq">FAQ</Subrayado>
       </Columnas>
       <Columnas>
-        <Box display="flex" justifyContent="center">
-          <IconButton href="https://www.facebook.com" color="inherit">
-            <FacebookIcon />
-          </IconButton>
-          <IconButton href="https://www.instagram.com" color="inherit">
-            <InstagramIcon />
-          </IconButton>
-          <IconButton href="https://twitter.com/home" color="inherit">
-            <TwitterIcon />
-          </IconButton>
-          <IconButton href="https://www.youtube.com" color="inherit">
-            <YouTubeIcon />
-          </IconButton>
-        </Box>
+      <Box display="flex" justifyContent="center" marginTop="20px">
+        <FooterIconButton href="https://www.facebook.com">
+          <FacebookIcon sx={{ fontSize: 35 }} /> 
+        </FooterIconButton>
+        <FooterIconButton href="https://www.instagram.com">
+          <InstagramIcon sx={{ fontSize: 35 }} />
+        </FooterIconButton>
+        <FooterIconButton href="https://twitter.com/home">
+          <TwitterIcon sx={{ fontSize: 35 }} />
+        </FooterIconButton>
+        <FooterIconButton href="https://www.youtube.com">
+          <YouTubeIcon sx={{ fontSize: 35 }} />
+        </FooterIconButton>
+      </Box>
       </Columnas>
     </Conteiner>
   );

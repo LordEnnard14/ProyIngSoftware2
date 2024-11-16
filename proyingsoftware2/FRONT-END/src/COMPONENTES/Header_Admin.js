@@ -52,7 +52,7 @@ const Header_Admin = () => {
             </Box>
 
             <Grow in={true} timeout={1000}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color:'white' }}>
                 {usuarioNombre ? `Bienvenido, ${usuarioNombre}` : 'Modo administrador'}
               </Typography>
             </Grow>

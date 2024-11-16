@@ -12,6 +12,9 @@ import Slide from '@mui/material/Slide';
 import Grow from '@mui/material/Grow';
 import Typography from '@mui/material/Typography';
 import BarraBusqueda from './Barra_Busqueda';
+import logoDosisXtra from '../imagenes/Logo/Logo_DosisXtra.png';
+
+
 
 const Barra = styled('div')(({ theme }) => ({
   flexGrow: 1,
@@ -128,18 +131,19 @@ const Header1 = () => {
   return (
     <Barra>
       <Slide direction="down" in={true} mountOnEnter unmountOnExit>
-        <AppBar position="static" sx={{ backgroundColor: '#FFFFFF' }} elevation={4}>
+        <AppBar position="static" sx={{ backgroundColor: '#5f9fbf', paddingTop:'6px',paddingBottom:'6px' }} elevation={4}>
           <Toolbar>
-            <Grow in={true} timeout={500}>
-              <Titulo_Boton onClick={() => handleNavigate('/')}>
-                DosisXtra
-              </Titulo_Boton>
-            </Grow>
+          <Grow in={true} timeout={500}>
+            <Titulo_Boton onClick={() => handleNavigate('/')} sx={{ fontSize: '28px', color: 'white', display: 'flex', alignItems: 'center' }}>
+              <img src={logoDosisXtra} alt="Logo DosisXtra" style={{ width: '52px', marginRight: '10px' }} />
+              DosisXtra
+            </Titulo_Boton>
+          </Grow>
             <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', mx: 2 }}>
               <BarraBusqueda />
             </Box>
 
-            <IconButton onClick={() => handleNavigate('/CarritoCompras')} sx={{ color: '#2F4156' }}>
+            <IconButton onClick={() => handleNavigate('/CarritoCompras')} sx={{ color: 'white' }}>
               <ShoppingCartIcon />
               {cartItemCount > 0 && (
                 <Box
@@ -164,31 +168,31 @@ const Header1 = () => {
             </IconButton>
 
             <Grow in={true} timeout={1300}>
-              <Navegar onClick={() => handleNavigate('/ayuda')}>
-                Ayuda
+              <Navegar onClick={() => handleNavigate('/ayuda')} sx={{color: 'white'}}>
+                <strong>Ayuda</strong>
               </Navegar>
             </Grow>
 
             {loggedIn ? (
               <>
                 <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: 2 }}>
-                  <Typography sx={{ color: '#000000', marginRight: 1, cursor: 'pointer' }} onClick={handleProfileClick}>
+                  <Typography sx={{ color: 'white', marginRight: 1, cursor: 'pointer',  }} onClick={handleProfileClick}>
                     {userName}
                   </Typography>
-                  <IconButton onClick={handleProfileClick} sx={{ color: '#000000' }}>
+                  <IconButton onClick={handleProfileClick} sx={{ color: 'white', height: '50px' }}>
                     <AccountCircleIcon />
                   </IconButton>
                 </Box>
                 <Button
                   variant="outlined"
-                  sx={{ marginLeft: 2, color: '#567C8D', borderColor: '#567C8D' }}
+                  sx={{ marginLeft: 2, color: '#567C8D', borderColor: '#28639b' , color: 'white'}}
                   onClick={() => handleNavigate('/MisOrdenes')}
                 >
                   Ver mis ordenes
                 </Button>
                 <Button
                   variant="contained"
-                  sx={{ marginLeft: 2, backgroundColor: '#567C8D', color: '#ffffff' }}
+                  sx={{ marginLeft: 2, backgroundColor: '#0b559c', color: '#ffffff' }}
                   onClick={handleLogout}
                 >
                   Cerrar Sesión

@@ -21,7 +21,7 @@ const ContenidoPaginaBusqueda = (props) => {
             justifyContent: 'flex-start',
             boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.1)',
             padding: '20px',
-            borderRadius: '10px',
+            borderRadius: '10px'
           }}
           elevation={3}
         >
@@ -88,7 +88,7 @@ const ContenidoPaginaBusqueda = (props) => {
               color: '#4CAF50',
               fontWeight: 'bold',
               fontSize: '18px',
-              marginBottom: '10px',
+              marginBottom: '30px',
             }}
           >
             S/. {caractProducto.precio.toFixed(2)}
@@ -99,7 +99,7 @@ const ContenidoPaginaBusqueda = (props) => {
             color="primary"
             sx={{
               borderRadius: '20px',
-              backgroundColor: '#4a6a7d',
+              backgroundColor: '#5f9fbf',
               width: '80%', 
               padding: '8px 16px', 
               margin: '0 auto', 

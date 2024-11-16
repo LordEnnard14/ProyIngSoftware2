@@ -1,4 +1,3 @@
-// Archivo: Controladores/Productos.js
 import express from "express";
 import {Producto, Marca, Botica, ProductoDetalle} from "../models/Relaciones.js";
 import { Op } from "sequelize";
@@ -184,47 +183,106 @@ router.get('/stockProductosAll', async (req, res) => {
   });
   
 
-  router.get('/searchStockProductos', async (req, res) => {
-    const query = req.query.query ? req.query.query.toLowerCase() : ''; // Obtener el término de búsqueda y convertirlo a minúsculas
-  
+  //EndPoint para traer todos los Productos registrados en la base de Datos 
+  router.get('/productos', async (req, res) => {
     try {
-      const stockProductos = await StockProducto.findAll({
-        include: [
-          {
-            model: Producto,
-            include: [
-              {
-                model: Marca,
-                attributes: ['id', 'nombre'] 
-              },
-              {
-                model: Botica,
-                attributes: ['id', 'nombre', 'direccion'] 
-              }
-            ],
-            attributes: ['id', 'nombre', 'presentacion', 'imageUrl'],
-            where: {
-              nombre: {
-                [Op.iLike]: `%${query}%` // Búsqueda insensible a mayúsculas/minúsculas por nombre del producto
-              }
-              
-            }
-            
-          },
-          
-        ]
-      });
-  
-      if (stockProductos.length > 0) {
-        res.json(stockProductos); // Devolver los productos encontrados
-      } else {
-        res.status(404).json({ message: 'No se encontraron productos que coincidan con la búsqueda.' });
+      // Obtenemos todos los productos de la base de datos
+      const productos = await Producto.findAll();
+      
+      // Si no hay productos, devolvemos un mensaje de error
+      if (productos.length === 0) {
+        return res.status(404).json({ message: "No se encontraron productos." });
       }
+  
+      // Devolvemos los productos como respuesta JSON
+      res.status(200).json(productos);
     } catch (error) {
-      console.error("Error al buscar stock de productos:", error);
-      res.status(500).json({ error: "Error al buscar los stock de productos." });
+      console.error('Error al obtener productos:', error);
+      res.status(500).json({ message: "Error al obtener los productos", error });
     }
   });
+  
+  
+
+/*router.get('/categoria/:categoria', async (req, res) => {
+  try {
+    const { categoria } = req.params;
+
+    // Obtenemos los productos y sus detalles asociados
+    const productos = await Producto.findAll({
+      where: {
+        categoria: {
+          [Op.contains]: [categoria],
+        },
+      },
+      include: [
+        {
+          model: ProductoDetalle, 
+          as: 'ProductoDetalle', 
+          attributes: ['descripcion', 'caracteristicas', 'imageUrl', 'cantidad', 'precio'],
+        }
+      ],
+    });
+
+    res.json(productos);
+  } catch (error) {
+    console.error("Error al obtener los productos por categoría:", error);
+    res.status(500).json({ message: "Error al obtener los productos", error: error.message });
+  }
+});*/
+
+router.get('/categoria/:categoria', async (req, res) => {
+  try {
+    const { categoria } = req.params;
+
+    // Obtenemos los productos, sus detalles asociados, y datos de Marca y Botica
+    const productos = await Producto.findAll({
+      where: {
+        categoria: {
+          [Op.contains]: [categoria],
+        },
+      },
+      include: [
+        {
+          model: ProductoDetalle,
+          as: 'ProductoDetalle',
+          attributes: ['descripcion', 'caracteristicas', 'imageUrl', 'cantidad', 'precio'],
+          include: [
+            {
+              model: Botica, // Incluye datos de Botica desde ProductoDetalle
+              attributes: ['nombre', 'direccion', 'horarioAbre', 'horarioCierre'],
+            },
+          ],
+        },
+        {
+          model: Marca, // Incluye datos de Marca directamente desde Producto
+          attributes: ['nombre'],
+        },
+      ],
+    });
+
+    res.json(productos);
+  } catch (error) {
+    console.error("Error al obtener los productos por categoría:", error);
+    res.status(500).json({ message: "Error al obtener los productos", error: error.message });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+  
   
 
 

@@ -4,21 +4,25 @@ import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 
 const NavegacionMedicinas = () => {
   const navigate = useNavigate();
-
+  
+  const handleCategoryClick = (categoria) => {
+    navigate(`/productos/categoria/${categoria}`); 
+  };
+  
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#EBF3FF', height: '30px' }}>
+    <AppBar position="static" sx={{ backgroundColor: '#ebf3ff', height: '30px' }}>
       <Toolbar>
         <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
-          <Button sx={{color: '#223D53', mx: 2 }} onClick={() => navigate('/BusquedaMedicina?categoria=Medicamentos')}>
+          <Button sx={{ color: '#223D53', mx: 2 }} onClick={() => handleCategoryClick('Medicamentos')}>
             <Typography variant="button"><b>Medicamentos</b></Typography>
           </Button>
-          <Button sx={{color: '#223D53', mx: 2 }} onClick={() => navigate('/BusquedaMedicina?categoria=Adulto Mayor')}>
+          <Button sx={{ color: '#223D53', mx: 2 }} onClick={() => handleCategoryClick('Adulto Mayor')}>
             <Typography variant="button"><b>Adulto Mayor</b></Typography>
           </Button>
-          <Button sx={{color: '#223D53', mx: 2 }} onClick={() => navigate('/BusquedaMedicina?categoria=Infantil')}>
+          <Button sx={{ color: '#223D53', mx: 2 }} onClick={() => handleCategoryClick('Infantil')}>
             <Typography variant="button"><b>Infantil</b></Typography>
           </Button>
-          <Button sx={{color: '#223D53', mx: 2 }} onClick={() => navigate('/BusquedaMedicina?categoria=Vitaminas')}>
+          <Button sx={{ color: '#223D53', mx: 2 }} onClick={() => handleCategoryClick('Vitaminas y Suplementos')}>
             <Typography variant="button"><b>Vitaminas y Suplementos</b></Typography>
           </Button>
         </Box>
@@ -28,3 +32,9 @@ const NavegacionMedicinas = () => {
 };
 
 export default NavegacionMedicinas;
+
+
+
+
+
+

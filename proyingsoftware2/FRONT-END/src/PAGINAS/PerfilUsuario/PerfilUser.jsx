@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './PerfilUserCss.css';
 import Header1 from '../../COMPONENTES/Header_Principal';
+import Footer from '../../COMPONENTES/Footer_Principal';
 
 const PerfilUsuario = () => {
   const { id } = useParams();
@@ -107,6 +108,7 @@ const PerfilUsuario = () => {
         <p>Cargando...</p>
       )}
     </div>
+    <Footer />
     </>
   );
 };

@@ -13,13 +13,13 @@ import DetallesProductos from './PAGINAS/BUSCAR_MEDICINAS/Detalles';
 import ResultadoBusqueda from './PAGINAS/BUSCAR_MEDICINAS/Resultado_Busqueda';
 import CarritoCompras from './PAGINAS/CARRITO_COMPRAS/CarritoCompras';
 import PaginaPago from './PAGINAS/CARRITO_COMPRAS/PaginaPago';
-//Vistas de administrador
+// Vistas de administrador
 import Dashboard from './PAGINAS/ADMINISTRADOR/Dashboard';
-import OrdenesUsuario from './PAGINAS/ADMINISTRADOR/OrdenesUsuario'
-import AgregarProducto from './PAGINAS/ADMINISTRADOR/AgregarProducto'
-import ListaUsuarios from './PAGINAS/ADMINISTRADOR/ListaUsuarios'
-import ListaProductos from './PAGINAS/ADMINISTRADOR/ListaProductos'
-//Vistas de Botica
+import OrdenesUsuario from './PAGINAS/ADMINISTRADOR/OrdenesUsuario';
+import AgregarProducto from './PAGINAS/ADMINISTRADOR/AgregarProducto';
+import ListaUsuarios from './PAGINAS/ADMINISTRADOR/ListaUsuarios';
+import ListaProductos from './PAGINAS/ADMINISTRADOR/ListaProductos';
+// Vistas de Botica
 import AgregarProductoBotica from './PAGINAS/USUARIO_BOTICA/AgregarProductoBotica';
 import DashboardBotica from './PAGINAS/USUARIO_BOTICA/DashboardBotica';
 import ListaProductosBotica from './PAGINAS/USUARIO_BOTICA/ListaProductoBotica';
@@ -28,9 +28,10 @@ import InicioSesionBotica from './PAGINAS/USUARIO_BOTICA/Inicio Sesion/InicioSes
 import RecuperarContraseñaBotica from './PAGINAS/USUARIO_BOTICA/Recuperar Contraseña/RecuperarContraseñaBotica.js';
 import RestablecerContraseñaBotica from './PAGINAS/USUARIO_BOTICA/Recuperar Contraseña/RestablecerContraseñaBotica.js';
 
-import RegisBotica from './PAGINAS/USUARIO_BOTICA/Registro_Botica.js'
-import RegisAdmin from './PAGINAS/ADMINISTRADOR/RegisAdmin.js'
+import RegisBotica from './PAGINAS/USUARIO_BOTICA/Registro_Botica.js';
+import RegisAdmin from './PAGINAS/ADMINISTRADOR/RegisAdmin.js';
 import PerfilUsuario from './PAGINAS/PerfilUsuario/PerfilUser.jsx';
+import ProductosCategoria from './PAGINAS/PRODUCTOS_CATEGORIA/ProductosCategoria.jsx';
 
 function App() {
   return (
@@ -71,13 +72,13 @@ function App() {
             <Route path='/RecuperarContraseñaBotica' element={<RecuperarContraseñaBotica/>}/>
             <Route path='/RestablecerContraseñaBotica' element={<RestablecerContraseñaBotica/>}/>
             <Route path="/perfil/:id" element={<PerfilUsuario />} />
-            
+            <Route path="/productos/categoria/:categoria" element={<ProductosCategoria />} />
           </Routes>
         </Box>
-       
       </Box>
     </Router>
   );
 }
 
 export default App;
+
