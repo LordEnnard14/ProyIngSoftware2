@@ -33,6 +33,9 @@ import RegisAdmin from './PAGINAS/ADMINISTRADOR/RegisAdmin.js';
 import PerfilUsuario from './PAGINAS/PerfilUsuario/PerfilUser.jsx';
 import ProductosCategoria from './PAGINAS/PRODUCTOS_CATEGORIA/ProductosCategoria.jsx';
 
+import InicioSesionSuperAdmin from './PAGINAS/ADMIN PRO/InicioSesionSuperAdmin.js';
+
+
 function App() {
   return (
     <Router>
@@ -71,6 +74,7 @@ function App() {
             <Route path='/RegisAdmin' element={<RegisAdmin/>}/>
             <Route path='/RecuperarContraseñaBotica' element={<RecuperarContraseñaBotica/>}/>
             <Route path='/RestablecerContraseñaBotica' element={<RestablecerContraseñaBotica/>}/>
+            <Route path='/InicioSesionSuperAdmin' element={<InicioSesionSuperAdmin />} />
             <Route path="/perfil/:id" element={<PerfilUsuario />} />
             <Route path="/productos/categoria/:categoria" element={<ProductosCategoria />} />
           </Routes>

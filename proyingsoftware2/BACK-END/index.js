@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import "./Models/Relaciones.js"
 import sequelize from "./Database/database.js"; 
 import FacadeRutas from "./FacadeRutas.js";
-import AdminMaestro from "./Models/AdminGeneral.js";
+
 
 const app = express();
 const port = process.env.PORT || 4000;
