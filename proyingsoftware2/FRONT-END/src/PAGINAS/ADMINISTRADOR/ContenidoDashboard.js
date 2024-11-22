@@ -10,13 +10,7 @@ const ContenidoDashboard = () => {
         </Paper>
       </Grid>
 
-      <Grid item xs={12} md={4}>
-        <Paper elevation={4} sx={{ backgroundColor: '#D6E9FE', padding: 4, textAlign: 'center' }}>
-          <Typography variant="h3" sx={{ fontWeight: 'bold' }}>69</Typography>
-          <Typography variant="body1">Usuarios nuevos</Typography>
-        </Paper>
-      </Grid>
-
+      
       <Grid item xs={12} md={4}>
         <Paper elevation={4} sx={{ backgroundColor: '#D6E9FE', padding: 4, textAlign: 'center' }}>
           <Typography variant="h3" sx={{ fontWeight: 'bold' }}>69</Typography>

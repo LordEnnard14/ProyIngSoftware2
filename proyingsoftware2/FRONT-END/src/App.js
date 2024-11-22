@@ -36,6 +36,8 @@ import ProductosCategoria from './PAGINAS/PRODUCTOS_CATEGORIA/ProductosCategoria
 
 import InicioSesionSuperAdmin from './PAGINAS/ADMIN PRO/InicioSesionSuperAdmin.js';
 
+import DashboardSuperAdmin from './PAGINAS/ADMIN PRO/DashboardSuperAdmin.js';
+
 
 function App() {
   return (
@@ -72,6 +74,7 @@ function App() {
             <Route path='/ListaProductosBotica' element={<ListaProductosBotica/>}/>
             <Route path='/OrdenesBotica' element={<OrdenesBotica/>}/>
             <Route path='/InicioSesionBotica' element={<InicioSesionBotica/>}/>
+            <Route path='/DashboardSuperAdmin' element={<DashboardSuperAdmin/>}/>
             <Route path='/RegisBotica' element={<RegisBotica/>}/>
             <Route path='/RegisAdmin' element={<RegisAdmin/>}/>
             <Route path='/RecuperarContraseñaBotica' element={<RecuperarContraseñaBotica/>}/>
