@@ -9,8 +9,6 @@ const RestablecerContraseña = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
-  const { email } = location.state || {};
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,7 +17,7 @@ const RestablecerContraseña = () => {
       setError('Las contraseñas no coinciden');
       return;
     }
-
+    const email = localStorage.getItem('recuperacion');
     try {
       // Petición para actualizar la contraseña en el backend
       const response = await fetch('http://localhost:4000/api/usuarios/restablecerContrasena', {

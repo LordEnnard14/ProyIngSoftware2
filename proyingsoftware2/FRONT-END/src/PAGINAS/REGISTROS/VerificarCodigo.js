@@ -15,20 +15,28 @@ const VerificarCodigo = () => {
             return;
         }
         const correo = localStorage.getItem('correo');
-        
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
         if (!correo) {
         setErrorMessage('No se encontró el correo en el almacenamiento');
         return;
         }
-        console.log("Correo en local Storage: ",correo);
         try {
             const response = await fetch('http://localhost:4000/api/usuarios/verificarCodigo', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ codigo:codigo, correo:correo }),              
+                body: JSON.stringify({ nombre: usuario.nombre,
+                    apellidoPaterno: usuario.apellidoPaterno,
+                    apellidoMaterno: usuario.apellidoMaterno,
+                    password: usuario.password,
+                    codigo:codigo, 
+                    correo:correo,
+                    telefono: usuario.telefono,
+                    dni: usuario.dni
+                 }),              
             });
 
             if (response.ok) {
+                alert("Se ha verificado su cuenta de forma exitosa");
                 console.log('Código verificado exitosamente');
                 navigate('/InicioSesion');
             } else {

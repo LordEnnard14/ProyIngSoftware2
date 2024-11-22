@@ -6,6 +6,7 @@ import InicioSesion from './PAGINAS/REGISTROS/InicioSesion';
 import Registro from './PAGINAS/REGISTROS/Registro';
 import VerificarCodigo from './PAGINAS/REGISTROS/VerificarCodigo';
 import RecuperarContraseña from './PAGINAS/REGISTROS/RecuperarContraseña';
+import CodigoContraseña from './PAGINAS/REGISTROS/CodigoContraseña';
 import RestablecerContraseña from './PAGINAS/REGISTROS/RestablecerContraseña';
 import MisOrdenes from './PAGINAS/ORDENES/MisOrdenes';
 import BusquedaMedicina from './PAGINAS/BUSCAR_MEDICINAS/BusquedaMedicina';
@@ -56,6 +57,7 @@ function App() {
             <Route path="/Registro" element={<Registro />} />
             <Route path="/VerificarCodigo" element={<VerificarCodigo/>}/>
             <Route path="/RecuperarContraseña" element={<RecuperarContraseña />} />
+            <Route path="/CodigoContraseña" element={<CodigoContraseña />} />
             <Route path="/RestablecerContraseña" element={<RestablecerContraseña />} />
             <Route path="/MisOrdenes" element={<MisOrdenes/>}/>
             <Route path="/BusquedaMedicina" element={<BusquedaMedicina />} />
