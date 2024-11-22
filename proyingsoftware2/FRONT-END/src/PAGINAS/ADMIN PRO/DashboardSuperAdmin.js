@@ -31,21 +31,22 @@ const DashboardSuperAdmin = () => {
       }
     };
 
-    const fetchAdminInfo = async () => {
+    const fetchAdminInfo = () => {
       try {
-        const respuesta = await fetch('http://localhost:4000/api/adminMaestro/obtenerAdminsMaestros');
-        if (respuesta.ok) {
-          const datos = await respuesta.json();
+        const adminData = localStorage.getItem('adminMaestro'); // Obtén el elemento del localStorage
+  
+        if (adminData) {
+          const datos = JSON.parse(adminData); // Convierte el string a un objeto JSON
           setAdminInfo({
-            nombre: datos[0]?.nombre,  // Asumimos que el primer admin es el que se debe mostrar
-            apellido: datos[0]?.apellido,
-            dni: datos[0]?.dni,
+            nombre: datos.nombre || '',  // Asegúrate de que las propiedades existen
+            apellido: datos.apellidoPaterno || '',
+            dni: datos.dni || '',
           });
         } else {
-          console.error('No se pudieron obtener la información del administrador.');
+          console.error('No se encontraron datos en el localStorage para adminMaestro.');
         }
       } catch (error) {
-        console.error('Error al obtener la información del administrador:', error);
+        console.error('Error al leer los datos del localStorage:', error);
       }
     };
 

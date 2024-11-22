@@ -23,13 +23,17 @@ const BarraHorizontalSuperAdmin = () => {
       <AppBar position="static" sx={{ backgroundColor: '#4A90E2', borderRadius: '50px', maxWidth: '400px', width: '100%' }}>
         <Toolbar sx={{ justifyContent: 'center' }}>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            {/* Botón para Dashboard Super Admin */}
+            <BotonNavegacion onClick={() => navigate('/DashboardSuperAdmin')}>
+              Página Principal
+            </BotonNavegacion>
             {/* Botón para Lista Admin */}
             <BotonNavegacion onClick={() => navigate('/ListaAdmin')}>
               Lista Admin
             </BotonNavegacion>
             
             {/* Botón para Lista Usuario */}
-            <BotonNavegacion onClick={() => navigate('/ListaUsuarios')}>
+            <BotonNavegacion onClick={() => navigate('/ListaUsuariosAdmin')}>
               Lista Usuario
             </BotonNavegacion>
           </Box>

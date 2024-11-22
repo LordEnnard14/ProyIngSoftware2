@@ -8,7 +8,7 @@ router.post('/iniciarSesionSuperAdmin', async (req, res) => {
   
     try {
       // Verificar si el correo corresponde al superAdmin en la base de datos
-      const superAdmin = await AdminMaestro.findOne({ where: { correo: 'admin@admin.com' } });
+      const superAdmin = await AdminMaestro.findOne({ where: { correo: correo.toLowerCase() } });
   
       // Si no se encuentra el superAdmin
       if (!superAdmin) {
@@ -27,6 +27,7 @@ router.post('/iniciarSesionSuperAdmin', async (req, res) => {
           id: superAdmin.id,
           nombre: superAdmin.nombre,
           apellidoPaterno: superAdmin.apellidoPaterno,
+          dni: superAdmin.dni,
           esSuperAdmin: true,
         },
       });
@@ -77,7 +78,34 @@ router.post('/iniciarSesionSuperAdmin', async (req, res) => {
     }
   });
 
- 
+
+
+  //Aleksey Chávez 
+  router.get('/listaUsuarios', async (req, res) => {
+    try {
+      const usuarios = await Usuario.findAll(); // Obtiene todos los registros de la tabla Usuario
+      res.json(usuarios); // Envía los datos en formato JSON
+    } catch (error) {
+      console.error('Error al obtener los usuarios:', error);
+      res.status(500).json({ error: 'Error al obtener los usuarios' });
+    }
+  });
+
+  router.get('/listaAdmins', async (req, res) => {
+    try {
+      const admins = await Admin.findAll({
+        include: {
+          model: Botica, // Relación definida entre Admin y Botica
+          attributes: ['id', 'nombre', 'ruc','estado'], // Campos que deseas incluir de Botica
+        },
+      });
+  
+      res.json(admins); // Envía los datos en formato JSON
+    } catch (error) {
+      console.error('Error al obtener los administradores:', error);
+      res.status(500).json({ error: 'Error al obtener los administradores' });
+    }
+  });
 
 
 

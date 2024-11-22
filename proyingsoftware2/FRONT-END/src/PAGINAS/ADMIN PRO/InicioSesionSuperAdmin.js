@@ -21,10 +21,13 @@ const InicioSesionSuperAdmin = () => {
 
       if (response.ok) {
         alert('Inicio de sesión exitoso, BIENVENIDO SUPER ADMIN GOAT');
-        localStorage.setItem('superadmin', JSON.stringify({
+        localStorage.setItem('adminMaestro', JSON.stringify({
           id: data.admin.id,
           nombre: data.admin.nombre,
+          apellidoPaterno: data.admin.apellidoPaterno,
+          dni: data.admin.dni,
         }));
+
         navigate('/DashboardSuperAdmin');
       } else {
         alert(data.message || 'Error en el inicio de sesión');

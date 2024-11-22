@@ -35,9 +35,11 @@ import RegisAdmin from './PAGINAS/ADMINISTRADOR/RegisAdmin.js';
 import PerfilUsuario from './PAGINAS/PerfilUsuario/PerfilUser.jsx';
 import ProductosCategoria from './PAGINAS/PRODUCTOS_CATEGORIA/ProductosCategoria.jsx';
 
+// Vistas Admin Maestro
 import InicioSesionSuperAdmin from './PAGINAS/ADMIN PRO/InicioSesionSuperAdmin.js';
-
 import DashboardSuperAdmin from './PAGINAS/ADMIN PRO/DashboardSuperAdmin.js';
+import ListaAdmin from './PAGINAS/ADMIN PRO/Tablas/Listas_Admin.js';
+import ListaUsuariosAdmin from './PAGINAS/ADMIN PRO/Tablas/Listas_Usuario.js';
 
 
 function App() {
@@ -84,6 +86,8 @@ function App() {
             <Route path='/InicioSesionSuperAdmin' element={<InicioSesionSuperAdmin />} />
             <Route path="/perfil/:id" element={<PerfilUsuario />} />
             <Route path="/productos/categoria/:categoria" element={<ProductosCategoria />} />
+            <Route path="/ListaAdmin" element={<ListaAdmin />} />
+            <Route path="/ListaUsuariosAdmin" element={<ListaUsuariosAdmin />} />
           </Routes>
         </Box>
       </Box>
