@@ -1,8 +1,10 @@
 import express from "express";
 import { Orden, ProductoOrden, Producto, Usuario } from "../Models/Relaciones.js"; 
+import crypto from "crypto";
+import NodeCache from "node-cache";
+import Transporter from "../Services/mail.service.js";
 
 const router = express.Router();
-
 // Endpoint para obtener a todos los usuarios registrados 
 router.get("/", async (req, res) => {
     try {
@@ -32,8 +34,129 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+
+// Usamos un caché en memoria para almacenar códigos de verificación temporalmente
+const myCache = new NodeCache({ stdTTL: 30000 }); // Expira en 10 minutos (600 segundos)
+
+router.post("/registrar", async (req, res) => {
+  try {
+    const { nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni } = req.body;
+
+    // Validaciones de los campos
+    if (!nombre) return res.status(400).json({ message: "El campo 'nombre' es requerido" });
+    if (!correo) return res.status(400).json({ message: "El campo 'correo' es requerido" });
+    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) return res.status(400).json({ message: "Formato de correo inválido" });
+    if (!telefono || telefono.length !== 9) return res.status(400).json({ message: "El campo 'telefono' debe tener 9 dígitos" });
+    if (!dni || dni.length !== 8) return res.status(400).json({ message: "El campo 'dni' debe tener 8 dígitos" });
+
+    // Crear el nuevo usuario
+    const nuevoUsuario = await Usuario.create({
+      nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni
+    });
+
+    // Generar un código de verificación aleatorio
+    const verificationCode = crypto.randomBytes(3).toString("hex"); // Genera un código de 6 dígitos
+
+    console.log("Correo para verificación:", correo);
+    // Almacenar el código de verificación en caché (por ejemplo, por correo)
+    myCache.set(correo, verificationCode); // Asociamos el código con el correo
+    // Verificar si el correo ya tiene un código de verificación en caché
+    const existingCode = myCache.get(correo);
+    console.log("Código existente en caché para este correo:", existingCode);
+
+    // Configurar el correo de verificación
+    const mailOptions = {
+      from: "andriuchg14@gmail.com",
+      to: correo, // El correo del usuario
+      subject: "Código de verificación",
+      text: `Tu código de verificación es: ${verificationCode}`
+    };
+
+    // Enviar el correo
+    await Transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: "Error al enviar el correo de verificación"});
+      }
+      console.log("Correo enviado: " + info.response);
+
+      res.status(201).json({
+        mensaje: "Usuario registrado exitosamente, revisa tu correo para obtener el código de verificación",
+        usuario: nuevoUsuario
+      });
+    });
+
+  } catch (error) {
+    console.error("Error al registrar usuario:", error);
+    res.status(500).json({
+      error: "Error al registrar usuario. Por favor, intenta nuevamente.",
+      detalles: error.message
+    });
+  }
+});
+
+router.post("/verificarCodigo", async (req, res) => {
+  const {codigo, correo } = req.body;
+  try {
+
+    if (!codigo) {
+      return res.status(400).json({ message: "El campo 'código' es requerido" });
+    }
+    // Depurar el valor del correo y código recibido
+    console.log("Verificando código para correo:", correo);
+    console.log("Código recibido:", codigo);
+    console.log("Correo recibido:", correo);
+    // Obtener el código almacenado en la caché
+    const storedCode = myCache.get(correo);
+    // Depurar el valor de la clave almacenada en la caché
+    console.log("Código almacenado en la caché:", storedCode);
+    if (!storedCode) {
+      return res.status(404).json({ message: "No se encontró un código de verificación para este correo" });
+    }
+
+    // Verificar el código
+    if (storedCode !== codigo) {
+      return res.status(400).json({ message: "Código incorrecto" });
+    }
+
+    // El código es correcto, puedes realizar cualquier acción adicional
+    // Ejemplo: Marcar al usuario como verificado en la base de datos si lo deseas.
+
+    res.status(200).json({ message: "Correo verificado correctamente" });
+
+    // Opcional: Eliminar el código de la caché después de su verificación
+    myCache.del(correo);
+
+  } catch (error) {
+    console.error("Error al verificar el código:", error);
+    res.status(500).json({ error: "Error al verificar el código" });
+  }
+});
+
+// Nueva ruta: Cambiar estado de un usuario (activar/inactivar)
+router.patch("/:id/estado", async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body; // Se espera un valor booleano: true (activo) o false (inactivo)
+
+  try {
+      const usuario = await Usuario.findByPk(id);
+
+      if (!usuario) {
+          return res.status(404).json({ mensaje: "Usuario no encontrado" });
+      }
+
+      usuario.estado = estado; // Actualizamos el estado
+      await usuario.save();
+
+      res.json({ mensaje: `Estado actualizado a ${estado ? "activo" : "inactivo"}`, usuario });
+  } catch (error) {
+      console.error("Error al cambiar el estado del usuario:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
 //Este endpoint sirve para poder guardar a un usuario en la base de datos
 //Esto se lleva cabo al registrarse a la página web
+/*
 router.post("/registrar", async (req, res) => {
   try {
       const { nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni } = req.body;
@@ -62,8 +185,7 @@ router.post("/registrar", async (req, res) => {
       });
   }
 });
-
-
+*/
 
 router.post('/iniciarSesion', async (req, res) => {
   const { correo, password } = req.body;
@@ -118,7 +240,6 @@ router.get('/verificarCorreo/:correo', async (req, res) => {
   }
 });
 
-
 //Endpoint que nos va a permitir reestablecer una contraseña para un correo existente
 router.put('/restablecerContrasena', async (req, res) => {
   const { correo, password } = req.body;
@@ -165,61 +286,6 @@ router.post('/:id/direcciones', async (req, res) => {
       res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-
-
-
-/*
-router.get('/:usuarioId/ordenes', async (req, res) => {
-  try {
-    const { usuarioId } = req.params;
-
-    // Verificamos si el usuario existe
-    const usuario = await Usuario.findByPk(usuarioId);
-    if (!usuario) {
-      return res.status(404).json({ message: 'Usuario no encontrado.' });
-    }
-
-    // Buscamos todas las órdenes del usuario
-    const ordenes = await Orden.findAll({
-      where: {
-        usuarioID: usuarioId // Aseguramos que las órdenes pertenezcan al usuario
-      },
-      include: {
-        model: ProductoOrden,
-        include: {
-          model: Producto,
-          attributes: ['nombre'] // Incluimos solo el nombre del producto
-        }
-      }
-    });
-
-    // Verificamos si el usuario tiene órdenes
-    if (ordenes.length === 0) {
-      return res.status(404).json({ message: 'Este usuario no tiene órdenes.' });
-    }
-
-    // Mapeamos las órdenes y productos
-    const resultado = ordenes.map((orden) => ({
-      ordenId: orden.id,
-      productos: orden.ProductoOrdens.map((productoOrden) => ({
-        nombreProducto: productoOrden.Producto.nombre,
-        cantidad: productoOrden.cantidad,
-        precio: productoOrden.precio,
-      }))
-    }));
-
-    // Enviamos la respuesta con todas las órdenes y productos
-    res.json({
-      usuarioId,
-      ordenes: resultado
-    });
-
-  } catch (error) {
-    console.error('Error al obtener las órdenes del usuario:', error);
-    res.status(500).json({ message: 'Error interno del servidor.' });
-  }
-});
-*/
 
 
 export default router;

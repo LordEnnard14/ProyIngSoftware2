@@ -4,6 +4,7 @@ import { Box } from '@mui/material'; // Asegúrate de importar Box desde MUI
 import Eleccion from './PAGINAS/PAG_PRINCIPAL/Eleccion';
 import InicioSesion from './PAGINAS/REGISTROS/InicioSesion';
 import Registro from './PAGINAS/REGISTROS/Registro';
+import VerificarCodigo from './PAGINAS/REGISTROS/VerificarCodigo';
 import RecuperarContraseña from './PAGINAS/REGISTROS/RecuperarContraseña';
 import RestablecerContraseña from './PAGINAS/REGISTROS/RestablecerContraseña';
 import MisOrdenes from './PAGINAS/ORDENES/MisOrdenes';
@@ -51,6 +52,7 @@ function App() {
             <Route path="/" element={<Eleccion />} />
             <Route path="/InicioSesion" element={<InicioSesion />} />
             <Route path="/Registro" element={<Registro />} />
+            <Route path="/VerificarCodigo" element={<VerificarCodigo/>}/>
             <Route path="/RecuperarContraseña" element={<RecuperarContraseña />} />
             <Route path="/RestablecerContraseña" element={<RestablecerContraseña />} />
             <Route path="/MisOrdenes" element={<MisOrdenes/>}/>
