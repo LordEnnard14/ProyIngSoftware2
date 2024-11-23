@@ -49,12 +49,6 @@ router.post("/registrar", async (req, res) => {
     if (!telefono || telefono.length !== 9) return res.status(400).json({ message: "El campo 'telefono' debe tener 9 dígitos" });
     if (!dni || dni.length !== 8) return res.status(400).json({ message: "El campo 'dni' debe tener 8 dígitos" });
 
-    // Crear el nuevo usuario
-    /*
-    const nuevoUsuario = await Usuario.create({
-      nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni
-    });
-    */
     // Generar un código de verificación aleatorio
     const verificationCode = crypto.randomBytes(3).toString("hex"); // Genera un código de 6 dígitos
 
@@ -101,12 +95,6 @@ router.post("/verificarCodigo", async (req, res) => {
     if (!codigo) {
       return res.status(400).json({ message: "El campo 'código' es requerido" });
     }
-    // Depurar el valor del correo y código recibido
-    /*
-    console.log("Verificando código para correo:", correo);
-    console.log("Código recibido:", codigo);
-    console.log("Correo recibido:", correo);
-    */
     // Obtener el código almacenado en la caché
     const storedCode = myCache.get(correo);
     // Depurar el valor de la clave almacenada en la caché
@@ -129,7 +117,6 @@ router.post("/verificarCodigo", async (req, res) => {
     res.status(200).json({ message: "Correo verificado correctamente",
     usuario: nuevoUsuario });
 
-    // Opcional: Eliminar el código de la caché después de su verificación
     myCache.del(correo);
 
   } catch (error) {
@@ -142,16 +129,20 @@ router.post("/verificarCodigo", async (req, res) => {
 
 router.post('/iniciarSesion', async (req, res) => {
   const { correo, password } = req.body;
-  
+
   if (!correo || !password) {
     return res.status(400).json({ message: "Correo y contraseña son requeridos" });
   }
 
   try {
-
     const usuario = await Usuario.findOne({ where: { correo } });
     if (!usuario) {
       return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    if (usuario.estado == false) {
+      // Si el usuario tiene estado 'false', enviar mensaje de cuenta inhabilitada
+      return res.status(403).json({ message: "Su cuenta ha sido inhabilitada. Por favor, contacte al soporte." });
     }
 
     if (password !== usuario.password) {
