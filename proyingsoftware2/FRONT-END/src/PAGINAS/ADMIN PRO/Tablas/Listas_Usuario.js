@@ -24,7 +24,7 @@ const ListaUsuario = () => {
                         correo: usuario?.correo || "Sin correo",
                         dni: usuario?.dni || "Sin DNI",
                         fechaRegistro: usuario?.fechaRegistro || "Fecha no disponible",
-                        estado: usuario?.estado === true ? "Disponible" : "No Disponible",
+                        estado: usuario?.estado === true ? "Activado" : "Desactivado",
                         telefono: usuario?.telefono || "Sin Telefono",
                     }));
                     setUsuarios(users);
@@ -39,25 +39,15 @@ const ListaUsuario = () => {
         fetchUsuarios();
     }, [navigate]);
 
-    const handleEstadoChange = async (id, nuevoEstado) => {
-        try {
-            // Llamada al endpoint para actualizar el estado del usuario
-            await fetch(`http://localhost:4000/api/adminMaestro/cambiarEstadoUsuario/${id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ estado: nuevoEstado === "Disponible" }),
-            });
-
-            // Actualización local de usuarios
-            setUsuarios((prevUsuarios) =>
-                prevUsuarios.map((usuario) =>
-                    usuario.id === id ? { ...usuario, estado: nuevoEstado } : usuario
-                )
-            );
-        } catch (error) {
-            console.error("Error al cambiar el estado del usuario", error);
-        }
-    };
+    const actualizarEstadoUsuario = (idUsuario) => {
+        setUsuarios(prevUsuarios =>
+            prevUsuarios.map(usuario =>
+                usuario.id === idUsuario 
+                    ? { ...usuario, estado: usuario.estado === 'Activado' ? 'Desactivado' : 'Activado' } 
+                    : usuario
+            )
+        );
+    }
 
     return (
         <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -107,7 +97,7 @@ const ListaUsuario = () => {
                             <ContenidoTablaUsuario
                             key={usuario.id}
                             usuario={usuario}
-                            onEstadoChange={handleEstadoChange}
+                            onEstadoChange={actualizarEstadoUsuario}
                             />
                         ))
                         )}

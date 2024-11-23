@@ -2,10 +2,26 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Button, TableCell, TableRow } from "@mui/material";
 
-function ContenidoTablaUsuario({ usuario, onEstadoChange }) {
-    const handleEstadoToggle = () => {
-        const nuevoEstado = usuario.estado === "Disponible" ? "No Disponible" : "Disponible";
-        onEstadoChange(usuario.id, nuevoEstado);
+function ContenidoTablaUsuario(props) {
+    const { usuario, onEstadoChange } = props;
+    
+    const handleEstadoToggle = async () => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/adminMaestro/cambiarEstadoUsuario/${usuario.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Error al cambiar el estado del usuario");
+            }
+
+            onEstadoChange(usuario.id);
+        } catch (error) {
+            console.error("Error al cambiar el estado:", error);
+        }
     };
 
     return (
@@ -21,7 +37,7 @@ function ContenidoTablaUsuario({ usuario, onEstadoChange }) {
             <TableCell sx={{ textAlign: "center" }}>{usuario.estado}</TableCell>
             <TableCell sx={{ textAlign: "center" }}>
                 <Button size="small" color="secondary" onClick={handleEstadoToggle}>
-                    <strong>{usuario.estado === "Disponible" ? "Desactivar" : "Activar"}</strong>
+                    <strong>{usuario.estado === "Activado" ? "Desactivar" : "Activar"}</strong>
                 </Button>
             </TableCell>
         </TableRow>

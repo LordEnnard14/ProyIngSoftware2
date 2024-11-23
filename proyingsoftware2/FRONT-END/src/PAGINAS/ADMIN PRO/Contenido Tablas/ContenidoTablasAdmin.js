@@ -5,9 +5,25 @@ import { Button, TableCell, TableRow } from "@mui/material";
 function ContenidoTablaAdmin(props) {
     const { admin, onEstadoChange } = props;
 
-    const handleEstadoToggle = () => {
-        const nuevoEstado = admin.estado === "Disponible" ? "No Disponible" : "Disponible";
-        onEstadoChange(admin.id, nuevoEstado);
+    const handleEstadoToggle = async () => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/adminMaestro/cambiarEstadoAdmin/${admin.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Error al cambiar el estado del administrador");
+            }
+
+            const data = await response.json();
+
+            onEstadoChange(admin.id);
+        } catch (error) {
+            console.error("Error al cambiar el estado:", error);
+        }
     };
 
     return (
@@ -23,7 +39,7 @@ function ContenidoTablaAdmin(props) {
             <TableCell sx={{ textAlign: "center" }}>{admin.estado}</TableCell>
             <TableCell sx={{ textAlign: "center" }}>
                 <Button size="small" color="secondary" onClick={handleEstadoToggle}>
-                    <strong>{admin.estado === "Disponible" ? "Desactivar" : "Activar"}</strong>
+                    <strong>{admin.estado === "Activado" ? "Desactivar" : "Activar"}</strong>
                 </Button>
             </TableCell>
         </TableRow>

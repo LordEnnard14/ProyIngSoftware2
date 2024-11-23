@@ -1,6 +1,5 @@
-// ListaAdmin.js
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from "@mui/material";
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Header_Admin from "../../../COMPONENTES/Header_Admin";
 import BarraHorizontalSuperAdmin from "../../../COMPONENTES/BarraSuperAdmin";
@@ -29,7 +28,7 @@ const ListaAdmin = () => {
                             ruc: admin?.Botica?.ruc || "Sin RUC",
                         },
                         dni: admin?.dni || "Sin DNI",
-                        estado: admin?.estado === true ? "Disponible" : "No Disponible",
+                        estado: admin?.estado === true ? "Activado" : "Desactivado",
                     }));
                     setAdministradores(admins);
                 } catch (error) {
@@ -43,25 +42,15 @@ const ListaAdmin = () => {
         fetchAdministradores();
     }, [navigate]);
 
-    const handleEstadoChange = async (id, nuevoEstado) => {
-        try {
-            await fetch(`http://localhost:4000/api/adminMaestro/cambiarEstado/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ estado: nuevoEstado }),
-            });
-
-            setAdministradores(prevState =>
-                prevState.map(admin =>
-                    admin.id === id ? { ...admin, estado: nuevoEstado } : admin
-                )
-            );
-        } catch (error) {
-            console.error("Error al cambiar el estado del administrador", error);
-        }
-    };
+    const actualizarEstadoAdmin = (idAdmin) => {
+        setAdministradores(prevAdministradores =>
+            prevAdministradores.map(admin =>
+                admin.id === idAdmin 
+                    ? { ...admin, estado: admin.estado === 'Activado' ? 'Desactivado' : 'Activado' } 
+                    : admin
+            )
+        );
+    }
 
     return (
         <>
@@ -112,7 +101,7 @@ const ListaAdmin = () => {
                                     <ContenidoTablaAdmin
                                     key={admin.id}
                                     admin={admin}
-                                    onEstadoChange={handleEstadoChange}
+                                    onEstadoChange={actualizarEstadoAdmin}
                                     />
                                 ))
                             )}

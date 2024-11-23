@@ -107,6 +107,49 @@ router.post('/iniciarSesionSuperAdmin', async (req, res) => {
     }
   });
 
+  router.put('/cambiarEstadoAdmin/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const admin = await Admin.findByPk(id);
+
+        if (!admin) {
+            return res.status(404).json({ mensaje: 'Administrador no encontrado' });
+        }
+
+        await admin.update({ estado: !admin.estado });
+
+        res.json({ mensaje: 'Estado actualizado con éxito', estadoActual: admin.estado });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ mensaje: 'Error al actualizar el estado' });
+    }
+  });
+  
+  router.put('/cambiarEstadoUsuario/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const usuario = await Usuario.findByPk(id);
+
+        if (!usuario) {
+            return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+        }
+
+        await usuario.update({ estado: !usuario.estado });
+
+        res.json({ 
+            mensaje: 'Estado actualizado con éxito', 
+            estadoActual: usuario.estado 
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ mensaje: 'Error al actualizar el estado' });
+    }
+  });
+
+
+
 
 
 export default router;
