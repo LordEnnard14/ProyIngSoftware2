@@ -126,7 +126,6 @@ router.post("/verificarCodigo", async (req, res) => {
 });
 
 
-
 router.post('/iniciarSesion', async (req, res) => {
   const { correo, password } = req.body;
 
@@ -135,6 +134,10 @@ router.post('/iniciarSesion', async (req, res) => {
   }
 
   try {
+    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) {
+      return res.status(400).json({ message: "Formato de correo inválido" });
+    }
+    
     const usuario = await Usuario.findOne({ where: { correo } });
     if (!usuario) {
       return res.status(404).json({ message: "Usuario no encontrado" });
