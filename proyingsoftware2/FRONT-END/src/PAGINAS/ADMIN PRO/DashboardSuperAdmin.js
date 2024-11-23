@@ -2,8 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import BarraHorizontalSuperAdmin from '../../COMPONENTES/BarraSuperAdmin'; // Importa tu barra personalizada
 import Header_Admin from '../../COMPONENTES/Header_Admin';
+import { useNavigate } from "react-router-dom";
+
 
 const DashboardSuperAdmin = () => {
+
+  const navigate = useNavigate();
+
   const [estadisticas, setEstadisticas] = useState({
     usuarios: 0,
     boticas: 0,
@@ -44,14 +49,15 @@ const DashboardSuperAdmin = () => {
           });
         } else {
           console.error('No se encontraron datos en el localStorage para adminMaestro.');
+          navigate("/InicioSesionBotica");
         }
       } catch (error) {
         console.error('Error al leer los datos del localStorage:', error);
       }
     };
 
-    fetchEstadisticas();
     fetchAdminInfo();
+    fetchEstadisticas();
   }, []); // Solo se ejecuta una vez al cargar el componente
 
   return (
