@@ -202,34 +202,6 @@ router.get('/stockProductosAll', async (req, res) => {
     }
   });
   
-  
-
-/*router.get('/categoria/:categoria', async (req, res) => {
-  try {
-    const { categoria } = req.params;
-
-    // Obtenemos los productos y sus detalles asociados
-    const productos = await Producto.findAll({
-      where: {
-        categoria: {
-          [Op.contains]: [categoria],
-        },
-      },
-      include: [
-        {
-          model: ProductoDetalle, 
-          as: 'ProductoDetalle', 
-          attributes: ['descripcion', 'caracteristicas', 'imageUrl', 'cantidad', 'precio'],
-        }
-      ],
-    });
-
-    res.json(productos);
-  } catch (error) {
-    console.error("Error al obtener los productos por categoría:", error);
-    res.status(500).json({ message: "Error al obtener los productos", error: error.message });
-  }
-});*/
 
 router.get('/categoria/:categoria', async (req, res) => {
   try {
