@@ -14,13 +14,12 @@ function ContenidoTablaAdmin(props) {
                 },
             });
 
-            if (!response.ok) {
-                throw new Error("Error al cambiar el estado del administrador");
-            }
+            if (response.ok) {
+                onEstadoChange(admin.id); 
+              } else {
+                console.error('Error al cambiar el estado del producto');
+              }
 
-            const data = await response.json();
-
-            onEstadoChange(admin.id);
         } catch (error) {
             console.error("Error al cambiar el estado:", error);
         }
@@ -38,9 +37,15 @@ function ContenidoTablaAdmin(props) {
             <TableCell sx={{ textAlign: "center" }}>{admin.dni}</TableCell>
             <TableCell sx={{ textAlign: "center" }}>{admin.estado}</TableCell>
             <TableCell sx={{ textAlign: "center" }}>
-                <Button size="small" color="secondary" onClick={handleEstadoToggle}>
-                    <strong>{admin.estado === "Activado" ? "Desactivar" : "Activar"}</strong>
+            {admin.estado === 'Activado' ? (
+                <Button size="small" color="secondary" onClick={handleEstadoToggle} >
+                    <strong>Desactivar</strong>
                 </Button>
+            ) : (
+                <Button size="small" color="secondary" onClick={handleEstadoToggle}>
+                    <strong>Activar</strong>
+                </Button>
+            )}
             </TableCell>
         </TableRow>
     );

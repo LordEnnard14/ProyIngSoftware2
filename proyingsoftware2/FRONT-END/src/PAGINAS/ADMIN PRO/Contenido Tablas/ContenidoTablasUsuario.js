@@ -14,11 +14,11 @@ function ContenidoTablaUsuario(props) {
                 },
             });
 
-            if (!response.ok) {
-                throw new Error("Error al cambiar el estado del usuario");
-            }
-
-            onEstadoChange(usuario.id);
+            if (response.ok) {
+                onEstadoChange(usuario.id); 
+              } else {
+                console.error('Error al cambiar el estado del producto');
+              }
         } catch (error) {
             console.error("Error al cambiar el estado:", error);
         }
@@ -36,9 +36,15 @@ function ContenidoTablaUsuario(props) {
             <TableCell sx={{ textAlign: "center" }}>{usuario.dni}</TableCell>
             <TableCell sx={{ textAlign: "center" }}>{usuario.estado}</TableCell>
             <TableCell sx={{ textAlign: "center" }}>
-                <Button size="small" color="secondary" onClick={handleEstadoToggle}>
-                    <strong>{usuario.estado === "Activado" ? "Desactivar" : "Activar"}</strong>
+            {usuario.estado === 'Activado' ? (
+                <Button size="small" color="secondary" onClick={handleEstadoToggle} >
+                    <strong>Desactivar</strong>
                 </Button>
+            ) : (
+                <Button size="small" color="secondary" onClick={handleEstadoToggle}>
+                    <strong>Activar</strong>
+                </Button>
+            )}
             </TableCell>
         </TableRow>
     );

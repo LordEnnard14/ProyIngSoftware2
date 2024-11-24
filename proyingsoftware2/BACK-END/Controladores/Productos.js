@@ -131,7 +131,7 @@ router.get('/stockProductosAll', async (req, res) => {
               },
               {
                 model: Botica,
-                attributes: ['id', 'nombre', 'direccion'] 
+                attributes: ['id', 'nombre', 'direccion','estado'] 
               }
             ],
             attributes: ['id', 'nombre','presentacion', 'imageUrl'],
@@ -166,7 +166,7 @@ router.get('/stockProductosAll', async (req, res) => {
           },
           {
             model: Botica,
-            attributes: ['id', 'nombre', 'direccion']
+            attributes: ['id', 'nombre', 'direccion','estado']
           }
         ]
       });
