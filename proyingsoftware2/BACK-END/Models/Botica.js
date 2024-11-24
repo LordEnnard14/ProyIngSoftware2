@@ -34,6 +34,10 @@ const Botica = sequelize.define('Botica', {
     direccion_longitude: {
         type: DataTypes.DOUBLE,
         allowNull: true, // Permitir valores nulos
+    },
+    estado: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false, // Valor predeterminado: false
     }
 }, {
     freezeTableName: true,

@@ -29,7 +29,8 @@ const BusquedaMedicina = () => {
         cantidad: dato.cantidad || 0,
         estado: dato.estado || false, 
         image: `${baseUrl}${dato.imageUrl || ''}`,
-        precio: dato.precio || 0
+        precio: dato.precio || 0,
+        boticaEstado: dato.Botica?.estado || false
       }));
   
       setCatalogo(catalogo); 
@@ -63,7 +64,7 @@ const BusquedaMedicina = () => {
             paddingLeft={'10%'}
           >
             {catalogo
-              .filter((item) => item.estado) // Filtra productos que su estado sea true
+              .filter((item) => item.estado && item.boticaEstado) // Filtra productos con estado y estadoBotica como true
               .map((catalogo, index) => (
                 <ContenidoPaginaBusqueda
                   key={index}  

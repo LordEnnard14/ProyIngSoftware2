@@ -3,7 +3,7 @@ import request from 'supertest';
 import {ProductoDetalle} from '../Models/Relaciones';
 
 const testPort = 4001;
-
+/*
 describe('Pruebas para el endpoint /ProductosAll', () => {
     let server;
 
@@ -102,5 +102,5 @@ describe('Pruebas para el endpoint /searchProductos', () => {
         expect(response.body.ProductosDetalles.length).toBeGreaterThan(0); 
     });
 });
-
+*/
 

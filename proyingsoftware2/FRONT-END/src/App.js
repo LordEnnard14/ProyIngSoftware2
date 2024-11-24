@@ -4,7 +4,9 @@ import { Box } from '@mui/material'; // Asegúrate de importar Box desde MUI
 import Eleccion from './PAGINAS/PAG_PRINCIPAL/Eleccion';
 import InicioSesion from './PAGINAS/REGISTROS/InicioSesion';
 import Registro from './PAGINAS/REGISTROS/Registro';
+import VerificarCodigo from './PAGINAS/REGISTROS/VerificarCodigo';
 import RecuperarContraseña from './PAGINAS/REGISTROS/RecuperarContraseña';
+import CodigoContraseña from './PAGINAS/REGISTROS/CodigoContraseña';
 import RestablecerContraseña from './PAGINAS/REGISTROS/RestablecerContraseña';
 import MisOrdenes from './PAGINAS/ORDENES/MisOrdenes';
 import BusquedaMedicina from './PAGINAS/BUSCAR_MEDICINAS/BusquedaMedicina';
@@ -33,6 +35,13 @@ import RegisAdmin from './PAGINAS/ADMINISTRADOR/RegisAdmin.js';
 import PerfilUsuario from './PAGINAS/PerfilUsuario/PerfilUser.jsx';
 import ProductosCategoria from './PAGINAS/PRODUCTOS_CATEGORIA/ProductosCategoria.jsx';
 
+// Vistas Admin Maestro
+import InicioSesionSuperAdmin from './PAGINAS/ADMIN PRO/InicioSesionSuperAdmin.js';
+import DashboardSuperAdmin from './PAGINAS/ADMIN PRO/DashboardSuperAdmin.js';
+import ListaAdmin from './PAGINAS/ADMIN PRO/Tablas/Listas_Admin.js';
+import ListaUsuariosAdmin from './PAGINAS/ADMIN PRO/Tablas/Listas_Usuario.js';
+
+
 function App() {
   return (
     <Router>
@@ -48,7 +57,9 @@ function App() {
             <Route path="/" element={<Eleccion />} />
             <Route path="/InicioSesion" element={<InicioSesion />} />
             <Route path="/Registro" element={<Registro />} />
+            <Route path="/VerificarCodigo" element={<VerificarCodigo/>}/>
             <Route path="/RecuperarContraseña" element={<RecuperarContraseña />} />
+            <Route path="/CodigoContraseña" element={<CodigoContraseña />} />
             <Route path="/RestablecerContraseña" element={<RestablecerContraseña />} />
             <Route path="/MisOrdenes" element={<MisOrdenes/>}/>
             <Route path="/BusquedaMedicina" element={<BusquedaMedicina />} />
@@ -67,12 +78,16 @@ function App() {
             <Route path='/ListaProductosBotica' element={<ListaProductosBotica/>}/>
             <Route path='/OrdenesBotica' element={<OrdenesBotica/>}/>
             <Route path='/InicioSesionBotica' element={<InicioSesionBotica/>}/>
+            <Route path='/DashboardSuperAdmin' element={<DashboardSuperAdmin/>}/>
             <Route path='/RegisBotica' element={<RegisBotica/>}/>
             <Route path='/RegisAdmin' element={<RegisAdmin/>}/>
             <Route path='/RecuperarContraseñaBotica' element={<RecuperarContraseñaBotica/>}/>
             <Route path='/RestablecerContraseñaBotica' element={<RestablecerContraseñaBotica/>}/>
+            <Route path='/InicioSesionSuperAdmin' element={<InicioSesionSuperAdmin />} />
             <Route path="/perfil/:id" element={<PerfilUsuario />} />
             <Route path="/productos/categoria/:categoria" element={<ProductosCategoria />} />
+            <Route path="/ListaAdmin" element={<ListaAdmin />} />
+            <Route path="/ListaUsuariosAdmin" element={<ListaUsuariosAdmin />} />
           </Routes>
         </Box>
       </Box>

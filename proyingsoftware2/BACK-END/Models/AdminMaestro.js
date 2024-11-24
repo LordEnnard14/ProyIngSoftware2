@@ -1,9 +1,9 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../Database/database.js";
-import Botica from "./Botica.js"; // Asegúrate de importar el modelo relacionado
 
-const Admin = sequelize.define(
-    "Admin",
+
+const AdminMaestro = sequelize.define(
+    "AdminMaestro",
     {
         id: {
             type: DataTypes.INTEGER,
@@ -42,11 +42,7 @@ const Admin = sequelize.define(
         password: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
-        estado: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false, // Valor predeterminado: false
-        },
+        }
     },
     {
         freezeTableName: true,
@@ -54,23 +50,6 @@ const Admin = sequelize.define(
     }
 );
 
-// Hook para sincronizar el estado de Botica
-Admin.addHook("afterUpdate", async (admin) => {
-    try {
-        const { estado, boticaID } = admin;
 
-        if (boticaID) {
-            // Actualizamos el estado de la Botica relacionada
-            await Botica.update(
-                { estado }, // Propagamos el mismo estado
-                { where: { id: boticaID } }
-            );
-            console.log(`Estado de Botica con ID ${boticaID} actualizado a ${estado}`);
-        }
-    } catch (error) {
-        console.error("Error al sincronizar el estado de la Botica:", error);
-        throw error;
-    }
-});
 
-export default Admin;
+export default AdminMaestro;

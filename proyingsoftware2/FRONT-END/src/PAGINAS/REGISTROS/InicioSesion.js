@@ -14,7 +14,7 @@ const InicioSesion = () => {
     const formData = new FormData(event.target); // Captura los datos del formulario
     const email = formData.get('email'); // Obtiene el valor del campo "email"
     const password = formData.get('password'); // Obtiene el valor del campo "password"
-    
+  
     try {
       // Aquí haces la petición al endpoint de inicio de sesión
       const response = await fetch('http://localhost:4000/api/usuarios/iniciarSesion', {
@@ -31,14 +31,14 @@ const InicioSesion = () => {
   
         // Almacenar los datos del usuario en localStorage
         localStorage.setItem('user', JSON.stringify({
-          nombre: data.user.nombre, // Acceder a los datos del usuario correctamente
-          apellidoPaterno: data.user.apellidoPaterno, // Acceder a los datos del usuario correctamente
-          id: data.user.id, // Acceder a los datos del usuario correctamente
-
+          nombre: data.user.nombre, 
+          apellidoPaterno: data.user.apellidoPaterno, 
+          id: data.user.id, 
         }));
   
         navigate('/');
       } else {
+        // Mostrar mensajes específicos de error
         alert(data.message || 'Error en el inicio de sesión');
       }
     } catch (error) {

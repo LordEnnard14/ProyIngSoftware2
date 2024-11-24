@@ -108,6 +108,20 @@ const DetalleProducto = () => {
     );
   }
 
+  if(stockProducto.Botica.estado === false)
+  {
+    return (
+      <Container maxWidth="md">
+        <Box my={4} textAlign="center">
+          <Typography variant="h4">Botica Desactivada</Typography>
+          <Typography variant="body1" color="textSecondary">
+            Este producto no está disponible actualmente.
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
+
   const imagenUrl = `http://localhost:4000/api/productoDetalle/${stockProducto.imageUrl}`;
   
   const admin = JSON.parse(localStorage.getItem('admin'));

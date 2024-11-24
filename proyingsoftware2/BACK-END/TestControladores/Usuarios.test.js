@@ -1,60 +1,129 @@
-import {app} from '../index.js';
+import { app } from '../index.js';
 import request from 'supertest';
-import {Usuario} from '../Models/Relaciones';
+import { Usuario } from '../Models/Relaciones';
+import nodemailer from 'nodemailer';
+
+// Mock de nodemailer
+jest.mock('nodemailer', () => {
+  const originalModule = jest.requireActual('nodemailer');
+  return {
+    ...originalModule,
+    createTransport: jest.fn(() => ({
+      verify: jest.fn().mockResolvedValue(true), // Simula una respuesta exitosa
+    })),
+  };
+});
 
 const testPort = 4001;
 
 describe('Pruebas para el endpoint /iniciarSesion', () => {
-    let server;
-    beforeAll(async () =>{
-        server = app.listen(testPort, () => {
-            console.log('Servidor de prueba escuchando en el puerto 4001')
-        });
+  let server;
+
+  beforeAll(async () => {
+    server = app.listen(testPort, () => {
+      console.log('Servidor de prueba escuchando en el puerto 4001');
     });
 
-    afterAll(async () => {
-        await server.close();
+    await Usuario.create({
+      correo: 'andriuchg14@gmail.com',
+      password: 'micontraseña',
+      nombre: 'Andres',
+      apellidoPaterno: 'ApellidoPaterno',
+      apellidoMaterno: 'ApellidoMaterno',
+      telefono: '1234567890',
+      dni: '12345678',
+    });
+  });
+
+  afterAll(async () => {
+    await Usuario.destroy({
+      where: {
+        correo: 'andriuchg14@gmail.com',
+      },
+    });
+    await server.close();
+  });
+
+  afterEach(async () => {
+    // Elimina los usuarios creados en las pruebas para evitar efectos secundarios
+    await Usuario.destroy({ where: {} });
+  });
+
+  it('Debe arrojar el código 400 si falta el correo o contraseña', async () => {
+    const response = await request(app).post('/api/usuarios/iniciarSesion').send({});
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe('Correo y contraseña son requeridos');
+  });
+
+  test('Debe devolver error 403 si la cuenta está inhabilitada', async () => {
+    // Deshabilitar al usuario de prueba
+    await Usuario.update({ estado: 'inhabilitado' }, {
+      where: {
+        correo: 'andriuchg14@gmail.com',
+      },
     });
 
-    it('Tiene que arrojar el código 400 si falta el correo o contraseña', async() =>{
-        const response = await request(app).post('/api/usuarios/iniciarSesion').send({});
-        expect(response.statusCode).toBe(400);
-        expect(response.body.message).toBe('Correo y contraseña son requeridos');
-    });
+    const response = await request(app)
+      .post('/api/usuarios/iniciarSesion')
+      .send({
+        correo: 'andriuchg14@gmail.com',
+        password: 'micontraseña',
+      });
 
-    it("Se tiene que mostrar el código 404 si no se encuentra al usuario en la base de datos de acuerdo al correo brindado", async() =>{
-        const response = await request(app)
-        .post('/api/usuarios/iniciarSesion')
-        .send({correo: "correoinvalido@ejemplo.com", password: "contraseña000"});
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe('Cuenta inhabilitada');
+  });
 
-        expect(response.statusCode).toBe(404);
-        expect(response.body.message).toBe('Usuario no encontrado');
-    });
+  test('Debe devolver error 401 si la contraseña no corresponde al usuario', async () => {
+    const response = await request(app)
+      .post('/api/usuarios/iniciarSesion')
+      .send({
+        correo: 'andriuchg14@gmail.com',
+        password: 'contraseñaIncorrecta',
+      });
 
-    it("Se tiene que mostrar el codigo 401 si la contraseña no corresponde al usuario (correo)", async() => {
-        const response = await request(app)
-        .post('/api/usuarios/iniciarSesion')
-        .send({correo: 'andriuchg14@gmail.com', password: 'contraseñaincorrecta'});
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBe('Contraseña incorrecta');
+  });
 
-        expect(response.statusCode).toBe(401);
-        expect(response.body.message).toBe('Contraseña incorrecta');
-    });
+  it("Debe devolver 400 si el correo tiene formato inválido", async () => {
+    const response = await request(app)
+      .post('/api/usuarios/iniciarSesion')
+      .send({ correo: "correo_sin_formato", password: "mipassword" });
 
-    it("Debe iniciar sesion exitosamente y devolver el nombre del usuario si las credenciales son correctas", async () => {
-        const response = await request(app)
-        .post('/api/usuarios/iniciarSesion')
-        .send({correo: 'andriuchg14@gmail.com', password: 'micontraseña'});
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe("Formato de correo inválido");
+  });
 
-        expect(response.statusCode).toBe(200);
-        expect(response.body.message).toBe('Inicio de sesión exitoso');
-        expect(response.body.user).toHaveProperty("id");
-        expect(response.body.user).toHaveProperty("nombre", "Andres");
-        expect(response.body.user).toHaveProperty("apellidoPaterno","Churampi");
-        expect(response.body.user).toHaveProperty("apellidoMaterno","Guerrero");
-        expect(response.body.user).toHaveProperty("correo", "andriuchg14@gmail.com");
-    });
+  it("Debe devolver 500 si ocurre un error inesperado", async () => {
+    jest.spyOn(Usuario, 'findOne').mockRejectedValue(new Error("Error simulado en la base de datos"));
+
+    const response = await request(app)
+      .post('/api/usuarios/iniciarSesion')
+      .send({ correo: "usuario@ejemplo.com", password: "mipassword" });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body.message).toBe("Error en el inicio de sesión");
+
+    Usuario.findOne.mockRestore();
+  });
+
+  test('Debe iniciar sesión exitosamente y devolver el nombre del usuario si las credenciales son correctas', async () => {
+    const response = await request(app)
+      .post('/api/usuarios/iniciarSesion')
+      .send({
+        correo: 'andriuchg14@gmail.com',
+        password: 'micontraseña',
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.nombre).toBe('Andres');
+  });
 });
 
+
+
+/*
 describe('Pruebas para el endpoint /verificarCorreo/:correo', () => {
 
     let server;

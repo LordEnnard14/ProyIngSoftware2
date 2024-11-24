@@ -13,17 +13,19 @@ const RecuperarContraseña = () => {
     event.preventDefault();
   
     try {
-      // Petición al endpoint para verificar si el correo existe usando GET con parámetros
-      const response = await fetch(`http://localhost:4000/api/usuarios/verificarCorreo/${encodeURIComponent(email)}`, {
-        method: 'GET',
+      // Petición al endpoint para verificar si el correo existe usando POST con el correo en el cuerpo de la solicitud
+      const response = await fetch('http://localhost:4000/api/usuarios/verificarCorreo', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: email }), // Enviamos el correo en el cuerpo de la solicitud
       });
   
       const data = await response.json();
   
       if (response.ok) {
-        // Si el correo existe, redirigir a la vista de restablecimiento de contraseña
-        navigate('/RestablecerContraseña', { state: { email } });
+        // Si el correo existe, redirigir a la vista de código de verificación
+        localStorage.setItem('recuperacion', email);
+        navigate('/CodigoContraseña');
       } else {
         setError(data.message || 'El correo no existe');
       }

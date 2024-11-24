@@ -8,11 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import Footer from '../../COMPONENTES/Footer_Principal';
 import NavegacionMedicinas from '../../COMPONENTES/NavegacionMedicinas';
 import Header_Botica from '../../COMPONENTES/Header_Botica';
-
-
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import './EleccionCSS.css'
+import ProductosDestacados from '../../COMPONENTES/ProductosDestacados';
 
 const Eleccion = () => {
 
@@ -185,6 +184,7 @@ const Eleccion = () => {
         </div>
       </div>
 
+      <ProductosDestacados />
 
       <Footer/>
     </>

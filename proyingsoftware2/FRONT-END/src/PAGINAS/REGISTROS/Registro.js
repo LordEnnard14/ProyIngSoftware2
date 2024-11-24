@@ -58,9 +58,18 @@ const Registro = () => {
       if (response.ok) {
         const data = await response.json();
         // Guarda el nombre y apellido en localStorage
-        localStorage.setItem('usuarioNombre', `${data.nombre} ${data.apellidoPaterno} ${data.apellidoMaterno}`);
+        localStorage.setItem('usuario', JSON.stringify({
+          nombre: formData.nombre,
+          apellidoPaterno: formData.apellidoPaterno,
+          apellidoMaterno: formData.apellidoMaterno,
+          password: formData.password,
+          correo: formData.email,
+          telefono: formData.telefono,
+          dni: formData.dni,
+        }));
+        localStorage.setItem('correo', formData.email);
         console.log('Usuario registrado con éxito');
-        navigate('/InicioSesion');; // Redirige a donde necesites
+        navigate('/VerificarCodigo');; // Redirige a donde necesites
       } else {
         const errorData = await response.json();
         console.error('Detalles del error:', errorData); // Imprimir el error completo
@@ -71,9 +80,6 @@ const Registro = () => {
       console.error('Error en la solicitud:', error);
     }
   };
-  
-
-
   
   return (
     <>
