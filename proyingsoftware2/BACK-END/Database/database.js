@@ -8,7 +8,7 @@ class Database {
                 dialect: "postgres",
                 database: "dosisxtra",
                 username: "postgres",
-                password: "ALBEDO004",
+                password: "pass",
                 host: "localhost",
                 port: 5432, 
                 ssl: false,

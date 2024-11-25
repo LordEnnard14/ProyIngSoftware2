@@ -43,7 +43,7 @@ router.post("/registrar", async (req, res) => {
     const { nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni } = req.body;
 
     // Validaciones de los campos
-    if (!nombre) return res.status(400).json({ message: "El campo 'nombre' es requerido" });
+    if (!nombre) return res.status(404).json({ message: "El campo 'nombre' es requerido" });
     if (!correo) return res.status(400).json({ message: "El campo 'correo' es requerido" });
     if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) return res.status(400).json({ message: "Formato de correo inválido" });
     if (!telefono || telefono.length !== 9) return res.status(400).json({ message: "El campo 'telefono' debe tener 9 dígitos" });
@@ -130,29 +130,28 @@ router.post('/iniciarSesion', async (req, res) => {
   const { correo, password } = req.body;
 
   if (!correo || !password) {
-    return res.status(400).json({ message: "Correo y contraseña son requeridos" });
+    return res.status(400).json({ message: "Correo y contraseña son requeridos" }); // Código 400 para mala solicitud
   }
 
   try {
     if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) {
-      return res.status(400).json({ message: "Formato de correo inválido" });
-    }
-    
-    const usuario = await Usuario.findOne({ where: { correo } });
-    if (!usuario) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      return res.status(400).json({ message: "Formato de correo inválido" }); // Código 400 para errores de formato
     }
 
-    if (usuario.estado == false) {
-      // Si el usuario tiene estado 'false', enviar mensaje de cuenta inhabilitada
-      return res.status(403).json({ message: "Su cuenta ha sido inhabilitada. Por favor, contacte al soporte." });
+    const usuario = await Usuario.findOne({ where: { correo } });
+    if (!usuario) {
+      return res.status(404).json({ message: "Usuario no encontrado" }); // Código 404 si el usuario no existe
+    }
+
+    if (usuario.estado === false) {
+      return res.status(403).json({ message: "Su cuenta ha sido inhabilitada. Por favor, contacte al soporte." }); // Código 403 para cuenta inhabilitada
     }
 
     if (password !== usuario.password) {
-      return res.status(401).json({ message: "Contraseña incorrecta" });
+      return res.status(401).json({ message: "Contraseña incorrecta" }); // Código 401 para contraseña incorrecta
     }
 
-    res.json({
+    return res.status(200).json({
       message: "Inicio de sesión exitoso",
       user: {
         id: usuario.id,
@@ -164,7 +163,7 @@ router.post('/iniciarSesion', async (req, res) => {
     });
   } catch (error) {
     console.error("Error en el inicio de sesión:", error);
-    res.status(500).json({ message: "Error en el inicio de sesión" });
+    return res.status(500).json({ message: "Error interno del servidor" }); // Código 500 para errores del servidor
   }
 });
 
@@ -257,8 +256,6 @@ router.put('/restablecerContrasena', async (req, res) => {
 });
 
 
-
-
 router.post('/:id/direcciones', async (req, res) => {
   const { id } = req.params;
   const { nuevaDireccion } = req.body;
@@ -284,68 +281,6 @@ router.post('/:id/direcciones', async (req, res) => {
       res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-
-
-// Eliminar una dirección del usuario
-router.delete('/:id/direcciones/:direccionIndex', async (req, res) => {
-  const { id, direccionIndex } = req.params;
-  
-  try {
-    const usuario = await Usuario.findByPk(id);
-    
-    if (!usuario) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
-
-    // Elimina la dirección especificada por su índice
-    if (usuario.direcciones[direccionIndex]) {
-      usuario.direcciones.splice(direccionIndex, 1);
-      await usuario.save();
-      return res.json({ direcciones: usuario.direcciones });
-    } else {
-      return res.status(404).json({ error: "Dirección no encontrada" });
-    }
-  } catch (error) {
-    console.error("Error al eliminar dirección:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
-  }
-});
-
-// Actualizar una dirección del usuario
-router.put('/:id/direcciones/:direccionIndex', async (req, res) => {
-  const { id, direccionIndex } = req.params;
-  const { nuevaDireccion } = req.body;
-
-  try {
-    const usuario = await Usuario.findByPk(id);
-
-    if (!usuario) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
-
-    if (!nuevaDireccion || nuevaDireccion.trim().length === 0) {
-      return res.status(400).json({ error: "La dirección no puede estar vacía" });
-    }
-
-    // Si el índice de la dirección es válido, actualiza la dirección
-    if (usuario.direcciones[direccionIndex]) {
-      usuario.direcciones[direccionIndex] = nuevaDireccion;
-      await usuario.save();
-      return res.json({ direcciones: usuario.direcciones });
-    } else {
-      return res.status(404).json({ error: "Dirección no encontrada" });
-    }
-  } catch (error) {
-    console.error("Error al actualizar dirección:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
-  }
-});
-
-
-
-
-
-
 
 
 export default router;
