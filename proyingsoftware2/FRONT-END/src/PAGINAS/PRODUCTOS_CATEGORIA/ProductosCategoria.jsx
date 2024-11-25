@@ -67,7 +67,7 @@ const ProductosCategoria = () => {
                 </p>
 
               <Link
-                to={`/detalles/${producto.id}`} // Cambié caractProducto por producto
+                to={`/detalles/${producto.id}`}
                 style={{ textDecoration: 'none', display: 'block', textAlign: 'center' }}
               >
                 <Button

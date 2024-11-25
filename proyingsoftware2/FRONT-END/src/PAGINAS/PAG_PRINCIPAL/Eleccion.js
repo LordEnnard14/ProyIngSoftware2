@@ -80,6 +80,10 @@ const Eleccion = () => {
         }}
       />
     </Box>
+
+    <ProductosDestacados />
+    <br/>
+    <br/>
     <Box sx={{ 
       position: 'relative', 
       display: 'flex', 
@@ -184,7 +188,7 @@ const Eleccion = () => {
         </div>
       </div>
 
-      <ProductosDestacados />
+     
 
       <Footer/>
     </>

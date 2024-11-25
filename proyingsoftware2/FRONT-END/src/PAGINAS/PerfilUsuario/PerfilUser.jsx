@@ -8,6 +8,8 @@ const PerfilUsuario = () => {
   const { id } = useParams();
   const [usuario, setUsuario] = useState(null);
   const [nuevaDireccion, setNuevaDireccion] = useState('');
+  const [direccionEditada, setDireccionEditada] = useState('');
+  const [direccionAEditar, setDireccionAEditar] = useState(null); // Dirección que se está editando
   const [error, setError] = useState('');
   const [mensaje, setMensaje] = useState('');
 
@@ -37,6 +39,11 @@ const PerfilUsuario = () => {
         return;
     }
 
+    if (usuario.direcciones.length >= 3) {
+      setError('Ya has alcanzado el límite de 3 direcciones.');
+      return;
+    }
+
     try {
         const response = await fetch(`http://localhost:4000/api/usuarios/${id}/direcciones`, {
             method: 'POST',
@@ -64,54 +71,139 @@ const PerfilUsuario = () => {
         console.error('Error en la solicitud:', error);
         setError('Error al agregar la dirección');
     }
-};
+  };
+
+  // Función para eliminar una dirección
+  const eliminarDireccion = async (direccionIndex) => {
+    try {
+        const response = await fetch(`http://localhost:4000/api/usuarios/${id}/direcciones/${direccionIndex}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error('Error en la respuesta:', errorData);
+            setError('Error al eliminar la dirección');
+            return;
+        }
+
+        const data = await response.json();
+        setUsuario((prevUsuario) => ({
+            ...prevUsuario,
+            direcciones: data.direcciones,
+        }));
+
+        setMensaje('Dirección eliminada correctamente');
+    } catch (error) {
+        console.error('Error en la solicitud:', error);
+        setError('Error al eliminar la dirección');
+    }
+  };
+
+  // Función para manejar la edición de una dirección
+  const actualizarDireccion = async () => {
+    if (!direccionAEditar || !direccionEditada.trim()) {
+      setError('Por favor ingresa una dirección válida para actualizar');
+      return;
+    }
+
+    const direccionIndex = usuario.direcciones.indexOf(direccionAEditar);
+    if (direccionIndex === -1) {
+      setError('Dirección no encontrada');
+      return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:4000/api/usuarios/${id}/direcciones/${direccionIndex}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nuevaDireccion: direccionEditada.trim() }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error('Error en la respuesta:', errorData);
+            setError('Error al actualizar la dirección');
+            return;
+        }
+
+        const data = await response.json();
+        setUsuario((prevUsuario) => ({
+            ...prevUsuario,
+            direcciones: data.direcciones,
+        }));
+
+        setMensaje('Dirección actualizada correctamente');
+        setDireccionEditada('');
+        setDireccionAEditar(null); // Reiniciar la dirección a editar
+        setError('');
+    } catch (error) {
+        console.error('Error en la solicitud:', error);
+        setError('Error al actualizar la dirección');
+    }
+  };
 
   return (
     <>
-    <Header1/>
-    <div className='ContenedorUser'>
-      {usuario ? (
-        <div>
-          <h1>
-            {usuario.nombre} {usuario.apellidoPaterno} {usuario.apellidoMaterno}
-          </h1>
-          <p>Correo: {usuario.correo}</p>
-          <p>Teléfono: {usuario.telefono}</p>
-          <p>DNI: {usuario.dni}</p>
-          <p>Te uniste el: {usuario.fechaRegistro}</p>
+      <Header1 />
+      <div className='ContenedorUser'>
+        {usuario ? (
+          <div>
+            <h1>
+              {usuario.nombre} {usuario.apellidoPaterno} {usuario.apellidoMaterno}
+            </h1>
+            <p>Correo: {usuario.correo}</p>
+            <p>Teléfono: {usuario.telefono}</p>
+            <p>DNI: {usuario.dni}</p>
+            <p>Te uniste el: {usuario.fechaRegistro}</p>
 
-          <h3>Direcciones</h3>
-          {usuario.direcciones && usuario.direcciones.length > 0 ? (
-            usuario.direcciones.map((direccion, index) => (
-              <div key={index} className="direccion-item">
-                <p>{direccion}</p>
+            <h3>Direcciones</h3>
+            {usuario.direcciones && usuario.direcciones.length > 0 ? (
+              usuario.direcciones.map((direccion, index) => (
+                <div key={index} className="direccion-item">
+                  <p>{direccion}</p>
+                  <button onClick={() => eliminarDireccion(index)}>Eliminar</button>
+                  <button onClick={() => setDireccionAEditar(direccion)}>Editar</button>
+                </div>
+              ))
+            ) : (
+              <p>No hay direcciones registradas.</p>
+            )}
+
+            {direccionAEditar && (
+              <div className="editar-direccion">
+                <input
+                  type="text"
+                  value={direccionEditada}
+                  onChange={(e) => setDireccionEditada(e.target.value)}
+                  placeholder="Edita la dirección"
+                />
+                <button onClick={actualizarDireccion}>Actualizar Dirección</button>
               </div>
-            ))
-          ) : (
-            <p>No hay direcciones registradas.</p>
-          )}
+            )}
 
-          <div className="agregar-direccion">
-            <input
-              type="text"
-              value={nuevaDireccion}
-              onChange={(e) => setNuevaDireccion(e.target.value)}
-              placeholder="Ingresa una nueva dirección"
-            />
-            <button onClick={agregarDireccion}>Agregar Dirección</button>
+            <div className="agregar-direccion">
+              <input
+                type="text"
+                value={nuevaDireccion}
+                onChange={(e) => setNuevaDireccion(e.target.value)}
+                placeholder="Ingresa una nueva dirección"
+              />
+              <button onClick={agregarDireccion}>Agregar Dirección</button>
+            </div>
+
+            {error && <p className="error">{error}</p>}
+            {mensaje && <p className="mensaje">{mensaje}</p>}
           </div>
-
-          {error && <p className="error">{error}</p>}
-          {mensaje && <p className="mensaje">{mensaje}</p>}
-        </div>
-      ) : (
-        <p>Cargando...</p>
-      )}
-    </div>
-    <Footer />
+        ) : (
+          <p>Cargando...</p>
+        )}
+      </div>
+      <Footer />
     </>
   );
 };
 
-
 export default PerfilUsuario;
+

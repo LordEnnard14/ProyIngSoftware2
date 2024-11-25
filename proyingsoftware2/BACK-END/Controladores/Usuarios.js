@@ -257,6 +257,8 @@ router.put('/restablecerContrasena', async (req, res) => {
 });
 
 
+
+
 router.post('/:id/direcciones', async (req, res) => {
   const { id } = req.params;
   const { nuevaDireccion } = req.body;
@@ -282,6 +284,68 @@ router.post('/:id/direcciones', async (req, res) => {
       res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
+
+// Eliminar una dirección del usuario
+router.delete('/:id/direcciones/:direccionIndex', async (req, res) => {
+  const { id, direccionIndex } = req.params;
+  
+  try {
+    const usuario = await Usuario.findByPk(id);
+    
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    // Elimina la dirección especificada por su índice
+    if (usuario.direcciones[direccionIndex]) {
+      usuario.direcciones.splice(direccionIndex, 1);
+      await usuario.save();
+      return res.json({ direcciones: usuario.direcciones });
+    } else {
+      return res.status(404).json({ error: "Dirección no encontrada" });
+    }
+  } catch (error) {
+    console.error("Error al eliminar dirección:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+// Actualizar una dirección del usuario
+router.put('/:id/direcciones/:direccionIndex', async (req, res) => {
+  const { id, direccionIndex } = req.params;
+  const { nuevaDireccion } = req.body;
+
+  try {
+    const usuario = await Usuario.findByPk(id);
+
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    if (!nuevaDireccion || nuevaDireccion.trim().length === 0) {
+      return res.status(400).json({ error: "La dirección no puede estar vacía" });
+    }
+
+    // Si el índice de la dirección es válido, actualiza la dirección
+    if (usuario.direcciones[direccionIndex]) {
+      usuario.direcciones[direccionIndex] = nuevaDireccion;
+      await usuario.save();
+      return res.json({ direcciones: usuario.direcciones });
+    } else {
+      return res.status(404).json({ error: "Dirección no encontrada" });
+    }
+  } catch (error) {
+    console.error("Error al actualizar dirección:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+
+
+
+
+
 
 
 export default router;
