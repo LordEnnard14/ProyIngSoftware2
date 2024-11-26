@@ -19,18 +19,18 @@ const BoticasCercanas = () => {
   const boticas = [
       {
         "Botica": "Botica Central",
-        "Latitude": -12.052208,
-        "Longitude": -76.939407
+        "Latitude": -12.085527,
+        "Longitude": -76.971014
       },
       {
         "Botica": "Botica Sur",
-        "Latitude": -12.062652,
-        "Longitude": -76.954135
+        "Latitude": -12.087966,
+        "Longitude":  -76.973396
       },
       {
         "Botica": "Botica Norte",
-        "Latitude": -12.062612,
-        "Longitude": -76.952695
+        "Latitude": -12.09344,
+        "Longitude": -76.97393
       },
   ]
 
@@ -43,11 +43,6 @@ const BoticasCercanas = () => {
           Boticas cercanas
         </Typography>
         
-        <TextField
-          label="Buscar dirección aquí"
-          variant="outlined"
-          sx={{ mb: 4, borderRadius: 50, width: '60%' }} 
-        />
 
         <Box
           sx={{
@@ -82,12 +77,6 @@ const BoticasCercanas = () => {
           </MapContainer>
         </Box>
 
-        <Button
-          variant="contained"
-          sx={{ backgroundColor: '#567C8D', color: '#fff', borderRadius: 50, mb: 8 }} 
-        >
-          Buscar boticas cercanas
-        </Button>
       </Box>
       <FooterPrincipal />
     </div>

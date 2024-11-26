@@ -116,16 +116,6 @@ const OrdenesBotica = () => {
                   </Typography>
                 </Box>
 
-                {/* Barra de búsqueda */}
-                <TextField
-                  fullWidth
-                  label="Buscar por nombre o apellido de usuario o nro de orden"
-                  variant="outlined"
-                  value={busqueda}
-                  onChange={handleSearchChange}
-                  sx={{ mb: 3 }}
-                />
-
                 {/* Tabla de Órdenes */}
                 <Paper sx={{heigh:'100%', width: '100%'}} >
                 <DataGrid
@@ -139,10 +129,6 @@ const OrdenesBotica = () => {
                />
             </Paper>
 
-                {/* Paginación */}
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                    <Pagination count={11} page={2} color="primary" />
-                </Box>
             </Box>
         </Box>
     );
