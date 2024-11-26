@@ -17,6 +17,11 @@ router.post('/iniciarSesion', async (req, res) => {
       if (!admin) {
         return res.status(401).json({ message: 'Credenciales inválidas. Administrador no encontrado.' });
       }
+      
+      // Verificar si el estado es false
+      if (!admin.estado) {
+        return res.status(403).json({ message: 'Tu cuenta está inactiva. Por favor, contacta al soporte.' });
+      }
   
       // Compara la contraseña 
       if (admin.password !== password) {

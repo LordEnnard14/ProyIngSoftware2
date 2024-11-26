@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { TextField, Grid, Button, Box, Typography } from '@mui/material';
+import { TextField, Grid, Button, Box, Typography, IconButton } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from 'react-router-dom';
 import Header2 from '../../../COMPONENTES/Header_2.js';
 import '../../REGISTROS/IScss.css';
@@ -24,13 +25,12 @@ const InicioSesionBotica = () => {
 
       if (response.ok) {
         alert('Inicio de sesión exitoso');
-        // Guardar el id, nombre y apellido en localStorage
         localStorage.setItem('admin', JSON.stringify({
-          id: data.admin.id,               // Se guarda el id del usuario
-          nombre: data.admin.nombre,        // Se guarda el nombre
-          apellidoPaterno: data.admin.apellidoPaterno,  // Se guarda el apellido paterno
+          id: data.admin.id,
+          nombre: data.admin.nombre,
+          apellidoPaterno: data.admin.apellidoPaterno,
         }));
-        navigate('/DashboardBotica'); // Redirige a DashboardBotica
+        navigate('/DashboardBotica');
       } else {
         alert(data.message || 'Error en el inicio de sesión');
       }
@@ -40,7 +40,6 @@ const InicioSesionBotica = () => {
     }
   };
 
-  
   return (
     <>
       <section id="BodyOne">
@@ -65,8 +64,8 @@ const InicioSesionBotica = () => {
             <Grid container spacing={2}>
               <Grid sx={{ width: '100%' }}>
                 <TextField
-                  value={email} // Asignar el valor del estado
-                  onChange={(e) => setEmail(e.target.value)} // Captura el cambio en el input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   fullWidth
                   label="Correo electrónico"
                   variant="outlined"
@@ -85,8 +84,8 @@ const InicioSesionBotica = () => {
               </Grid>
               <Grid sx={{ marginTop: '50px', width: '100%', marginBottom: '5px' }}>
                 <TextField
-                  value={password} // Asignar el valor del estado
-                  onChange={(e) => setPassword(e.target.value)} // Captura el cambio en el input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   fullWidth
                   label="Contraseña"
                   variant="outlined"
@@ -140,6 +139,26 @@ const InicioSesionBotica = () => {
             </Box>
           </form>
         </Box>
+        {/* Icono de botón en la esquina inferior derecha */}
+        <IconButton
+            sx={{
+              position: 'fixed',
+              bottom: 10,
+              right: 10,
+              backgroundColor: '#28639B',
+              color: 'white',
+              borderRadius: '50%',
+              opacity: 0.1, // Transparencia inicial
+              '&:hover': {
+                backgroundColor: '#174a74',
+                opacity: 0.2, // Menos transparente al pasar el mouse
+              },
+            }}
+            onClick={() => navigate('/InicioSesionSuperAdmin')}
+          >
+            <PersonIcon />
+          </IconButton>
+
       </section>
       <Footer />
     </>

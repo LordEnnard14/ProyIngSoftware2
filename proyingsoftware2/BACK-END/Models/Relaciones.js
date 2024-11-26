@@ -8,6 +8,7 @@ import ProductoDetalle from "./ProductoDetalle.js";
 import ProductoCarrito from "./ProductoCarrito.js";
 import ProductoOrden from "./ProductoOrden.js";
 import Usuario from "./Usuario.js";
+import AdminMaestro from "./AdminMaestro.js";
 
 Admin.belongsTo(Botica,{ foreignKey: 'boticaID' });
 Botica.hasMany(ProductoDetalle, {foreignKey: 'boticaID'});
@@ -43,5 +44,6 @@ export {
     ProductoCarrito,
     ProductoOrden,
     ProductoDetalle,
-    Usuario
+    Usuario,
+    AdminMaestro
   };

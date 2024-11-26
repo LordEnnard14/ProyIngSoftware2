@@ -4,7 +4,7 @@ import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, Ta
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import HeaderAdmin from '../../COMPONENTES/Header_Admin';
+import Header_Principal from '../../COMPONENTES/Header_Principal';
 
 const CarritoCompras = () => {
   const [productos, setProductos] = useState([]);
@@ -157,7 +157,7 @@ const CarritoCompras = () => {
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <HeaderAdmin />
+      <Header_Principal />
 
       <Box sx={{ flexGrow: 1, mx: 4, mt: 4 }}>
         <Box

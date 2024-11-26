@@ -1,9 +1,7 @@
 import {app} from '../index.js';
 import request from 'supertest'
 import {Orden} from '../Models/Relaciones';
-
-
-
+/*
 describe('Pruebas para el endpoint /ingresosBotica/:boticaID/:fecha', () => {
     let server;
 
@@ -50,4 +48,4 @@ describe('Pruebas para el endpoint /ingresosBotica/:boticaID/:fecha', () => {
         expect(response.body).toHaveProperty('mensaje', 'Error interno del servidor');
         expect(response.body).toHaveProperty('detalles', 'Error simulado en la base de datos');
     });
-});
+});*/

@@ -8,6 +8,8 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import Slide from '@mui/material/Slide';
 import Grow from '@mui/material/Grow';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import IconButton from '@mui/material/IconButton';
 
 // Estilo para el título "DosisXtra"
 const Titulo_Boton = styled(Button)(({ theme }) => ({
@@ -28,17 +30,46 @@ const Header_Admin = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userName, setUserName] = useState('');
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('adminMaestro'));
+    if (user) {
+      setLoggedIn(true);
+      // Asegúrate de ajustar aquí las propiedades de tu modelo de usuario
+      setUserName(`${user.nombre} ${user.apellidoPaterno}`);
+    } else {
+      setLoggedIn(false);
+      setUserName('');
+    }
+
+    // Escuchar cambios en el localStorage
+    const storageChangeHandler = () => {
+      const updatedUser = JSON.parse(localStorage.getItem('adminMaestro'));
+      if (updatedUser) {
+        setLoggedIn(true);
+        setUserName(`${updatedUser.nombre} ${updatedUser.apellidoPaterno}`);
+      } else {
+        setLoggedIn(false);
+        setUserName('');
+      }
+    };
+
+    window.addEventListener('storage', storageChangeHandler);
+
+    return () => {
+      window.removeEventListener('storage', storageChangeHandler);
+    };
+  }, []);
+
   const handleLogout = () => {
-    localStorage.removeItem('admin');
-    console.log("Usuario eliminado del localStorage");
+    localStorage.removeItem('adminMaestro');
     setLoggedIn(false);
     setUserName('');
-    navigate('/InicioSesion');
+    navigate('/InicioSesionBotica'); // Ajusta la ruta para cerrar sesión si es necesario
   };
 
-
-  // Recupera el nombre del usuario de localStorage
-  const usuarioNombre = localStorage.getItem('usuarioNombre');
+  const handleProfileClick = () => {
+    navigate('/DashboardSuperAdmin'); // Redirige al dashboard de botica
+  };
 
   return (
     <Box>
@@ -46,24 +77,45 @@ const Header_Admin = () => {
         <AppBar position="static" sx={{ backgroundColor: '#FFFFFF' }} elevation={4}>
           <Toolbar sx={{ justifyContent: 'space-between' }}>
             <Box>
-              <Titulo_Boton onClick={() => navigate('/BusquedaMedicina')}>
+              <Titulo_Boton onClick={() => navigate('/DashboardSuperAdmin')}>
                 DosisXtra
               </Titulo_Boton>
             </Box>
 
             <Grow in={true} timeout={1000}>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                {usuarioNombre ? `Bienvenido, ${usuarioNombre}` : 'Modo administrador'}
+                Modo Botica
               </Typography>
             </Grow>
 
-            <Button
-              variant="contained"
-              sx={{ backgroundColor: '#567C8D', color: '#ffffff' }}
-              onClick={handleLogout}
-            >
-              Cerrar Sesión
-            </Button>
+            {loggedIn ? (
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography sx={{ color: '#000000', marginRight: 2 }}>
+                  {userName}
+                </Typography>
+                <IconButton
+                  onClick={handleProfileClick} // Redirige al dashboard cuando se haga clic
+                  sx={{ color: '#000000' }}
+                >
+                  <AccountCircleIcon />
+                </IconButton>
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: '#567C8D', color: '#ffffff', marginLeft: 2 }}
+                  onClick={handleLogout}
+                >
+                  Cerrar Sesión
+                </Button>
+              </Box>
+            ) : (
+              <Button
+                variant="contained"
+                sx={{ backgroundColor: '#567C8D', color: '#ffffff' }}
+                onClick={() => navigate('/InicioSesion')}
+              >
+                Iniciar Sesión
+              </Button>
+            )}
           </Toolbar>
         </AppBar>
       </Slide>

@@ -1,8 +1,10 @@
 import express from "express";
 import { Orden, ProductoOrden, Producto, Usuario } from "../Models/Relaciones.js"; 
+import crypto from "crypto";
+import NodeCache from "node-cache";
+import Transporter from "../Services/mail.service.js";
 
 const router = express.Router();
-
 // Endpoint para obtener a todos los usuarios registrados 
 router.get("/", async (req, res) => {
     try {
@@ -32,58 +34,124 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-//Este endpoint sirve para poder guardar a un usuario en la base de datos
-//Esto se lleva cabo al registrarse a la página web
+
+// Usamos un caché en memoria para almacenar códigos de verificación temporalmente
+const myCache = new NodeCache({ stdTTL: 300 }); // Expira en 5 minutos (300 segundos)
+
 router.post("/registrar", async (req, res) => {
   try {
-      const { nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni } = req.body;
+    const { nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni } = req.body;
 
-      // Validaciones de los campos
-      if (!nombre) return res.status(400).json({ message: "El campo 'nombre' es requerido" });
-      if (!correo) return res.status(400).json({ message: "El campo 'correo' es requerido" });
-      if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) return res.status(400).json({ message: "Formato de correo inválido" });
-      if (!telefono || telefono.length !== 9) return res.status(400).json({ message: "El campo 'telefono' debe tener 9 dígitos" });
-      if (!dni || dni.length !== 8) return res.status(400).json({ message: "El campo 'dni' debe tener 8 dígitos" });
+    // Validaciones de los campos
+    if (!nombre) return res.status(404).json({ message: "El campo 'nombre' es requerido" });
+    if (!correo) return res.status(400).json({ message: "El campo 'correo' es requerido" });
+    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) return res.status(400).json({ message: "Formato de correo inválido" });
+    if (!telefono || telefono.length !== 9) return res.status(400).json({ message: "El campo 'telefono' debe tener 9 dígitos" });
+    if (!dni || dni.length !== 8) return res.status(400).json({ message: "El campo 'dni' debe tener 8 dígitos" });
 
-      const nuevoUsuario = await Usuario.create({
-          nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni
-      });
+    // Generar un código de verificación aleatorio
+    const verificationCode = crypto.randomBytes(3).toString("hex"); // Genera un código de 6 dígitos
+
+    console.log("Correo para verificación:", correo);
+    // Almacenar el código de verificación en caché (por ejemplo, por correo)
+    myCache.set(correo, verificationCode); // Asociamos el código con el correo
+    // Verificar si el correo ya tiene un código de verificación en caché
+    const existingCode = myCache.get(correo);
+    console.log("Código existente en caché para este correo:", existingCode);
+
+    // Configurar el correo de verificación
+    const mailOptions = {
+      from: "andriuchg14@gmail.com",
+      to: correo, // El correo del usuario
+      subject: "Código de verificación",
+      text: `Tu código de verificación es: ${verificationCode}`
+    };
+
+    // Enviar el correo
+    await Transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: "Error al enviar el correo de verificación"});
+      }
+      console.log("Correo enviado: " + info.response);
 
       res.status(201).json({
-          mensaje: "Usuario registrado exitosamente",
-          usuario: nuevoUsuario
+        mensaje: "Se ha enviado un código de verificación a tu correo",
       });
+    });
 
   } catch (error) {
-      console.error("Error al registrar usuario:", error);
-      res.status(500).json({
-          error: "Error al registrar usuario. Por favor, intenta nuevamente.",
-          detalles: error.message
-      });
+    console.error("Error al registrar usuario:", error);
+    res.status(500).json({
+      error: "Error al registrar usuario. Por favor, intenta nuevamente.",
+      detalles: error.message
+    });
+  }
+});
+
+router.post("/verificarCodigo", async (req, res) => {
+  const {nombre, apellidoPaterno, apellidoMaterno, password, codigo, correo, telefono, dni } = req.body;
+  try {
+
+    if (!codigo) {
+      return res.status(400).json({ message: "El campo 'código' es requerido" });
+    }
+    // Obtener el código almacenado en la caché
+    const storedCode = myCache.get(correo);
+    // Depurar el valor de la clave almacenada en la caché
+    console.log("Código almacenado en la caché:", storedCode);
+    if (!storedCode) {
+      return res.status(404).json({ message: "No se encontró un código de verificación para este correo" });
+    }
+
+    // Verificar el código
+    if (storedCode !== codigo) {
+      return res.status(400).json({ message: "Código incorrecto" });
+    }
+
+    // El código es correcto, puedes realizar cualquier acción adicional
+    // Ejemplo: Marcar al usuario como verificado en la base de datos si lo deseas.
+    const nuevoUsuario = await Usuario.create({
+      nombre, apellidoPaterno, apellidoMaterno, password, correo, telefono, dni
+    });
+
+    res.status(200).json({ message: "Correo verificado correctamente",
+    usuario: nuevoUsuario });
+
+    myCache.del(correo);
+
+  } catch (error) {
+    console.error("Error al verificar el código:", error);
+    res.status(500).json({ error: "Error al verificar el código" });
   }
 });
 
 
-
 router.post('/iniciarSesion', async (req, res) => {
   const { correo, password } = req.body;
-  
+
   if (!correo || !password) {
-    return res.status(400).json({ message: "Correo y contraseña son requeridos" });
+    return res.status(400).json({ message: "Correo y contraseña son requeridos" }); // Código 400 para mala solicitud
   }
 
   try {
+    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(correo)) {
+      return res.status(400).json({ message: "Formato de correo inválido" }); // Código 400 para errores de formato
+    }
 
     const usuario = await Usuario.findOne({ where: { correo } });
     if (!usuario) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      return res.status(404).json({ message: "Usuario no encontrado" }); // Código 404 si el usuario no existe
+    }
+
+    if (usuario.estado === false) {
+      return res.status(403).json({ message: "Su cuenta ha sido inhabilitada. Por favor, contacte al soporte." }); // Código 403 para cuenta inhabilitada
     }
 
     if (password !== usuario.password) {
-      return res.status(401).json({ message: "Contraseña incorrecta" });
+      return res.status(401).json({ message: "Contraseña incorrecta" }); // Código 401 para contraseña incorrecta
     }
 
-    res.json({
+    return res.status(200).json({
       message: "Inicio de sesión exitoso",
       user: {
         id: usuario.id,
@@ -95,29 +163,77 @@ router.post('/iniciarSesion', async (req, res) => {
     });
   } catch (error) {
     console.error("Error en el inicio de sesión:", error);
-    res.status(500).json({ message: "Error en el inicio de sesión" });
+    return res.status(500).json({ message: "Error interno del servidor" }); // Código 500 para errores del servidor
   }
 });
 
-
+const cacheContraseña = new NodeCache({ stdTTL: 300 }); // Expira en 5 minutos (300 segundos)
 // Endpoint para consultar a la base de datos si existe un correo (se utiliza para poder establecer nueva contraseña)
-router.get('/verificarCorreo/:correo', async (req, res) => {
-  const { correo } = req.params; // Obtenemos el correo de los parámetros de la ruta
+router.post('/verificarCorreo', async (req, res) => {
+  const { correo } = req.body; // Obtenemos el correo del cuerpo de la solicitud
+  console.log("Correo recibido:", correo); // Log para verificar que el correo se está recibiendo correctamente
 
   try {
     const usuario = await Usuario.findOne({ where: { correo } }); // Verifica si el usuario existe
+    console.log("Usuario encontrado:", usuario); // Log para ver si el usuario existe
 
-    if (usuario) {
-      return res.status(200).json({ message: 'El correo existe' }); // Respuesta positiva si el usuario se encuentra
-    } else {
-      return res.status(404).json({ message: 'El correo no existe' }); // Respuesta negativa si no se encuentra
+    if (!usuario) {
+      return res.status(404).json({ message: 'El correo no existe' });
     }
+
+    const codigoVerificación = crypto.randomBytes(3).toString("hex");
+    cacheContraseña.set(correo, codigoVerificación); // Guardar el código en caché
+
+    // Configuramos el correo a enviar al usuario
+    const mail = {
+      from: "andriuchg14@gmail.com",
+      to: correo, // El correo del usuario
+      subject: "Recuperación de cuenta",
+      text: `Tu código para recuperar tu cuenta es: ${codigoVerificación}`
+    };
+
+    // Enviamos el correo
+    await Transporter.sendMail(mail, (error, info) => {
+      if (error) {
+        console.error('Error al enviar el correo:', error);
+        return res.status(500).json({ message: 'Error al enviar el correo' });
+      } else {
+        console.log("Correo enviado: " + info.response);
+        return res.status(200).json({ message: 'El correo existe. Código enviado.' });
+      }
+    });
   } catch (error) {
     console.error('Error al verificar el correo:', error);
     return res.status(500).json({ message: 'Ocurrió un error al verificar el correo.' });
   }
 });
 
+router.post('/codigoContrasenia', async (req, res) => {
+  const {email,codigo } = req.body;
+
+  try {
+    // Obtén el código almacenado en caché
+    console.log('Email:',email);
+    console.log('Codigo:',codigo);
+    const codigoGenerado = cacheContraseña.get(email);
+    console.log('Código generado en caché:', codigoGenerado);
+    if (!codigoGenerado) {
+      return res.status(400).json({ message: 'Código expirado. Solicita uno nuevo.' });
+    }
+
+    if (codigoGenerado !== codigo) {
+      return res.status(400).json({ message: 'Código inválido.' });
+    }
+
+    // Código válido, puedes borrar el código para evitar reutilización
+    cacheContraseña.del(email);
+
+    res.status(200).json({ message: 'Código verificado correctamente.' });
+  } catch (error) {
+    console.error('Error al verificar el código:', error);
+    res.status(500).json({ message: 'Error al verificar el código.' });
+  }
+});
 
 //Endpoint que nos va a permitir reestablecer una contraseña para un correo existente
 router.put('/restablecerContrasena', async (req, res) => {
@@ -165,61 +281,6 @@ router.post('/:id/direcciones', async (req, res) => {
       res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-
-
-
-/*
-router.get('/:usuarioId/ordenes', async (req, res) => {
-  try {
-    const { usuarioId } = req.params;
-
-    // Verificamos si el usuario existe
-    const usuario = await Usuario.findByPk(usuarioId);
-    if (!usuario) {
-      return res.status(404).json({ message: 'Usuario no encontrado.' });
-    }
-
-    // Buscamos todas las órdenes del usuario
-    const ordenes = await Orden.findAll({
-      where: {
-        usuarioID: usuarioId // Aseguramos que las órdenes pertenezcan al usuario
-      },
-      include: {
-        model: ProductoOrden,
-        include: {
-          model: Producto,
-          attributes: ['nombre'] // Incluimos solo el nombre del producto
-        }
-      }
-    });
-
-    // Verificamos si el usuario tiene órdenes
-    if (ordenes.length === 0) {
-      return res.status(404).json({ message: 'Este usuario no tiene órdenes.' });
-    }
-
-    // Mapeamos las órdenes y productos
-    const resultado = ordenes.map((orden) => ({
-      ordenId: orden.id,
-      productos: orden.ProductoOrdens.map((productoOrden) => ({
-        nombreProducto: productoOrden.Producto.nombre,
-        cantidad: productoOrden.cantidad,
-        precio: productoOrden.precio,
-      }))
-    }));
-
-    // Enviamos la respuesta con todas las órdenes y productos
-    res.json({
-      usuarioId,
-      ordenes: resultado
-    });
-
-  } catch (error) {
-    console.error('Error al obtener las órdenes del usuario:', error);
-    res.status(500).json({ message: 'Error interno del servidor.' });
-  }
-});
-*/
 
 
 export default router;

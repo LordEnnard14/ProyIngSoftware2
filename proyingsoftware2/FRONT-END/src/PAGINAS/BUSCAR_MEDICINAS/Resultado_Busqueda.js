@@ -4,7 +4,7 @@ import { Box, Grid, Button } from '@mui/material';
 import Header1 from '../../COMPONENTES/Header_Principal';
 import NavegacionMedicinas from '../../COMPONENTES/NavegacionMedicinas';
 import Footer from '../../COMPONENTES/Footer_Principal';
-import ContenidoPaginaBusqueda from './ContenidoBusquedaMedicina.js'; 
+import ContenidoPaginaBusqueda from './ContenidoBusquedaMedicina.js';
 
 const ResultadoBusqueda = () => {
   const location = useLocation();
@@ -19,16 +19,13 @@ const ResultadoBusqueda = () => {
     const fetchProductos = async () => {
       try {
         const respuesta = await fetch(`http://localhost:4000/api/productoDetalle/searchProductos?nombreProducto=${query}`);
-                
         const data = await respuesta.json();
 
         if (!respuesta.ok) {
-          
           setSearchError(data.message || 'Error al buscar productos.'); 
           setFilteredStocks([]); 
           return; 
         }
-         
 
         const baseUrl = `http://localhost:4000/api/productoDetalle/`; 
 
@@ -41,6 +38,8 @@ const ResultadoBusqueda = () => {
           cantidad: dato.cantidad || 0,
           image: `${baseUrl}${dato.imageUrl || ''}`,
           precio: dato.precio || 0,
+          estado: dato.estado || false, 
+          boticaEstado: dato.Botica?.estado || false 
         }));
 
         setFilteredStocks(producto_busqueda);
@@ -59,7 +58,9 @@ const ResultadoBusqueda = () => {
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredStocks.slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = filteredStocks
+    .filter((item) => item.estado && item.boticaEstado) // Filtrar productos con estado y boticaEstado en true
+    .slice(indexOfFirstProduct, indexOfLastProduct);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {

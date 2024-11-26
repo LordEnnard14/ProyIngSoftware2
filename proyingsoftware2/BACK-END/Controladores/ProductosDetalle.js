@@ -72,7 +72,7 @@ router.post('/newDetalle', upload.single('imagen'), async (req, res) => {
           },
           {
             model: Botica, 
-            attributes: ['nombre', 'direccion'], 
+            attributes: ['nombre', 'direccion','estado'], 
           }
         ],
         order: [['id', 'ASC']] 
@@ -111,7 +111,7 @@ router.get('/searchProductos', async (req, res) => {
                 },
                 {
                     model: Botica,
-                    attributes: ['nombre', 'direccion'],
+                    attributes: ['nombre', 'direccion','estado'],
                 }
             ],
             order: [['id', 'ASC']]
