@@ -55,16 +55,20 @@ const ProductosDestacados = () => {
           p: 2,
           width: '97%',
           margin: 'auto',
-          borderRadius: 2
+          borderRadius: 2        
         }}
       >
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container spacing={2} sx={{display: 'flex',flexWrap: 'wrap', justifyContent: 'center',gap: '8px'}}>
           {productos.map((producto) => (
             <Grid item key={producto.id}>
-              <Card sx={{ width: 230, height: 360 }}>
+              <Card sx={{ width: 200, height: 350, backgroundColor:'white', justifyContent: 'flex-start', boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.1)', padding: '20px', borderRadius: '10px', marginTop: '10px' }}>
                 <CardMedia
                   component="img"
                   height="150px"
+                  display='flex'
+                  justifyContent='center'
+                  alignItems='center'
+                  marginBottom='10px'
                   image={`http://localhost:4000/api/productoDetalle/${producto.imageUrl}`}
                   alt={producto.Producto?.nombre}
                   onError={(e) => {
@@ -73,13 +77,13 @@ const ProductosDestacados = () => {
                   }}
                 />
                 <CardContent>
-                  <Typography style={{fontWeight: 'bold',color: '#888',marginBottom: '5px', marginTop: '0px'}} >
-                    {producto.Producto?.Marca?.nombre || 'Sin marca'}
-                  </Typography>
-                  <Typography style={{fontWeight: 'bold', marginBottom: '5px', textAlign: 'left',fontSize: '16px', marginTop: '0px'}}>
+                    <Typography style={{fontWeight: 'bold',color: '#888',marginBottom: '5px', marginTop: '0px', textAlign:'left'}} >
+                      {producto.Producto?.Marca?.nombre || 'Sin marca'}
+                    </Typography>
+                  <Typography style={{fontWeight: 'bold', marginBottom: '5px', textAlign: 'left',fontSize: '16px', marginTop: '0px', textAlign:'left', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}}>
                     {producto.Producto?.nombre || 'Producto sin nombre'}
                   </Typography>
-                  <Typography style={{color: '#888',marginBottom: '10px', marginTop: '0px'}}>
+                  <Typography style={{color: '#888',marginBottom: '10px', marginTop: '0px', textAlign:'left'}}>
                     {producto.Botica?.nombre || 'Sin botica'}
                   </Typography>
                   <Typography style={{color: '#4CAF50',fontWeight: 'bold',fontSize: '18px', marginBottom: '15px',}}>
