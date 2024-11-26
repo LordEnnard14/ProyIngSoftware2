@@ -1,9 +1,69 @@
 import {app} from '../index.js';
 import request from 'supertest';
 import {ProductoDetalle} from '../Models/Relaciones';
-/*
+
 const testPort = 4001;
 
+//Aleksey Chávez
+describe('Pruebas para el endpoint /api/productos/stockProductos/:id', () => {
+    let server;
+  
+    beforeAll(() => {
+      server = app.listen(testPort, () => {
+        console.log(`Servidor de prueba escuchando en el puerto ${testPort}`);
+      });
+    });
+  
+    afterAll(async () => {
+      await server.close();
+    });
+  
+    it('Debe devolver el código 200 y un stockProducto con detalles asociados cuando existe', async () => {
+      const mockStockProducto = {
+        id: 1,
+        cantidad: 50,
+        precio: 12,
+        estado: true,
+        descripcion: 'Antibiótico de amplio espectro utilizado para tratar infecciones.',
+        caracteristicas: ['Antibiótico', '500 mg', 'Cápsulas'],
+        fechaRegistro: '2024-11-22T17:24:52.726Z',
+        imageUrl: '/images/Amoxicilina500mg.jpg',
+        Producto: {
+          id: 1,
+          nombre: 'Amoxicilina 500 mg',
+          presentacion: 'Cápsulas',
+          categoria: ['Medicamentos', 'Adulto Mayor'],
+          nRegistroSanitario: 'ABC123456',
+          fechaRegistro: '2024-11-22T17:24:46.206Z',
+          Marca: {
+            id: 1,
+            nombre: 'Marca A',
+          },
+        },
+        Botica: {
+          id: 1,
+          nombre: 'Botica Central',
+          direccion: 'Av. Principal 123',
+          estado: true,
+        },
+      };
+  
+      jest.spyOn(ProductoDetalle, 'findByPk').mockResolvedValue(mockStockProducto);
+  
+      const response = await request(app).get('/api/productos/stockProductos/1');
+  
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual(mockStockProducto);
+  
+      ProductoDetalle.findByPk.mockRestore();
+    });
+
+});
+
+
+
+
+/*
 describe('Pruebas para el endpoint /ProductosAll', () => {
     let server;
 
