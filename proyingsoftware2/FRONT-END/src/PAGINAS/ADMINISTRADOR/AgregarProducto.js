@@ -5,6 +5,7 @@ import { Box, Typography, Grid, Paper, TextField, Button, Input, InputLabel, Sel
 import { alignProperty } from '@mui/material/styles/cssUtils';
 import Popup from '../ADMINISTRADOR/popup.js';
 import Buscar from '../ADMINISTRADOR/buscarAgrega.js';
+import { useNavigate } from 'react-router-dom';
 
 const AgregarProducto = () => {
     // Manejo de estado para los campos del formulario
@@ -19,11 +20,17 @@ const AgregarProducto = () => {
         imagenURL: '',
         id:''
     });
+    const logeado = JSON.parse(localStorage.getItem('admin'));
+    const boticaID = logeado?.id;
+
+
+
     const [errorMessage, setErrorMessage] = useState('');
     const [pop, setpop ] = useState(false);
     const handleOpen = () => setpop(true);
     const handleClose = () => setpop(false);
     const [update, setUpdate] = useState(false);
+    const navigate = useNavigate();
     const handleUpdate = () => {
       setUpdate(!update)
     }
@@ -98,6 +105,9 @@ const AgregarProducto = () => {
                   if(response.ok){
                     const data = await response.json();
                     console.log(data);
+                    alert("Se agrego el producto exitosamente")
+                  } else {
+                    alert('Hubo un problema con la solicitud, intente nuevamente más tarde')
                   }
                   
                 } catch (error) {

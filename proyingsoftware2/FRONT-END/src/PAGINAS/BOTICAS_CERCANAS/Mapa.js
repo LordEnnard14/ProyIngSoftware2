@@ -41,7 +41,7 @@ const BoticasCercanas = () => {
             overflow: 'hidden' // Esto es para asegurarse de que el mapa no se desborde
           }}
         >
-          <MapContainer center={center} zoom={30} >
+          <MapContainer center={[-12.052208, -76.939407]} zoom={30} >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -52,6 +52,8 @@ const BoticasCercanas = () => {
               </Popup>
             </Marker>
           </MapContainer>
+
+
         </Box>
 
         <Button

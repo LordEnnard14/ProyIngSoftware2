@@ -92,17 +92,25 @@ const  CrearProducto = () =>{
     };
 
     const handleMarcaSubmit = async () =>{
+      try{  
         const body = {
-            nombre: nuevaMarca
-        };
-        const response = await fetch('http://localhost:4000/api/marcas/newMarca',{
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json'
-            },
-            body: JSON.stringify(body),
-        })
-       console.log(body)
+              nombre: nuevaMarca
+          };
+          const response = await fetch('http://localhost:4000/api/marcas/newMarca',{
+              method: 'POST',
+              headers: {
+                  'Content-type': 'application/json'
+              },
+              body: JSON.stringify(body),
+          })
+          if(response.ok){
+            alert("Marca creada con exito")
+          }
+        console.log(body)
+      } catch (error){
+        setErrorMessage('Hubo un problema con la solicitud, intente nuevamente más tarde');
+        console.error('Error en la solicitud:', error);
+      }
     }
 
     const handleSubmit = async () => {
@@ -128,6 +136,12 @@ const  CrearProducto = () =>{
             body: JSON.stringify(body),
 
           });
+          if(response.ok){
+            alert("Producto creado con exito");
+          } else{
+            alert("Ocurrio un error al crear el producto")
+          }
+        
           
         } catch (error) {
           setErrorMessage('Hubo un problema con la solicitud, intente nuevamente más tarde');
@@ -232,7 +246,7 @@ const  CrearProducto = () =>{
                         renderValue={(selected) => selected.join(', ')}
 
                       >
-                        {['Adulto mayor', 'Infantil', 'Medicamentos', 'Vitaminas'].map((category) =>
+                        {['Adulto mayor', 'Infantil', 'Medicamentos', 'Vitaminas y Suplementos'].map((category) =>
                           <MenuItem key={category} value= {category}>
                             <Checkbox checked={selectedCategories.indexOf(category) > -1} />
                               <ListItemText primary={category} />

@@ -10,6 +10,7 @@ const Buscar = ({nombre, marca, handleProductoChange,update}) => {
         console.log(producto.id)
         handleProductoChange("nombre",producto.nombre)
         handleProductoChange("marca",producto.Marca.nombre)
+        alert('Producto Seleccionado');
         
     }
 
@@ -24,7 +25,7 @@ const Buscar = ({nombre, marca, handleProductoChange,update}) => {
                     //style={{ marginLeft: 16 }}
                     sx= {{backgroundColor:'black'}}
                     onClick={() =>{
-                        child(params.row)
+                        child(params.row)                       
                     }}
                 >
                     Seleccionar

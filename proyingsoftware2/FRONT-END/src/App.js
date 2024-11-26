@@ -9,6 +9,9 @@ import RestablecerContraseña from './PAGINAS/REGISTROS/RestablecerContraseña';
 import MisOrdenes from './PAGINAS/ORDENES/MisOrdenes';
 import BusquedaMedicina from './PAGINAS/BUSCAR_MEDICINAS/BusquedaMedicina';
 import BoticasCercanas from './PAGINAS/BOTICAS_CERCANAS/BoticasCercanas';
+
+import Mapa from './PAGINAS/BOTICAS_CERCANAS/Mapa.js';
+
 import DetallesProductos from './PAGINAS/BUSCAR_MEDICINAS/Detalles';
 import ResultadoBusqueda from './PAGINAS/BUSCAR_MEDICINAS/Resultado_Busqueda';
 import CarritoCompras from './PAGINAS/CARRITO_COMPRAS/CarritoCompras';
@@ -71,6 +74,7 @@ function App() {
             <Route path='/RecuperarContraseñaBotica' element={<RecuperarContraseñaBotica/>}/>
             <Route path='/RestablecerContraseñaBotica' element={<RestablecerContraseñaBotica/>}/>
             <Route path="/perfil/:id" element={<PerfilUsuario />} />
+            <Route path="/mapa" element={<Mapa />} />
             
           </Routes>
         </Box>
