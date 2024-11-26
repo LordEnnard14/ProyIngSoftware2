@@ -16,6 +16,24 @@ const BoticasCercanas = () => {
     lng: -77.0428
   };
 
+  const boticas = [
+      {
+        "Botica": "Botica Central",
+        "Latitude": -12.052208,
+        "Longitude": -76.939407
+      },
+      {
+        "Botica": "Botica Sur",
+        "Latitude": -12.062652,
+        "Longitude": -76.954135
+      },
+      {
+        "Botica": "Botica Norte",
+        "Latitude": -12.062612,
+        "Longitude": -76.952695
+      },
+  ]
+
   return (
     <div>
       <HeaderPrincipal />
@@ -46,9 +64,19 @@ const BoticasCercanas = () => {
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-            <Marker position={[-12.052208, -76.939407]}>
+            <Marker position={[boticas[0].Latitude, boticas[0].Longitude]}>
               <Popup>
                 BOTICA CENTRAL
+              </Popup>
+            </Marker>
+            <Marker position={[boticas[1].Latitude, boticas[1].Longitude]}>
+              <Popup>
+                BOTICA SUR
+              </Popup>
+            </Marker>
+            <Marker position={[boticas[2].Latitude, boticas[2].Longitude]}>
+              <Popup>
+                BOTICA NORTE
               </Popup>
             </Marker>
           </MapContainer>

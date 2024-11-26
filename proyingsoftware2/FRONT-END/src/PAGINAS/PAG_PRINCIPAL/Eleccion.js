@@ -116,7 +116,7 @@ const Eleccion = () => {
             </Grid>
 
             <Grid item xs={12} sm={4} md={3}>
-              <Button className='boticasbton' disabled sx={{ width: '100%' }}>
+              <Button className='boticasbton' onClick={()=> navigate('/BoticasCercanas')} sx={{ width: '100%' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <StorefrontIcon sx={{ fontSize: 70, color: '#ffffff' }} />
                   <Typography variant="h6" sx={{ mt: 2, color: 'white', fontWeight: 'bold' }}>
@@ -124,9 +124,6 @@ const Eleccion = () => {
                   </Typography>
                 </Box>
               </Button>
-              <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold', color: '#555' }}>
-                Próximamente
-              </Typography>
             </Grid>
 
             <Grid item xs={12} sm={4} md={3}>
