@@ -93,7 +93,7 @@ const Footer = () => {
         <Titulo_Columnas variant="h6" gutterBottom>
           Productos
         </Titulo_Columnas>
-        <Subrayado onClick={() => handleNavigate('/', 'vendidos')}>Más Vendidos</Subrayado>
+        <Subrayado onClick={() => handleNavigate('/MasVendido', 'vendidos')}>Más Vendidos</Subrayado>
         <Subrayado onClick={() => handleNavigate('/', 'nuevos')}>Nuevos</Subrayado>
         <Subrayado onClick={() => handleNavigate('/', 'ofertas')}>Ofertas</Subrayado>
       </Columnas>

@@ -243,6 +243,74 @@ router.get('/categoria/:categoria', async (req, res) => {
 
 
 
+router.get('/masVendidos', async (req, res) => {
+  try {
+      // Consultar los productos más vendidos agrupando por productoDetalleID
+      const productosMasVendidos = await ProductoOrden.findAll({
+          attributes: [
+              'productoDetalleID',
+              [
+                  ProductoOrden.sequelize.fn(
+                      'SUM',
+                      ProductoOrden.sequelize.col('ProductoOrden.cantidad') // Cantidad total vendida
+                  ),
+                  'totalVendido'
+              ]
+          ],
+          include: [
+              {
+                  model: ProductoDetalle,
+                  as: 'ProductoDetalle',
+                  attributes: ['precio', 'imageUrl', 'productoID', 'boticaID'],
+                  include: [
+                      {
+                          model: Producto,
+                          as: 'Producto',
+                          attributes: ['nombre']
+                      },
+                      {
+                          model: Botica,
+                          as: 'Botica',
+                          attributes: ['nombre']
+                      }
+                  ]
+              }
+          ],
+          group: [
+              'ProductoOrden.productoDetalleID',
+              'ProductoDetalle.id',
+              'ProductoDetalle->Producto.id',
+              'ProductoDetalle->Botica.id'
+          ],
+          order: [
+              [
+                  ProductoOrden.sequelize.fn(
+                      'SUM',
+                      ProductoOrden.sequelize.col('ProductoOrden.cantidad')
+                  ),
+                  'DESC'
+              ]
+          ],
+          limit: 10
+      });
+
+      // Mapeo de resultados para devolver una respuesta más legible
+      const productos = productosMasVendidos.map(item => ({
+          productoDetalleID: item.productoDetalleID,
+          nombre: item.ProductoDetalle.Producto.nombre,
+          imageUrl: item.ProductoDetalle.imageUrl,
+          precio: item.ProductoDetalle.precio,
+          totalVendido: parseInt(item.dataValues.totalVendido, 10),
+          botica: item.ProductoDetalle.Botica.nombre
+      }));
+
+      res.status(200).json(productos);
+  } catch (error) {
+      console.error('Error al obtener los productos más vendidos:', error);
+      res.status(500).json({ mensaje: 'Error interno del servidor', detalles: error.message });
+  }
+});
+
 
 
 

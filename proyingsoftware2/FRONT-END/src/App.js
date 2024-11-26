@@ -45,6 +45,8 @@ import ListaAdmin from './PAGINAS/ADMIN PRO/Tablas/Listas_Admin.js';
 import ListaUsuariosAdmin from './PAGINAS/ADMIN PRO/Tablas/Listas_Usuario.js';
 
 
+import MasVendido from './PAGINAS/PAG_PRINCIPAL/MasVendido.js';
+
 function App() {
   return (
     <Router>
@@ -93,6 +95,8 @@ function App() {
             <Route path="/productos/categoria/:categoria" element={<ProductosCategoria />} />
             <Route path="/ListaAdmin" element={<ListaAdmin />} />
             <Route path="/ListaUsuariosAdmin" element={<ListaUsuariosAdmin />} />
+            <Route path="/MasVendido" element={<MasVendido />} />
+
           </Routes>
         </Box>
       </Box>
