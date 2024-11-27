@@ -283,4 +283,88 @@ router.post('/:id/direcciones', async (req, res) => {
 });
 
 
+// Endpoint para editar una dirección específica
+router.put('/:id/direcciones/:index', async (req, res) => {
+  const { id, index } = req.params;
+  const { nuevaDireccion } = req.body;
+
+  console.log(`Editar Dirección - Usuario ID: ${id}, Índice: ${index}, Nueva Dirección: ${nuevaDireccion}`);
+
+  try {
+      if (!nuevaDireccion || nuevaDireccion.trim().length === 0) {
+          console.log("La dirección está vacía");
+          return res.status(400).json({ error: "La dirección no puede estar vacía" });
+      }
+
+      const usuario = await Usuario.findByPk(id);
+
+      if (!usuario) {
+          console.log("Usuario no encontrado");
+          return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      const indexInt = parseInt(index, 10);
+      if (isNaN(indexInt) || indexInt < 0 || indexInt >= usuario.direcciones.length) {
+          console.log("Índice de dirección no válido");
+          return res.status(400).json({ error: "Índice de dirección no válido" });
+      }
+
+      console.log("Antes de editar:", usuario.direcciones);
+
+      // Actualizar la dirección
+      usuario.direcciones[indexInt] = nuevaDireccion;
+      await usuario.save();
+
+      console.log("Después de editar:", usuario.direcciones);
+
+      res.json({ direcciones: usuario.direcciones });
+  } catch (error) {
+      console.error("Error al actualizar la dirección:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+
+
+
+// Endpoint para eliminar una dirección específica
+router.delete('/:id/direcciones/:index', async (req, res) => {
+  const { id, index } = req.params;
+
+  console.log(`Eliminar Dirección - Usuario ID: ${id}, Índice: ${index}`);
+
+  try {
+      const usuario = await Usuario.findByPk(id);
+
+      if (!usuario) {
+          console.log("Usuario no encontrado");
+          return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+
+      const indexInt = parseInt(index, 10);
+      if (isNaN(indexInt) || indexInt < 0 || indexInt >= usuario.direcciones.length) {
+          console.log("Índice de dirección no válido");
+          return res.status(400).json({ error: "Índice de dirección no válido" });
+      }
+
+      console.log("Antes de eliminar:", usuario.direcciones);
+
+      // Eliminar la dirección
+      usuario.direcciones.splice(indexInt, 1);
+      await usuario.save();
+
+      console.log("Después de eliminar:", usuario.direcciones);
+
+      res.json({ direcciones: usuario.direcciones });
+  } catch (error) {
+      console.error("Error al eliminar la dirección:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+
+
+
+
+
 export default router;

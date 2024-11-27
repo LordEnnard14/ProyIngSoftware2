@@ -46,22 +46,22 @@ p {
   margin-left: 5px;
   padding: 5px 10px;
   border: none;
-  background-color: #007bff;
+  background-color: #e40101;
   color: white;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .direccion-item button:hover {
-  background-color: #0056b3;
+  background-color: #b3001e;
 }
 
 .direccion-item button:last-child {
-  background-color: #dc3545;
+  background-color: #00bbff;
 }
 
 .direccion-item button:last-child:hover {
-  background-color: #a71d2a;
+  background-color: #0049a8;
 }
 
 
