@@ -186,7 +186,7 @@ router.post('/verificarCorreo', async (req, res) => {
 
     // Configuramos el correo a enviar al usuario
     const mail = {
-      from: "andriuchg14@gmail.com",
+      from: "lll",
       to: correo, // El correo del usuario
       subject: "Recuperación de cuenta",
       text: `Tu código para recuperar tu cuenta es: ${codigoVerificación}`
